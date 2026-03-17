@@ -3,9 +3,10 @@ scipy>=1.13.1
 pandas>=2.2.0
 scikit-learn>=1.5.0
 xgboost>=2.1.0
-gymnasium>=0.26.2
+gym==0.26.2
 fastapi>=0.115.0
 uvicorn>=0.31.0
 py-cpuinfo>=9.0.0
 pynvml>=11.5.0
 python-multipart>=0.0.17
+torch>=2.3.0

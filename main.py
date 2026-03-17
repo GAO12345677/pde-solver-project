@@ -14,11 +14,13 @@ Debugging in Cursor:
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+import numpy as np
 
 from config.constants import (
     ALGORITHM_CANDIDATES,
@@ -29,6 +31,7 @@ from config.constants import (
     Stationarity,
 )
 from services.hardware import hardware_info_dict
+from algorithm.selector import AlgorithmSelector, AlgorithmSelectionError
 
 
 app = FastAPI(
@@ -67,6 +70,32 @@ class DomainRequirementsIn(BaseModel):
     resource_budget: Optional[float] = Field(
         None, description="资源消耗预算(0-1，越小越严格)。为空则使用默认阈值。"
     )
+
+
+class FeatureVectorsIn(BaseModel):
+    """Normalized feature vectors for selection layer.
+
+    - physics: length 5
+    - hardware: length 5
+    - domain: length 3
+    """
+
+    physics: List[float] = Field(..., description="物理特征向量(归一化到[0,1])，长度=5")
+    hardware: List[float] = Field(..., description="硬件特征向量(归一化到[0,1])，长度=5")
+    domain: List[float] = Field(..., description="领域特征向量(归一化到[0,1])，长度=3")
+
+
+class TrainStaticIn(BaseModel):
+    strategy: Literal["static_rf", "static_xgb"] = Field("static_rf", description="静态选择策略：RF 或 XGB")
+    seed: int = Field(42, description="随机种子")
+
+
+class TrainDynamicIn(BaseModel):
+    episodes: int = Field(200, ge=1, le=5000, description="训练回合数(示例RL)")
+    seed: int = Field(42, description="随机种子")
+
+
+selector = AlgorithmSelector(model_dir="model")
 
 
 def _is_applicable(alg: Any, features: PhysicsFeaturesIn) -> bool:
@@ -117,6 +146,70 @@ def list_algorithms() -> List[Dict[str, Any]]:
 def get_hardware() -> Dict[str, Any]:
     """Detect and return current hardware info (CPU + optional NVIDIA GPU)."""
     return hardware_info_dict()
+
+
+@app.post("/selector/train_static")
+def train_static(payload: TrainStaticIn) -> Dict[str, Any]:
+    """Train static supervised model (RF/XGB) on typical-case proxy dataset."""
+    try:
+        # DEBUG_BREAKPOINT_TRAIN_STATIC: set breakpoint here.
+        info = selector.train_static(strategy=payload.strategy, seed=payload.seed)
+        path = selector.save_static()
+        return {"trained": info, "saved_to": path}
+    except AlgorithmSelectionError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/selector/load_static")
+def load_static(path: Optional[str] = None) -> Dict[str, Any]:
+    """Load static model from model directory or a given path."""
+    try:
+        # DEBUG_BREAKPOINT_LOAD_STATIC: set breakpoint here.
+        return selector.load_static(path=path)
+    except AlgorithmSelectionError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/selector/train_dynamic")
+def train_dynamic(payload: TrainDynamicIn) -> Dict[str, Any]:
+    """Train RL dynamic agent using proxy reward shaping."""
+    try:
+        # DEBUG_BREAKPOINT_TRAIN_DYNAMIC: set breakpoint here.
+        info = selector.train_dynamic(episodes=payload.episodes, seed=payload.seed)
+        path = selector.save_dynamic()
+        return {"trained": info, "saved_to": path}
+    except AlgorithmSelectionError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/selector/load_dynamic")
+def load_dynamic(path: Optional[str] = None) -> Dict[str, Any]:
+    """Load RL agent from disk."""
+    try:
+        # DEBUG_BREAKPOINT_LOAD_DYNAMIC: set breakpoint here.
+        return selector.load_dynamic(path=path)
+    except AlgorithmSelectionError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/selector/select")
+def select_algorithm(
+    features: FeatureVectorsIn,
+    strategy: Literal["static_rf", "static_xgb", "dynamic_rl"] = "static_rf",
+) -> Dict[str, Any]:
+    """Core mapping function M(F,H,D)->A with scoring & rationale.
+
+    This endpoint expects **normalized** feature vectors (each element in [0,1]).
+    You can obtain them from your feature extraction layer, then call this endpoint.
+    """
+    try:
+        # DEBUG_BREAKPOINT_SELECT: set breakpoint here.
+        physics = np.array(features.physics, dtype=float)
+        hardware = np.array(features.hardware, dtype=float)
+        domain = np.array(features.domain, dtype=float)
+        return selector.select(physics=physics, hardware=hardware, domain=domain, strategy=strategy)
+    except AlgorithmSelectionError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @app.post("/select/rule_based")
