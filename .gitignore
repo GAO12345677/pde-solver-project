@@ -26,3 +26,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+# 忽略 Python 编译缓存
+__pycache__/
+*.pyc
