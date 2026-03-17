@@ -1,0 +1,20 @@
+{
+  "equation_type": "heat1d",
+  "strategy": "static_rf",
+  "k": 1.0,
+  "L": 1.0,
+  "nx": 101,
+  "t0": 0.0,
+  "t1": 0.05,
+  "bc_type": "dirichlet",
+  "left_bc": 0.0,
+  "right_bc": 0.0,
+  "initial": "sine_nonnegative",
+  "enforce_nonnegativity": true,
+  "domain": {
+    "accuracy": "medium",
+    "realtime": "high",
+    "resource_budget": 0.5
+  }
+}
+

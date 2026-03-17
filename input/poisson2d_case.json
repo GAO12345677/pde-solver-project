@@ -1,0 +1,16 @@
+{
+  "equation_type": "poisson2d_nonlinear",
+  "strategy": "dynamic_rl",
+  "nx": 41,
+  "ny": 41,
+  "Lx": 1.0,
+  "Ly": 1.0,
+  "tol": 1e-6,
+  "max_iter": 200,
+  "domain": {
+    "accuracy": "medium",
+    "realtime": "medium",
+    "resource_budget": 0.7
+  }
+}
+
