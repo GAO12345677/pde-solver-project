@@ -594,3 +594,139 @@ def get_solver(algorithm_key: str) -> BaseHeatSolver1D:
         return SpectralMethodSolver()
     raise SolverError(f"未知求解算法: {algorithm_key!r}")
 
+
+# =========================
+# Extension: 2D nonlinear Poisson (demo for geological prospecting case)
+# =========================
+
+
+def solve_poisson2d_nonlinear(
+    *,
+    nx: int = 41,
+    ny: int = 41,
+    Lx: float = 1.0,
+    Ly: float = 1.0,
+    tol: float = 1e-6,
+    max_iter: int = 200,
+) -> Tuple[np.ndarray, Dict[str, Any]]:
+    """Solve a 2D nonlinear Poisson-like equation on a rectangle with Dirichlet BC.
+
+    Equation (manufactured-solution friendly):
+        -Δu + u^3 = f(x,y)
+
+    We use a manufactured solution:
+        u*(x,y) = sin(pi x/Lx) * sin(pi y/Ly)  (>=0 on (0,Lx)x(0,Ly))
+    so:
+        f = -Δu* + (u*)^3
+
+    Discretization:
+    - 5-point finite difference Laplacian
+    - fixed-point iteration: solve linear system for u^{k+1}:
+        -Δ u^{k+1} = f - (u^k)^3
+
+    Returns:
+        u: (ny, nx) array
+        info: dict (elapsed, iterations, residual, estimated_error)
+
+    Notes:
+    - This is a *runnable baseline* to support the end-to-end framework test.
+    - For real workloads, replace with robust nonlinear solvers (Newton/Krylov) and preconditioning.
+    """
+    import time as _time
+
+    if nx < 5 or ny < 5:
+        raise SolverError("nx/ny 太小（建议 >= 5）。")
+    if Lx <= 0 or Ly <= 0:
+        raise SolverError("Lx/Ly 必须为正。")
+    if tol <= 0 or max_iter < 1:
+        raise SolverError("tol 必须为正且 max_iter>=1。")
+
+    from scipy.sparse import csr_matrix
+    from scipy.sparse.linalg import spsolve
+
+    x = np.linspace(0.0, float(Lx), int(nx), dtype=float)
+    y = np.linspace(0.0, float(Ly), int(ny), dtype=float)
+    dx = float(x[1] - x[0])
+    dy = float(y[1] - y[0])
+
+    X, Y = np.meshgrid(x, y, indexing="xy")
+    u_star = np.sin(np.pi * X / float(Lx)) * np.sin(np.pi * Y / float(Ly))
+    # Laplacian of u_star analytically:
+    lap_u = -((np.pi / Lx) ** 2 + (np.pi / Ly) ** 2) * u_star
+    f = -lap_u + u_star**3
+
+    # Unknowns: interior points only (Dirichlet u=0 on boundary for u_star)
+    ix = nx - 2
+    iy = ny - 2
+    n = ix * iy
+
+    def idx(i: int, j: int) -> int:
+        return j * ix + i
+
+    # Build sparse matrix for -Δ on interior with 5-point stencil
+    data = []
+    rows = []
+    cols = []
+    cx = 1.0 / (dx * dx)
+    cy = 1.0 / (dy * dy)
+    center = 2.0 * (cx + cy)
+
+    for j in range(iy):
+        for i in range(ix):
+            r = idx(i, j)
+            rows.append(r)
+            cols.append(r)
+            data.append(center)
+            if i > 0:
+                rows.append(r)
+                cols.append(idx(i - 1, j))
+                data.append(-cx)
+            if i < ix - 1:
+                rows.append(r)
+                cols.append(idx(i + 1, j))
+                data.append(-cx)
+            if j > 0:
+                rows.append(r)
+                cols.append(idx(i, j - 1))
+                data.append(-cy)
+            if j < iy - 1:
+                rows.append(r)
+                cols.append(idx(i, j + 1))
+                data.append(-cy)
+
+    A = csr_matrix((data, (rows, cols)), shape=(n, n), dtype=float)
+
+    # Initial guess: zeros
+    u = np.zeros((ny, nx), dtype=float)
+    rhs_base = f[1:-1, 1:-1].reshape(-1)
+
+    start = _time.perf_counter()
+    residual = float("inf")
+    iters = 0
+    for iters in range(1, int(max_iter) + 1):
+        rhs = rhs_base - (u[1:-1, 1:-1].reshape(-1) ** 3)
+        ui = spsolve(A, rhs)
+        u_new = u.copy()
+        u_new[1:-1, 1:-1] = ui.reshape((iy, ix))
+
+        # Enforce physics non-negativity (proxy physical constraint for this manufactured case)
+        u_new[u_new < 0] = 0.0
+
+        residual = float(np.max(np.abs(u_new - u)))
+        u = u_new
+        if residual < tol:
+            break
+
+    elapsed = float(_time.perf_counter() - start)
+    est_err = float(np.sqrt(np.mean((u - u_star) ** 2)))
+    info = {
+        "algorithm": "fdm",
+        "elapsed_s": elapsed,
+        "iterations": int(iters),
+        "residual": float(residual),
+        "estimated_error": est_err,
+        "resource_proxy": float(nx * ny) / 2e6,
+        "status": "ok" if residual < tol else "max_iter_reached",
+    }
+    return u, info
+
