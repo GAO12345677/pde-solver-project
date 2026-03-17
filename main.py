@@ -32,6 +32,8 @@ from config.constants import (
 )
 from services.hardware import hardware_info_dict
 from algorithm.selector import AlgorithmSelector, AlgorithmSelectionError
+from solver.numerical_solver import BoundarySpec, Heat1DParams, SolverError, get_solver
+from feedback.evaluator import FeedbackError, ModelOptimizer, ResultEvaluator
 
 
 app = FastAPI(
@@ -95,7 +97,39 @@ class TrainDynamicIn(BaseModel):
     seed: int = Field(42, description="随机种子")
 
 
+class SolveHeat1DIn(BaseModel):
+    """1D heat equation solve request (demo-friendly)."""
+
+    algorithm_key: Literal["fdm", "fem", "spectral"] = Field(..., description="数值求解算法")
+    k: float = Field(1.0, gt=0.0, description="扩散系数 k > 0")
+    L: float = Field(1.0, gt=0.0, description="求解区间长度 L > 0")
+    nx: int = Field(101, ge=5, le=5001, description="空间离散点数/节点数")
+    t0: float = Field(0.0, description="起始时间")
+    t1: float = Field(0.1, description="结束时间（t1==t0 时按稳态示例处理）")
+    bc_type: BoundaryCondition = Field(BoundaryCondition.DIRICHLET, description="边界条件类型")
+    left_bc: float = Field(0.0, description="左边界值(Dirichlet)/导数(Neumann)")
+    right_bc: float = Field(0.0, description="右边界值(Dirichlet)/导数(Neumann)")
+    initial: Literal["sine_nonnegative", "constant"] = Field("sine_nonnegative", description="内置初始条件")
+    enforce_nonnegativity: bool = Field(True, description="启用非负物理约束(温度非负)")
+
+
+class EvaluateIn(BaseModel):
+    solution: List[float] = Field(..., description="求解结果数组(1D)")
+    solve_info: Dict[str, Any] = Field(..., description="求解信息(耗时/资源等)")
+    domain: DomainRequirementsIn = Field(..., description="领域需求")
+    validation: Optional[Dict[str, Any]] = Field(None, description="物理/稳定性验证报告(可选)")
+
+
+class OptimizeIn(BaseModel):
+    x13: List[float] = Field(..., description="拼接特征向量(13维)")
+    selected_algorithm: Literal["fdm", "fem", "spectral"] = Field(..., description="选用算法")
+    retrain_strategy: Literal["static_rf", "static_xgb"] = Field("static_rf", description="重训练策略")
+    seed: int = Field(42, description="随机种子")
+
+
 selector = AlgorithmSelector(model_dir="model")
+evaluator = ResultEvaluator()
+optimizer = ModelOptimizer(model_dir="model", feedback_dir="result")
 
 
 def _is_applicable(alg: Any, features: PhysicsFeaturesIn) -> bool:
@@ -209,6 +243,98 @@ def select_algorithm(
         domain = np.array(features.domain, dtype=float)
         return selector.select(physics=physics, hardware=hardware, domain=domain, strategy=strategy)
     except AlgorithmSelectionError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/solve/heat1d")
+def solve_heat_1d(payload: SolveHeat1DIn) -> Dict[str, Any]:
+    """Solve a 1D heat equation instance using a selected numerical method.
+
+    This is a runnable baseline with physics constraints:
+    - Dirichlet/Neumann/Mixed BC (FEM/Spectral currently focus on Dirichlet)
+    - Non-negativity projection for temperature
+    """
+    try:
+        # DEBUG_BREAKPOINT_SOLVE: set breakpoint here.
+        params = Heat1DParams(
+            k=payload.k,
+            L=payload.L,
+            nx=payload.nx,
+            t_span=(payload.t0, payload.t1),
+            enforce_nonnegativity=payload.enforce_nonnegativity,
+        )
+
+        if payload.bc_type == BoundaryCondition.DIRICHLET:
+            bc = BoundarySpec(
+                bc_type=payload.bc_type,
+                left_value=lambda t: float(payload.left_bc),
+                right_value=lambda t: float(payload.right_bc),
+            )
+        elif payload.bc_type == BoundaryCondition.NEUMANN:
+            bc = BoundarySpec(
+                bc_type=payload.bc_type,
+                left_value=lambda t: float(payload.left_bc),
+                right_value=lambda t: float(payload.right_bc),
+            )
+        else:
+            # Mixed: alpha*u + beta*u_x = g(t). We provide a simple default:
+            # alpha=1, beta=1, g(t)=const
+            bc = BoundarySpec(
+                bc_type=payload.bc_type,
+                left_mixed=(1.0, 1.0, lambda t: float(payload.left_bc)),
+                right_mixed=(1.0, 1.0, lambda t: float(payload.right_bc)),
+            )
+
+        def initial_fn(x: np.ndarray) -> np.ndarray:
+            if payload.initial == "constant":
+                return np.full_like(x, 1.0, dtype=float)
+            # Non-negative sine bump
+            return np.maximum(0.0, np.sin(np.pi * x / float(payload.L)))
+
+        solver = get_solver(payload.algorithm_key)
+        u, info, validation = solver.solve(params=params, bc=bc, initial=initial_fn)
+        return {
+            "solution": u.tolist(),
+            "solve_info": info.__dict__,
+            "validation": validation,
+        }
+    except SolverError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except FloatingPointError as e:
+        raise HTTPException(status_code=500, detail=f"浮点异常/溢出：{e}") from e
+
+
+@app.post("/feedback/evaluate")
+def evaluate_result(payload: EvaluateIn) -> Dict[str, Any]:
+    """Evaluate a solver run and persist evaluation report to result/."""
+    try:
+        # DEBUG_BREAKPOINT_EVALUATE: set breakpoint here.
+        report = evaluator.evaluate(
+            solution=np.array(payload.solution, dtype=float),
+            solve_info=payload.solve_info,
+            domain_requirements={
+                "accuracy": payload.domain.accuracy,
+                "realtime": payload.domain.realtime,
+                "resource_budget": payload.domain.resource_budget if payload.domain.resource_budget is not None else 0.75,
+            },
+            validation=payload.validation,
+        )
+        path = evaluator.save_report(report, result_dir="result")
+        return {"report": report, "saved_to": path}
+    except (FeedbackError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/feedback/optimize")
+def optimize_model(payload: OptimizeIn) -> Dict[str, Any]:
+    """Append feedback sample and optionally retrain static model."""
+    try:
+        # DEBUG_BREAKPOINT_OPTIMIZE: set breakpoint here.
+        x13 = np.array(payload.x13, dtype=float)
+        sample_path = optimizer.append_training_sample(x13=x13, algorithm_key=payload.selected_algorithm)
+        train_info = optimizer.retrain_static_with_feedback(strategy=payload.retrain_strategy, seed=payload.seed)
+        return {"feedback_saved_to": sample_path, "retrained": train_info}
+    except (FeedbackError, AlgorithmSelectionError) as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
