@@ -49,6 +49,13 @@ def on_startup() -> None:
     # DEBUG_BREAKPOINT_STARTUP: set breakpoint here.
     hw = hardware_info_dict()
     print("[startup] hardware:", hw)
+    print("[startup] Baidu Qianfan config:")
+    print("  - Set env BAIDU_QIANFAN_API_KEY / BAIDU_QIANFAN_SECRET_KEY to enable ERNIE-Speed-8K parsing.")
+    print("  - Test parse: http://127.0.0.1:8001/docs -> /api/parse_question")
+    print("  - Auto solve: http://127.0.0.1:8001/docs -> /api/auto_solve")
+    print("  - Swagger:    http://127.0.0.1:8001/docs")
+    print("  - Redoc:      http://127.0.0.1:8001/redoc")
+    print("  - Key config: http://127.0.0.1:8001/api/baidu/config")
 
 
 def run() -> None:
