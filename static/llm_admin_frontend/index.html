@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 模型配置与额度监控</title>
+    <!-- 修正：改为绝对路径，和 main.py 中 mount 的 /llm_admin_static 对应 -->
+    <link rel="stylesheet" href="/llm_admin_static/style.css">
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <h1>LLM 模型配置与额度监控</h1>
+            <p class="hint">配置各大语言模型的 API Key 与 Base URL，并实时监控额度使用情况。API Key 支持本地缓存，刷新页面不丢失。</p>
+        </header>
+
+        <section class="config-section">
+            <div class="section-header">
+                <h2>模型配置</h2>
+                <button id="load-configs-btn" class="btn secondary">重新加载服务器配置</button>
+            </div>
+            <div class="grid" id="model-grid">
+                <!-- 模型配置卡片将由 JS 动态生成 -->
+            </div>
+        </section>
+
+        <section class="quota-section">
+            <div class="section-header">
+                <h2>额度监控</h2>
+                <button id="refresh-quota-btn" class="btn primary">刷新额度</button>
+            </div>
+            <div class="grid" id="quota-grid">
+                <!-- 额度监控卡片将由 JS 动态生成 -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast 提示容器 -->
+    <div id="toast-container"></div>
+
+    <!-- 修正：改为绝对路径 -->
+    <script src="/llm_admin_static/app.js"></script>
+</body>
+</html>

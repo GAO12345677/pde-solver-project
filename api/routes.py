@@ -42,9 +42,13 @@ from solver.numerical_solver import (
     solve_poisson2d_nonlinear,
 )
 from nlp.baidu_parser import GLOBAL_BAIDU_KEY_STORE, PDEQuestionBaiduParser
+from api.llm.llm_routes import router as llm_router
+
 
 
 router = APIRouter()
+
+router.include_router(llm_router, prefix="/llm")
 
 # Singletons for the service process.
 selector = AlgorithmSelector(model_dir="model")
