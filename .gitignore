@@ -1,31 +1,34 @@
-# 忽略虚拟环境目录（包含你提到的 vene，以及常用的 .venv/venv）
+# Python
 .venv/
 venv/
-vene/
 env/
 ENV/
-
-# 可选：补充 Python 项目常见的忽略项（推荐加上）
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
+.pytest_cache/
+
+# Build / packaging
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-# 忽略 Python 编译缓存
-__pycache__/
-*.pyc
+
+# Local runtime output
+log/
+result/
+output/
+
+# Frontend
+static/node_modules/
+static/.vite/
+
+# Secrets / local config
+.env
+.env.*
+config/llm_config.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
