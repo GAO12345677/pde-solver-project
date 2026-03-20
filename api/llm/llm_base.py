@@ -26,33 +26,19 @@ class BaseLLM(abc.ABC):
         """
         pass
 
+class BaseParser(abc.ABC):
+    """
+    抽象基类，定义了所有 PDE 问题解析器应实现的核心接口。
+    """
     @abc.abstractmethod
-    async def get_quota(self) -> Dict[str, Any]:
+    async def parse(self, question: str) -> Dict[str, Any]:
         """
-        获取当前模型的额度信息。
-        子类需要实现此方法以从特定的 LLM API 获取额度。
+        将自然语言的 PDE 问题描述解析为结构化 JSON。
+
+        Args:
+            question: 自然语言的 PDE 问题描述。
 
         Returns:
-            包含额度信息的字典，例如：
-            {
-                "model_name": "openai",
-                "provider": "OpenAI",
-                "remaining_quota": 8500,
-                "total_quota": 10000,
-                "update_time": "2026-03-18 10:00:00",
-                "status": "normal" // normal/insufficient/exhausted
-            }
-        """
-        pass
-
-    @abc.abstractmethod
-    async def test_connection(self) -> Dict[str, Any]:
-        """
-        测试与模型 API 的连接和认证是否有效。
-
-        Returns:
-            包含测试结果的字典，例如：
-            {"success": True, "message": "连接成功"}
-            {"success": False, "message": "连接失败: API Key 无效"}
+            包含解析结果的字典。
         """
         pass

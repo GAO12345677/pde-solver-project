@@ -179,6 +179,11 @@ class PhysicsFeatureExtractor:
         return {
             "features": pf,
             "vector": vec,
+            "dimension": int(pf.dimension),
+            "linearity": int(pf.linearity),
+            "stationarity": int(pf.stationarity),
+            "boundary_condition": pf.boundary_condition.value,
+            "problem_size": int(pf.problem_size),
         }
 
     @staticmethod

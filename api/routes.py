@@ -19,11 +19,10 @@ from __future__ import annotations
 import math
 import time
 from typing import Any, Dict, Optional
+import inspect
 
 import numpy as np
-from fastapi import APIRouter, HTTPException, Request, Form
-from fastapi.responses import HTMLResponse
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Request
 
 from algorithm.selector import AlgorithmSelector, AlgorithmSelectionError, concat_features
 from config.constants import BoundaryCondition, RequirementLevel
@@ -42,27 +41,53 @@ from solver.numerical_solver import (
     solve_poisson2d_nonlinear,
 )
 from nlp.baidu_parser import GLOBAL_BAIDU_KEY_STORE, PDEQuestionBaiduParser
-from api.llm.llm_routes import router as llm_router
-
+from api.llm.llm_factory import LLMFactory
+from api.llm.llm_config_manager import LLMConfigManager
+from api.llm.universal_parser import PDEQuestionUniversalParser
+from api.llm.llm_base import BaseParser
+from pydantic import BaseModel
 
 
 router = APIRouter()
 
-router.include_router(llm_router, prefix="/llm")
+class ParseQuestionIn(BaseModel):
+    question: str
+    model_name: Optional[str] = "baidu" # Default to baidu for backward compatibility
+
+class AutoSolveIn(BaseModel):
+    question: str
+    parser_model: Optional[str] = "baidu" # Default to baidu for backward compatibility
+    return_full_solution: Optional[bool] = False
+
+async def _get_parser_instance(model_name: str) -> BaseParser:
+    # Try to create LLM-based parser
+    try:
+        import api.llm.llm_models  # noqa: F401  # register LLMs lazily to avoid global import side effects
+
+        llm_config_manager = LLMConfigManager()
+        llm_config = llm_config_manager.get_model_config(model_name)
+
+        # If config exists, try to create LLM instance
+        if llm_config and llm_config.get('api_key'):
+            llm_instance = LLMFactory.create_llm(
+                model_name=llm_config.get('model_name', model_name),
+                api_key=str(llm_config.get('api_key', '')).strip(),
+                base_url=llm_config.get('base_url')
+            )
+            if llm_config.get("model_id"):
+                setattr(llm_instance, "model_id", llm_config.get("model_id"))
+            return PDEQuestionUniversalParser(llm_instance)
+    except Exception as e:
+        # Log the error but don't fail, fallback to Baidu parser
+        print(f"Error creating LLM-based parser for {model_name}: {e}")
+
+    # Fallback to Baidu parser
+    return PDEQuestionBaiduParser()
 
 # Singletons for the service process.
 selector = AlgorithmSelector(model_dir="model")
 evaluator = ResultEvaluator()
 optimizer = ModelOptimizer(model_dir="model", feedback_dir="result")
-
-
-class ParseQuestionIn(BaseModel):
-    question: str = Field(..., description="自然语言题目")
-
-
-class AutoSolveIn(BaseModel):
-    question: str = Field(..., description="自然语言题目")
-    return_full_solution: bool = Field(False, description="是否返回完整解数组（可能导致 Swagger 卡顿）")
 
 
 def _score_to_level(score: float) -> str:
@@ -83,6 +108,65 @@ def _resource_to_budget(score: float) -> float:
     if s > 1:
         return 1.0
     return s
+
+
+_PDE_POSITIVE_HINTS = (
+    "pde",
+    "偏微分",
+    "热传导",
+    "热方程",
+    "波动方程",
+    "泊松方程",
+    "poisson",
+    "heat equation",
+    "heat1d",
+    "u_t",
+    "u_xx",
+    "u_x",
+    "边界条件",
+    "初始条件",
+    "dirichlet",
+    "neumann",
+)
+
+_NON_PDE_HINTS = (
+    "质量",
+    "受力",
+    "牛顿",
+    "加速度",
+    "末速度",
+    "位移",
+    "动摩擦",
+    "摩擦因数",
+    "水平面",
+    "自由落体",
+    "小车",
+    "斜面",
+)
+
+
+def _validate_parsed_problem(question: str, parsed: Dict[str, Any]) -> Optional[str]:
+    q = (question or "").strip().lower()
+    physics_params = parsed.get("physics_params", {}) if isinstance(parsed.get("physics_params"), dict) else {}
+    equation_type = str(physics_params.get("equation_type", "")).strip().lower()
+    problem_size = physics_params.get("problem_size", None)
+
+    has_pde_hint = any(token in q for token in _PDE_POSITIVE_HINTS)
+    has_non_pde_hint = any(token in question for token in _NON_PDE_HINTS)
+
+    if has_non_pde_hint and not has_pde_hint:
+        return "这道题看起来不是偏微分方程题，而是普通力学/物理应用题，当前自动求解器不支持。"
+
+    if equation_type not in ("heat1d", "poisson2d_nonlinear"):
+        return "当前仅支持热传导方程和二维非线性 Poisson 方程相关 PDE 题。"
+
+    try:
+        if int(problem_size) <= 0:
+            return "题目未能解析出有效的 PDE 网格规模或自由度，当前自动求解器不支持继续求解。"
+    except Exception:
+        return "题目未能解析出有效的 PDE 网格规模或自由度，当前自动求解器不支持继续求解。"
+
+    return None
 
 
 def _preview_list(values: list[float], head: int = 50, tail: int = 50) -> Dict[str, Any]:
@@ -322,9 +406,8 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
                 "solve_info": info.__dict__,
                 "validation": validation,
                 "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
             }
-            if return_full:
-                data["solution"] = sol_list
             return _ok(data)
 
         if eq_type == "poisson2d_nonlinear":
@@ -336,9 +419,12 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
             max_iter = _to_int(payload.get("max_iter", 200), "max_iter")
             sol2d, info = solve_poisson2d_nonlinear(nx=nx, ny=ny, Lx=Lx, Ly=Ly, tol=tol, max_iter=max_iter)
             sol_list = sol2d.reshape(-1).tolist()
-            data = {"shape": [ny, nx], "solve_info": info, "solution_preview": _preview_list(sol_list)}
-            if return_full:
-                data["solution"] = sol_list
+            data = {
+                "shape": [ny, nx],
+                "solve_info": info,
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
             return _ok(data)
 
         return _err("equation_type 必须是 heat1d 或 poisson2d_nonlinear。", code="INVALID_EQUATION_TYPE")
@@ -348,9 +434,12 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
         return _err(f"求解失败: {e}", code="INTERNAL_ERROR")
 
 
-async def _evaluate_result_impl(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """Shared implementation for GET/POST evaluate_result to avoid duplicated OpenAPI IDs."""
+@router.api_route("/evaluate_result", methods=["GET", "POST"])
+async def evaluate_result(request: Request) -> Dict[str, Any]:
+    """Result evaluation + model optimization feedback endpoint."""
+    payload = await _read_payload(request)
     try:
+        # Required inputs
         solution = np.array(payload.get("solution", []), dtype=float).reshape(-1)
         solve_info = payload.get("solve_info", {})
         if not isinstance(solve_info, dict):
@@ -359,8 +448,10 @@ async def _evaluate_result_impl(payload: Dict[str, Any]) -> Dict[str, Any]:
         acc = _parse_requirement_level(payload.get("accuracy", "medium"), "accuracy")
         rt = _parse_requirement_level(payload.get("realtime", "medium"), "realtime")
         rb = payload.get("resource_budget", 0.75)
+
         validation = payload.get("validation", None)
 
+        # Evaluate
         # DEBUG_BREAKPOINT_API_EVAL: set breakpoint here.
         report = evaluator.evaluate(
             solution=solution,
@@ -370,6 +461,7 @@ async def _evaluate_result_impl(payload: Dict[str, Any]) -> Dict[str, Any]:
         )
         report_path = evaluator.save_report(report, result_dir="result")
 
+        # Optimization feedback (optional but recommended)
         x13 = payload.get("x13", None)
         selected_algorithm = str(payload.get("selected_algorithm", solve_info.get("algorithm", ""))).strip().lower()
         opt_status: Dict[str, Any] = {"skipped": True}
@@ -381,85 +473,72 @@ async def _evaluate_result_impl(payload: Dict[str, Any]) -> Dict[str, Any]:
             opt_status = {"skipped": False, "feedback_saved_to": sample_path, "retrained": train_info}
 
         return _ok({"report": report, "saved_to": report_path, "optimizer": opt_status})
-    except (FeedbackError, AlgorithmSelectionError) as e:
+    except (FeedbackError, AlgorithmSelectionError, AlgorithmSelectionError) as e:
         return _err(str(e), code="FEEDBACK_ERROR")
     except Exception as e:  # noqa: BLE001
         return _err(f"评估失败: {e}", code="INTERNAL_ERROR")
 
 
-@router.get("/evaluate_result")
-async def evaluate_result_get(request: Request) -> Dict[str, Any]:
-    payload = await _read_payload(request)
-    return await _evaluate_result_impl(payload)
-
-
-@router.post("/evaluate_result")
-async def evaluate_result_post(request: Request) -> Dict[str, Any]:
-    payload = await _read_payload(request)
-    return await _evaluate_result_impl(payload)
-
-
-@router.get("/api/parse_question")
-async def api_parse_question_get(question: str) -> Dict[str, Any]:
-    """Parse question only (GET).
-
-    This is convenient for quick browser tests:
-      /api/parse_question?question=...
-    """
+@router.api_route("/api/parse_question", methods=["POST"])
+async def api_parse_question(request_body: ParseQuestionIn) -> Dict[str, Any]:
+    """Test endpoint: parse question only (no solve)."""
     try:
-        question = str(question).strip()
-        if not question:
-            return _err("question 不能为空。", code="INVALID_PARAM")
-        pde_question_parser = PDEQuestionBaiduParser()
-        parsed = pde_question_parser.parse(question)
-        msg = (
-            "当前使用大模型智能解析（全局配置Key）。"
-            if parsed.get("parser_mode") == "baidu_llm"
-            else "当前使用规则解析（未配置Key或解析失败自动降级）。"
-        )
-        return _ok({"message": msg, "parsed": parsed, "key_configured": GLOBAL_BAIDU_KEY_STORE.is_configured()})
-    except Exception as e:  # noqa: BLE001
-        return _err(str(e), code="PARSE_ERROR")
-
-
-@router.post("/api/parse_question")
-async def api_parse_question_post(payload: ParseQuestionIn) -> Dict[str, Any]:
-    """Parse question only (POST JSON).
-
-    Swagger will show an editable JSON body for this endpoint.
-    """
-    try:
-        question = str(payload.question).strip()
+        question = request_body.question
+        model_name = request_body.model_name
         if not question:
             return _err("question 不能为空。", code="INVALID_PARAM")
 
         # DEBUG_BREAKPOINT_PARSE_QUESTION: set breakpoint here.
-        pde_question_parser = PDEQuestionBaiduParser()
-        parsed = pde_question_parser.parse(question)
+        pde_question_parser = await _get_parser_instance(model_name)
+        if inspect.iscoroutinefunction(pde_question_parser.parse):
+            parsed = await pde_question_parser.parse(question)
+        else:
+            parsed = pde_question_parser.parse(question)
+        validation_error = _validate_parsed_problem(question, parsed)
+        if validation_error:
+            return _err(
+                validation_error,
+                code="UNSUPPORTED_QUESTION",
+                details={"parsed": parsed},
+            )
         msg = (
-            "当前使用大模型智能解析（全局配置Key）。"
-            if parsed.get("parser_mode") == "baidu_llm"
-            else "当前使用规则解析（未配置Key或解析失败自动降级）。"
+            "当前使用大模型智能解析。"
+            if parsed.get("parser_mode") not in (None, "rule_based")
+            else "当前使用规则解析（未配置 Key 或大模型解析失败后自动降级）。"
         )
-        return _ok({"message": msg, "parsed": parsed, "key_configured": GLOBAL_BAIDU_KEY_STORE.is_configured()})
+        return _ok({"message": msg, "parsed": parsed, "key_configured": LLMConfigManager().is_llm_configured(model_name)})
     except Exception as e:  # noqa: BLE001
         return _err(str(e), code="PARSE_ERROR")
 
 
-@router.post("/api/auto_solve")
-async def api_auto_solve(payload: AutoSolveIn) -> Dict[str, Any]:
+@router.api_route("/api/auto_solve", methods=["POST"])
+async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
     """Full pipeline: natural language -> JSON -> features -> selection -> solve -> evaluate."""
     try:
-        question = str(payload.question).strip()
+        question = request_body.question
+        parser_model = request_body.parser_model
+        return_full = request_body.return_full_solution
         if not question:
             return _err("question 不能为空。", code="INVALID_PARAM")
 
-        pde_question_parser = PDEQuestionBaiduParser()
-        return_full = bool(payload.return_full_solution)
+        pde_question_parser = await _get_parser_instance(parser_model)
+        parsed = {} # Initialize parsed to an empty dictionary
+        try:
+            if inspect.iscoroutinefunction(pde_question_parser.parse):
+                parsed = await pde_question_parser.parse(question)
+            else:
+                parsed = pde_question_parser.parse(question)
+        except Exception as parse_e:
+            print(f"Error during parsing with {parser_model} parser: {parse_e}")
+            return _err(f"解析失败: {parse_e}", code="PARSE_ERROR")
+        validation_error = _validate_parsed_problem(question, parsed)
+        if validation_error:
+            return _err(
+                validation_error,
+                code="UNSUPPORTED_QUESTION",
+                details={"parsed": parsed},
+            )
 
-        # 1) Parse
-        # DEBUG_BREAKPOINT_AUTO_SOLVE_PARSE: set breakpoint here.
-        parsed = pde_question_parser.parse(question)
         physics_params = parsed.get("physics_params", {}) if isinstance(parsed.get("physics_params"), dict) else {}
         domain_demand = parsed.get("domain_demand", {}) if isinstance(parsed.get("domain_demand"), dict) else {}
 
@@ -621,9 +700,9 @@ async def api_auto_solve(payload: AutoSolveIn) -> Dict[str, Any]:
             opt_status.update({"skipped": True, "reason": str(e)})
 
         msg = (
-            "当前使用大模型智能解析（全局配置Key）。"
-            if parsed.get("parser_mode") == "baidu_llm"
-            else "当前使用规则解析（未配置Key或解析失败自动降级）。"
+            "当前使用大模型智能解析。"
+            if parsed.get("parser_mode") not in (None, "rule_based")
+            else "当前使用规则解析（未配置 Key 或大模型解析失败后自动降级）。"
         )
         return _ok(
             {
@@ -645,16 +724,18 @@ async def api_auto_solve(payload: AutoSolveIn) -> Dict[str, Any]:
         return _err(f"auto_solve 失败：{e}", code="AUTO_SOLVE_ERROR")
 
 
-@router.get("/api/baidu/config", response_class=HTMLResponse)
-async def baidu_config_get() -> HTMLResponse:
+@router.api_route("/api/baidu/config", methods=["GET", "POST"])
+async def baidu_config(request: Request) -> Any:
     """Simple configuration page for Baidu API keys (thread-safe, in-memory).
 
     Notes:
     - This does NOT write secrets to disk.
     - Env vars still take precedence if set.
     """
-    configured = GLOBAL_BAIDU_KEY_STORE.is_configured()
-    html = f"""
+    if request.method.upper() == "GET":
+        # Minimal responsive HTML (PC/mobile)
+        configured = GLOBAL_BAIDU_KEY_STORE.is_configured()
+        html = f"""
 <!doctype html>
 <html lang="zh-CN">
 <head>
@@ -698,15 +779,12 @@ async def baidu_config_get() -> HTMLResponse:
 </body>
 </html>
 """
-    return HTMLResponse(content=html)
+        return html
 
-
-@router.post("/api/baidu/config")
-async def baidu_config_post(api_key: str = Form(...), secret_key: str = Form(...)) -> Dict[str, Any]:
-    api_key = str(api_key).strip()
-    secret_key = str(secret_key).strip()
+    payload = await _read_payload(request)
+    api_key = str(payload.get("api_key", "")).strip()
+    secret_key = str(payload.get("secret_key", "")).strip()
     if not api_key or not secret_key:
         return _err("api_key/secret_key 不能为空。", code="INVALID_PARAM")
     GLOBAL_BAIDU_KEY_STORE.set(api_key, secret_key)
     return _ok({"message": "已保存到当前服务内存（重启后失效）。建议仍使用环境变量方式配置。"})
-

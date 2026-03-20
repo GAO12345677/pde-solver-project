@@ -1,0 +1,36 @@
+{
+  "timestamp": 1774007470.700041,
+  "cases": [
+    {
+      "question": "我要算一个一维的线性定常热传导方程，精度要求90%，别太耗资源",
+      "elapsed_s": 2.4449196999994456,
+      "parse_success": false,
+      "auto_solve_success": true,
+      "parser_message": null,
+      "selected_algorithm": "fdm",
+      "total_score": 0.9999556108570361
+    },
+    {
+      "question": "求解2维非线性非定常泊松方程，要算得快一点，精度不用太高",
+      "elapsed_s": 1.8555177000016556,
+      "parse_success": false,
+      "auto_solve_success": true,
+      "parser_message": null,
+      "selected_algorithm": "fdm",
+      "total_score": 0.9927825805116665
+    },
+    {
+      "question": "我要算一个一维的线性定常热传导方程，精度要求90%，别太耗资源",
+      "elapsed_s": 2.4132864999992307,
+      "parse_success": false,
+      "auto_solve_success": true,
+      "parser_message": null,
+      "selected_algorithm": "fdm",
+      "total_score": 0.9999563108571276
+    }
+  ],
+  "notes": [
+    "本测试默认使用 MOCK 模式模拟 ERNIE-Speed-8K 输出，以保证无需真实 Key 也可运行。",
+    "如需真实调用，请设置 BAIDU_QIANFAN_API_KEY / BAIDU_QIANFAN_SECRET_KEY 并关闭 BAIDU_QIANFAN_MOCK。"
+  ]
+}

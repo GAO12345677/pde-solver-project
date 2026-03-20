@@ -2,11 +2,13 @@ import httpx
 from typing import Dict, Any, Optional
 from api.llm.llm_base import BaseLLM
 from api.llm.llm_factory import LLMFactory
+from config.app_config import get_config
 import openai
 import os
 from datetime import datetime
 
-import google.generativeai as genai
+import google.genai as genai
+from google.genai.types import HttpOptions
 
 class OpenAI(BaseLLM):
     def __init__(self, model_name: str, api_key: str, base_url: Optional[str] = None):
@@ -58,26 +60,34 @@ class OpenAI(BaseLLM):
 LLMFactory.register_llm("openai", OpenAI)
 
 
+from urllib.parse import urlparse
+import google.genai as genai
+from google.genai.types import HttpOptions
+from google.genai._interactions.resources.interactions import AsyncInteractionsResource # Corrected import
+
 class GoogleGemini(BaseLLM):
     def __init__(self, model_name: str, api_key: str, base_url: Optional[str] = None):
         super().__init__(model_name, api_key, base_url)
-        genai.configure(api_key=self.api_key)
-        # Note: base_url is not directly used by genai.configure,
-        # but could be used if we were to directly use httpx or requests
-        # with a custom endpoint. For now, we rely on the default endpoint.
-        # model_name for Gemini is typically "gemini-pro" or "gemini-ultra"
+        self.client = genai.Client(api_key=self.api_key, base_url=self.base_url if self.base_url else None)
+        self.interactions_resource = AsyncInteractionsResource(self.client) # New resource initialization
 
     async def generate(self, prompt: str, **kwargs) -> Dict[str, Any]:
         try:
-            model = genai.GenerativeModel(self.model_name)
-            response = await model.generate_content_async(prompt, **kwargs)
-            # Assuming 'text' is the primary output. Gemini response object might be more complex.
-            return {"text": response.text, "usage": {}} # Gemini Python SDK doesn't directly expose usage in a simple way for generate_content
+            response = await self.interactions_resource.create(
+                input={"text": prompt},
+                model=self.model_name,
+                **kwargs
+            )
+            # The response object from create() should contain the generated content
+            # The exact structure needs to be verified based on the actual API response.
+            # Assuming it's in response.output.text or similar.
+            if response and response.output and response.output.text:
+                return {"text": response.output.text, "usage": {}}
+            return {"text": str(response), "usage": {}}
         except Exception as e:
             return {"error": f"Google Gemini API error: {e}", "status_code": 500}
 
     async def get_quota(self) -> Dict[str, Any]:
-        # Google Gemini 也没有直接的额度查询 API，返回模拟信息
         return {
             "model_name": self.model_name,
             "provider": "Google Gemini",
@@ -89,14 +99,16 @@ class GoogleGemini(BaseLLM):
 
     async def test_connection(self) -> Dict[str, Any]:
         try:
-            # 尝试生成一个短内容来测试连接
-            model = genai.GenerativeModel(self.model_name)
-            await model.generate_content_async("hello", stream=False)
-            return {"success": True, "message": "Google Gemini API 连接成功。"}
-        except genai.APIError as e:
-            return {"success": False, "message": f"Google Gemini API 错误: {e.args[0]}"}
+            # Test connection by sending a simple prompt and checking for a response
+            response = await self.interactions_resource.create(
+                input={"text": "hello"},
+                model=self.model_name
+            )
+            if response and response.output and response.output.text:
+                return {"success": True, "message": "Google Gemini API 连接成功。"}
+            return {"success": False, "message": f"Google Gemini API 连接测试返回空或无效响应: {response}"}
         except Exception as e:
-            return {"success": False, "message": f"连接测试发生未知错误: {e}"}
+            return {"success": False, "message": f"Google Gemini API 错误或连接测试发生未知错误: {e}"}
 
 # 注册 Google Gemini 模型
 LLMFactory.register_llm("gemini", GoogleGemini)
@@ -216,25 +228,40 @@ class Doubao(BaseLLM):
     def __init__(self, model_name: str, api_key: str, base_url: Optional[str] = None):
         super().__init__(model_name, api_key, base_url)
         if not self.base_url:
-            self.base_url = "https://api.doubao.com/v1" 
-        self.client = httpx.AsyncClient(base_url=self.base_url)
+            self.base_url = "https://ark.cn-beijing.volces.com/api/v3" 
+        cfg = get_config()
+        proxy_url = None
+        if cfg.proxy.enabled:
+            proxy_url = cfg.proxy.https_proxy or cfg.proxy.http_proxy
+        self.client = httpx.AsyncClient(
+            base_url=self.base_url,
+            verify=cfg.proxy.verify_ssl,
+            proxy=proxy_url,
+            trust_env=not cfg.proxy.enabled,
+        )
 
     async def generate(self, prompt: str, **kwargs) -> Dict[str, Any]:
         try:
             headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+            messages = prompt if isinstance(prompt, list) else [{"role": "user", "content": prompt}]
             payload = {
-                "model": self.model_name,
-                "messages": [{"role": "user", "content": prompt}],
+                "model": kwargs.pop("model_id", None) or kwargs.pop("model", None) or self.model_name,
+                "messages": messages,
                 **kwargs
             }
             response = await self.client.post("/chat/completions", headers=headers, json=payload, timeout=30)
             response.raise_for_status() 
             response_json = response.json()
-            return {"text": response_json["choices"][0]["message"]["content"], "usage": response_json.get("usage", {})}
+            content = response_json["choices"][0]["message"]["content"]
+            return {"result": content, "text": content, "usage": response_json.get("usage", {})}
         except httpx.HTTPStatusError as e:
             return {"error": f"Doubao API error: {e.response.status_code} - {e.response.text}", "status_code": e.response.status_code}
         except httpx.RequestError as e:
-            return {"error": f"Doubao API connection error: {e}", "status_code": 500}
+            request_url = str(e.request.url) if getattr(e, "request", None) else self.base_url
+            return {
+                "error": f"Doubao API connection error ({type(e).__name__}) while requesting {request_url}: {e!r}",
+                "status_code": 500,
+            }
         except Exception as e:
             return {"error": f"An unexpected error occurred with Doubao API: {e}", "status_code": 500}
 
@@ -275,23 +302,26 @@ class Doubao(BaseLLM):
 LLMFactory.register_llm("doubao", Doubao)
 LLMFactory.register_llm("doubao-pro", Doubao)
 
-import qianfan
-
 class BaiduQianfan(BaseLLM):
     def __init__(self, model_name: str, api_key: str, base_url: Optional[str] = None):
         super().__init__(model_name, api_key, base_url)
-        self.client = qianfan.Completion(ak=self.api_key, sk=os.environ.get("QIANFAN_SECRET_KEY")) 
+        self.client = None
+
+    def _get_client(self):
+        import qianfan
+
+        if self.client is None:
+            self.client = qianfan.Completion(ak=self.api_key, sk=os.environ.get("QIANFAN_SECRET_KEY"))
+        return self.client
 
     async def generate(self, prompt: str, **kwargs) -> Dict[str, Any]:
         try:
-            response = await self.client.chat(
+            response = await self._get_client().chat(
                 model=self.model_name,
                 messages=[{"role": "user", "content": prompt}],
                 **kwargs
             )
             return {"text": response.body["result"], "usage": response.body.get("usage", {})}
-        except qianfan.RequestError as e:
-            return {"error": f"Baidu Qianfan API request error: {e.msg}", "status_code": e.error_code}
         except Exception as e:
             return {"error": f"An unexpected error occurred with Baidu Qianfan API: {e}", "status_code": 500}
 
@@ -307,7 +337,9 @@ class BaiduQianfan(BaseLLM):
 
     async def test_connection(self) -> Dict[str, Any]:
         try:
-            response = await self.client.chat(
+            import qianfan
+
+            response = await self._get_client().chat(
                 model=self.model_name,
                 messages=[{"role": "user", "content": "hi"}],
                 stream=False,
@@ -327,7 +359,3 @@ class BaiduQianfan(BaseLLM):
 LLMFactory.register_llm("qianfan", BaiduQianfan)
 LLMFactory.register_llm("ERNIE-Bot", BaiduQianfan)
 LLMFactory.register_llm("ERNIE-Bot-4", BaiduQianfan)
-
-
-
-

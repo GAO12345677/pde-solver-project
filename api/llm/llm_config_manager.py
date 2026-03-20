@@ -41,7 +41,7 @@ class LLMConfigManager:
                 cls._config[model_name]["base_url"] = env_base_url
 
     @classmethod
-    def save_config(cls, model_name: str, api_key: str, base_url: Optional[str] = None):
+    def save_config(cls, model_name: str, api_key: str, base_url: Optional[str] = None, model_id: Optional[str] = None):
         """
         保存单个 LLM 模型的配置到文件。
         """
@@ -57,6 +57,9 @@ class LLMConfigManager:
         
         if not env_base_url: # 如果环境变量没有设置，才允许从接口保存
             cls._config[model_name]["base_url"] = base_url if base_url else ""
+        
+        if model_id:
+            cls._config[model_name]["model_id"] = model_id
 
         # 确保目录存在
         CONFIG_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -112,6 +115,14 @@ class LLMConfigManager:
         if len(api_key) > 8:
             return f"{api_key[:4]}********{api_key[-4:]}"
         return "********"
+
+    @classmethod
+    def is_llm_configured(cls, model_name: str) -> bool:
+        """
+        检查指定模型是否已配置。
+        """
+        config = cls.get_model_config(model_name)
+        return bool(config.get('api_key'))
 
 # 初始化加载配置
 LLMConfigManager.load_config()

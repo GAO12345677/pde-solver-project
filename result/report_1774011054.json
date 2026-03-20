@@ -1,0 +1,26 @@
+{
+  "timestamp": 1774011054.9875135,
+  "selected_algorithm": "fdm",
+  "metrics": {
+    "accuracy": 0.9809055801811579,
+    "convergence": 0.0,
+    "time_efficiency": 0.9755650799997966,
+    "resource_efficiency": 0.9998557142857143,
+    "robustness": 1.0,
+    "total": 0.7893558329114495
+  },
+  "pass_fail": {
+    "accuracy_ok": true,
+    "time_ok": true,
+    "resource_ok": true
+  },
+  "notes": [],
+  "context": {
+    "estimated_error": 0.00019094419818842085,
+    "error_target": 0.01,
+    "elapsed_s": 0.1221746000010171,
+    "time_target_s": 5.0,
+    "resource_proxy": 0.000101,
+    "resource_budget": 0.7
+  }
+}

@@ -47,6 +47,13 @@ function renderModelCards() {
                 <label>Base URL <span style="color:#999;font-weight:normal;font-size:11px;">(可选)</span></label>
                 <input type="text" id="url-${model.id}" placeholder="${model.defaultUrl}">
             </div>
+            ${model.id === 'doubao' ? `
+            <div class="form-group">
+                <label>模型名称 <span style="color:#999;font-weight:normal;font-size:11px;">(必填)</span></label>
+                <input type="text" id="model-id-${model.id}" placeholder="例如：doubao-seed-1-8-251228">
+                <div class="error-msg" style="color:#666;font-size:11px;margin-top:2px;">请在火山方舟控制台的「模型推理」页面获取模型名称</div>
+            </div>
+            ` : ''}
             <div class="card-actions">
                 <button class="btn secondary" id="test-btn-${model.id}" onclick="testConfig('${model.id}')">
                     <div class="spinner"></div>测试连接
@@ -69,6 +76,14 @@ function renderModelCards() {
         urlInput.addEventListener('change', (e) => {
             localStorage.setItem(`llm_url_${model.id}`, e.target.value);
         });
+
+        // 为豆包添加模型名称的本地缓存
+        if (model.id === 'doubao') {
+            const modelIdInput = document.getElementById(`model-id-${model.id}`);
+            modelIdInput.addEventListener('change', (e) => {
+                localStorage.setItem(`llm_model_id_${model.id}`, e.target.value);
+            });
+        }
     });
 }
 
@@ -115,6 +130,14 @@ function loadLocalConfigs() {
         if (localUrl) {
             document.getElementById(`url-${model.id}`).value = localUrl;
         }
+        
+        // 为豆包加载模型名称
+        if (model.id === 'doubao') {
+            const localModelId = localStorage.getItem(`llm_model_id_${model.id}`);
+            if (localModelId) {
+                document.getElementById(`model-id-${model.id}`).value = localModelId;
+            }
+        }
     });
 }
 
@@ -147,26 +170,37 @@ async function fetchServerConfigs() {
 
 // 测试连接
 window.testConfig = async function(modelId) {
-    const keyInput = document.getElementById(`key-${modelId}`).value;
-    const urlInput = document.getElementById(`url-${modelId}`).value;
+    const keyInput = document.getElementById(`key-${modelId}`);
+    const urlInput = document.getElementById(`url-${modelId}`);
+    const modelIdInput = modelId === 'doubao' ? document.getElementById(`model-id-${modelId}`) : null;
     
-    if (!keyInput && !document.getElementById(`key-${modelId}`).placeholder.includes('已在服务器配置')) {
+    if (!keyInput.value && !keyInput.placeholder.includes('已在服务器配置')) {
         showToast('请先输入 API Key', 'error');
+        return;
+    }
+
+    if (modelId === 'doubao' && !modelIdInput) {
+        showToast('请先输入模型名称', 'error');
         return;
     }
 
     const btn = document.getElementById(`test-btn-${modelId}`);
     setLoading(btn, true);
 
+    const requestData = {
+        model_name: modelId,
+        api_key: keyInput.value || "", 
+        base_url: urlInput.value || null,
+        model_id: modelIdInput ? modelIdInput.value : null
+    };
+    
+    console.log('发送测试请求:', requestData);
+
     try {
         const res = await fetch(`${API_BASE}/config/test`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model_name: modelId,
-                api_key: keyInput || "", 
-                base_url: urlInput || null
-            })
+            body: JSON.stringify(requestData)
         });
         const result = await res.json();
         
@@ -184,16 +218,22 @@ window.testConfig = async function(modelId) {
 
 // 保存配置
 window.saveConfig = async function(modelId) {
-    const keyInput = document.getElementById(`key-${modelId}`).value;
-    const urlInput = document.getElementById(`url-${modelId}`).value;
+    const keyInput = document.getElementById(`key-${modelId}`);
+    const urlInput = document.getElementById(`url-${modelId}`);
+    const modelIdInput = modelId === 'doubao' ? document.getElementById(`model-id-${modelId}`) : null;
     
-    if (!keyInput) {
+    if (!keyInput.value) {
         showToast('请先输入 API Key', 'error');
         return;
     }
 
     if (!validateKey(modelId, keyInput)) {
         showToast('API Key 格式可能不正确，请检查', 'error');
+    }
+
+    if (modelId === 'doubao' && !modelIdInput) {
+        showToast('请先输入模型名称', 'error');
+        return;
     }
 
     const btn = document.getElementById(`save-btn-${modelId}`);
@@ -205,8 +245,9 @@ window.saveConfig = async function(modelId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model_name: modelId,
-                api_key: keyInput,
-                base_url: urlInput || null
+                api_key: keyInput.value,
+                base_url: urlInput.value || null,
+                model_id: modelIdInput ? modelIdInput.value : null
             })
         });
         const result = await res.json();

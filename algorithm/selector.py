@@ -296,6 +296,16 @@ class AlgorithmSelector:
         self.rl_agent: Optional[QLearningAgent] = None
         self.dynamic_strategy: StrategyName = "dynamic_rl"
 
+    @staticmethod
+    def _force_single_thread_static_model(model: Any) -> Any:
+        """Normalize sklearn-style models for restricted Windows environments."""
+        if hasattr(model, "n_jobs"):
+            try:
+                model.n_jobs = 1
+            except Exception:
+                pass
+        return model
+
     # ---------- Static selection (supervised learning) ----------
 
     def train_static(self, strategy: StrategyName = "static_rf", seed: int = 42) -> Dict[str, Any]:
@@ -312,7 +322,9 @@ class AlgorithmSelector:
             model = RandomForestClassifier(
                 n_estimators=300,
                 random_state=seed,
-                n_jobs=-1,
+                # Keep training single-process so it works reliably in constrained
+                # Windows test environments where joblib pipe creation can fail.
+                n_jobs=1,
             )
         elif strategy == "static_xgb":
             try:
@@ -333,7 +345,7 @@ class AlgorithmSelector:
             raise AlgorithmSelectionError(f"未知静态策略: {strategy!r}，请使用 static_rf/static_xgb。")
 
         model.fit(X, y)
-        self.static_model = model
+        self.static_model = self._force_single_thread_static_model(model)
         self.static_label_keys = label_keys
         self.static_strategy = strategy
         return {"strategy": strategy, "num_samples": int(X.shape[0]), "labels": label_keys}
@@ -369,7 +381,7 @@ class AlgorithmSelector:
         except Exception as e:  # noqa: BLE001
             raise AlgorithmSelectionError(f"加载静态模型失败: {e}") from e
 
-        self.static_model = payload.get("model")
+        self.static_model = self._force_single_thread_static_model(payload.get("model"))
         self.static_label_keys = payload.get("label_keys")
         self.static_strategy = payload.get("strategy", "static_rf")
         if self.static_model is None or not self.static_label_keys:
@@ -380,6 +392,7 @@ class AlgorithmSelector:
         """Predict best algorithm key using the trained static model."""
         if self.static_model is None or not self.static_label_keys:
             raise AlgorithmSelectionError("静态模型未加载/未训练。请先调用 train_static() 或 load_static().")
+        self._force_single_thread_static_model(self.static_model)
         x = concat_features(physics, hardware, domain).reshape(1, -1)
         try:
             proba = self.static_model.predict_proba(x)[0]
@@ -497,9 +510,19 @@ class AlgorithmSelector:
             }
         """
         if strategy in ("static_rf", "static_xgb"):
+            if self.static_model is None or not self.static_label_keys:
+                try:
+                    self.load_static()
+                except AlgorithmSelectionError:
+                    self.train_static(strategy=strategy)
             alg_key, probs = self.predict_static(physics, hardware, domain)
             static_probs = probs
         elif strategy == "dynamic_rl":
+            if self.rl_agent is None:
+                try:
+                    self.load_dynamic()
+                except AlgorithmSelectionError:
+                    self.train_dynamic()
             alg_key = self.act_dynamic(physics, hardware, domain)
             static_probs = None
         else:
@@ -513,7 +536,7 @@ class AlgorithmSelector:
             ranking.append({"key": k, "name": ALGORITHM_CANDIDATES_BY_KEY[k].name, "total": s.total})
         ranking.sort(key=lambda r: r["total"], reverse=True)
 
-        return {
+        result = {
             "strategy": strategy,
             "algorithm_key": alg_key,
             "algorithm_name": ALGORITHM_CANDIDATES_BY_KEY[alg_key].name,
@@ -527,4 +550,8 @@ class AlgorithmSelector:
             "ranking": ranking,
             **({"static_probs": static_probs} if static_probs is not None else {}),
         }
+        result["selected_algorithm"] = alg_key
+        result["algorithm_scores"] = result["score"]
+        result["rationale"] = reason
+        return result
 

@@ -30,17 +30,19 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
 from feature.extractor import HardwareFeatureExtractor
+from api.llm.llm_base import BaseParser
+from api.llm.universal_parser import _rule_based_parse, _sanitize_to_json_text, UniversalParserError
 
 
-class BaiduParserError(RuntimeError):
+class BaiduParserError(UniversalParserError):
     """Raised when parsing fails and no fallback is possible."""
 
 
-class BaiduApiNotConfiguredError(BaiduParserError):
+class BaiduApiNotConfiguredError(UniversalParserError):
     """Raised when Baidu API key/secret are missing."""
 
 
-class BaiduApiCallError(BaiduParserError):
+class BaiduApiCallError(UniversalParserError):
     """Raised when Baidu API call fails."""
 
 
@@ -91,96 +93,7 @@ class GlobalBaiduKeyStore:
 GLOBAL_BAIDU_KEY_STORE = GlobalBaiduKeyStore()
 
 
-def _sanitize_to_json_text(text: str) -> str:
-    """Remove markdown fences and extract the first JSON object."""
-    s = text.strip()
-    s = re.sub(r"^```json\s*", "", s, flags=re.IGNORECASE)
-    s = re.sub(r"^```\s*", "", s)
-    s = re.sub(r"\s*```$", "", s)
-    # Find first {...} block (greedy but bounded by last brace)
-    start = s.find("{")
-    end = s.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        s = s[start : end + 1]
-    return s.strip()
-
-
-def _rule_based_parse(question: str) -> Dict[str, Any]:
-    """Offline fallback parser implementing the mapping rules required."""
-    q = question.strip().lower()
-
-    # dimension mapping
-    dim = 1
-    if "二维" in question or "2维" in question or "2d" in q:
-        dim = 2
-    if "三维" in question or "3维" in question or "3d" in q:
-        dim = 3
-
-    # linear mapping (requirement: 线性->true, 非线性->false)
-    linear = True
-    if "非线性" in question or "nonlinear" in q:
-        linear = False
-
-    # stationary mapping (定常/稳态->true, 非定常/瞬态->false)
-    stationary = True
-    if "非定常" in question or "瞬态" in question or "unsteady" in q or "transient" in q:
-        stationary = False
-
-    # domain numeric thresholds
-    def map_accuracy() -> float:
-        if "很准" in question:
-            return 0.95
-        if "一般" in question or "不用太高" in question:
-            return 0.8
-        if "90%" in question or "0.9" in q or "90" in q:
-            return 0.9
-        return 0.9
-
-    def map_realtime() -> float:
-        if "不急" in question or "不着急" in question:
-            return 0.7
-        if "快" in question or "尽快" in question:
-            return 0.9
-        return 0.8
-
-    def map_resource() -> float:
-        if "不限" in question or "不限制" in question:
-            return 1.0
-        if "省资源" in question or "别太耗资源" in question:
-            return 0.7
-        return 0.7
-
-    # equation hints
-    equation_type = "heat1d" if ("热传导" in question or "heat" in q) else "poisson2d_nonlinear" if ("泊松" in question or "poisson" in q) else "heat1d"
-
-    physics_params = {
-        "dimension": dim,
-        "linear": linear,
-        "stationary": stationary,
-        # Provide minimal defaults for our demo solvers:
-        "equation_type": equation_type,
-        "boundary_condition": "dirichlet",
-        "problem_size": 101 if equation_type == "heat1d" else 41 * 41,
-    }
-
-    domain_demand = {
-        "accuracy": map_accuracy(),
-        "realtime": map_realtime(),
-        "resource_budget": map_resource(),
-    }
-
-    hw_raw = HardwareFeatureExtractor.extract()
-    hw = {
-        "cpu_cores": int(hw_raw["vector"][1]),
-        "gpu_available": bool(hw_raw.get("gpu_name")),
-        "gpu_name": hw_raw.get("gpu_name"),
-        "vram_gb": float(hw_raw["vector"][3]),
-    }
-
-    return {"physics_params": physics_params, "domain_demand": domain_demand, "hardware_info": hw, "parser_mode": "rule_based"}
-
-
-class PDEQuestionBaiduParser:
+class PDEQuestionBaiduParser(BaseParser):
     """PDE question parser backed by Baidu Qianfan (ERNIE-Speed-8K)."""
 
     def __init__(
