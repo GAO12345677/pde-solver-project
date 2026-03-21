@@ -1,5 +1,0 @@
-2026-03-17 18:18:41,456 [INFO] Batch processor started (pid=34024)
-2026-03-17 18:18:41,458 [INFO] Batch start: 2 config(s) in input
-2026-03-17 18:18:45,068 [INFO] Processed heat1d_case.json OK (strategy=static_rf, alg=fdm, 3.610s)
-2026-03-17 18:18:46,085 [INFO] Processed poisson2d_case.json OK (strategy=dynamic_rl, alg=fdm, 1.015s)
-2026-03-17 18:18:46,085 [INFO] Batch end: success=2 failed=0 elapsed=4.627s
