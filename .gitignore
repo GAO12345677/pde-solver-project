@@ -17,6 +17,7 @@ dist/
 log/
 result/
 output/
+model/*.pkl
 
 # Frontend
 static/node_modules/
@@ -32,3 +33,4 @@ config/llm_config.json
 Thumbs.db
 .idea/
 .vscode/
+t `
