@@ -1,0 +1,100 @@
+{
+  "focus": "gnn_selector",
+  "description": "Extend the current algorithm selection layer with a GNN-based selector before attempting a PINN solver.",
+  "phases": [
+    {
+      "id": "phase0_baseline",
+      "title": "固化现有基线",
+      "tasks": [
+        {
+          "id": "baseline_benchmark",
+          "kind": "command",
+          "title": "运行 benchmark 基线",
+          "command": [".venv\\Scripts\\python.exe", "-m", "test_case.benchmark_algorithms"]
+        },
+        {
+          "id": "baseline_tests",
+          "kind": "command",
+          "title": "运行核心回归测试",
+          "command": [".venv\\Scripts\\python.exe", "-m", "pytest", "-q", "tests/test_wave1d_api.py", "tests/test_mlp_selector.py"]
+        }
+      ]
+    },
+    {
+      "id": "phase1_graph_data",
+      "title": "准备图数据适配层",
+      "tasks": [
+        {
+          "id": "graph_dataset_file",
+          "kind": "file_check",
+          "title": "新增图数据构建模块",
+          "path": "algorithm/graph_dataset.py"
+        },
+        {
+          "id": "graph_dataset_test",
+          "kind": "file_check",
+          "title": "新增图数据构建测试",
+          "path": "tests/test_graph_dataset.py"
+        }
+      ]
+    },
+    {
+      "id": "phase2_gnn_model",
+      "title": "实现 GNN 选择器",
+      "tasks": [
+        {
+          "id": "gnn_selector_file",
+          "kind": "file_check",
+          "title": "新增 GNN 选择器模块",
+          "path": "algorithm/gnn_selector.py"
+        },
+        {
+          "id": "gnn_selector_test",
+          "kind": "file_check",
+          "title": "新增 GNN 选择器测试",
+          "path": "tests/test_gnn_selector.py"
+        }
+      ]
+    },
+    {
+      "id": "phase3_api_integration",
+      "title": "接入接口和前端",
+      "tasks": [
+        {
+          "id": "api_strategy_support",
+          "kind": "content_check",
+          "title": "后端接口支持 gnn_selector",
+          "path": "api/routes.py",
+          "contains": "gnn_selector"
+        },
+        {
+          "id": "frontend_strategy_support",
+          "kind": "content_check",
+          "title": "前端下拉支持 GNN",
+          "path": "static/src/pages/SolvePage.tsx",
+          "contains": "GNN"
+        }
+      ]
+    },
+    {
+      "id": "phase4_report",
+      "title": "加入对比实验报告",
+      "tasks": [
+        {
+          "id": "benchmark_mentions_gnn",
+          "kind": "content_check",
+          "title": "benchmark 脚本纳入 GNN",
+          "path": "test_case/benchmark_algorithms.py",
+          "contains": "gnn"
+        },
+        {
+          "id": "docs_mentions_gnn",
+          "kind": "content_check",
+          "title": "文档补充 GNN 说明",
+          "path": "README.md",
+          "contains": "GNN"
+        }
+      ]
+    }
+  ]
+}

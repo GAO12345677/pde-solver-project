@@ -12,7 +12,7 @@ export default function QuestionPage() {
 
   const handleParse = async () => {
     if (!question.trim()) {
-      setError('请输入题目内容');
+      setError('Please enter a PDE question. 请输入题目内容。');
       return;
     }
 
@@ -21,17 +21,15 @@ export default function QuestionPage() {
     setParsed(null);
 
     try {
-      console.log('[QuestionPage] parseQuestion request', { model, question });
       const result = await api.parseQuestion(question, model);
-      console.log('[QuestionPage] parseQuestion response', result);
       if (result.success && result.data) {
         setParsed(result.data);
       } else {
-        const errorMsg = result.error?.message || result.error || result.message || '解析失败';
+        const errorMsg = result.error?.message || result.error || result.message || 'Parsing failed. 解析失败。';
         setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '解析失败');
+      setError(err instanceof Error ? err.message : 'Parsing failed. 解析失败。');
     } finally {
       setLoading(false);
     }
@@ -39,7 +37,7 @@ export default function QuestionPage() {
 
   const handleAutoSolve = async () => {
     if (!question.trim()) {
-      setError('请输入题目内容');
+      setError('Please enter a PDE question. 请输入题目内容。');
       return;
     }
 
@@ -48,17 +46,15 @@ export default function QuestionPage() {
     setParsed(null);
 
     try {
-      console.log('[QuestionPage] autoSolve request', { model, question });
       const result = await api.autoSolve(question, model);
-      console.log('[QuestionPage] autoSolve response', result);
       if (result.success && result.data) {
         setParsed(result.data);
       } else {
-        const errorMsg = result.error?.message || result.error || result.message || '求解失败';
+        const errorMsg = result.error?.message || result.error || result.message || 'Auto solve failed. 自动求解失败。';
         setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '求解失败');
+      setError(err instanceof Error ? err.message : 'Auto solve failed. 自动求解失败。');
     } finally {
       setLoading(false);
     }
@@ -69,7 +65,7 @@ export default function QuestionPage() {
       return;
     }
     await navigator.clipboard.writeText(JSON.stringify(parsed, null, 2));
-    alert('已复制到剪贴板');
+    alert('Copied to clipboard. 已复制到剪贴板。');
   };
 
   const handleDownload = () => {
@@ -78,60 +74,72 @@ export default function QuestionPage() {
     }
     const blob = new Blob([JSON.stringify(parsed, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'parsed_result.json';
-    a.click();
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'parsed_result.json';
+    anchor.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="mx-auto max-w-7xl p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-          <FileText className="w-6 h-6" />
-          题目解析
+        <h1 className="mb-2 flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <FileText className="h-6 w-6" />
+          PDE Question Parsing
         </h1>
-        <p className="text-gray-600">输入偏微分方程题目，使用大模型自动解析为结构化 JSON。</p>
+        <p className="text-gray-600">Parse or auto-solve a natural-language PDE prompt. 自然语言题目解析与自动求解。</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4">题目输入</h2>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold">Prompt Input 输入区域</h2>
 
-            <InputGroup label="模型选择">
+            <InputGroup label="Model 模型选择">
               <select
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="doubao">豆包 (Doubao)</option>
+                <option value="doubao">Doubao 豆包</option>
                 <option value="gpt-4">GPT-4</option>
                 <option value="claude">Claude</option>
               </select>
             </InputGroup>
 
-            <InputGroup label="题目内容">
+            <InputGroup label="Question 题目内容">
               <textarea
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="例如：求解一维热传导方程 u_t = k * u_xx，在区间 [0, L] 上，边界条件 u(0,t)=u(L,t)=0，初始条件 u(x,0)=sin(pi*x/L)。"
-                className="w-full h-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="Example: Solve the 1D heat equation u_t = k u_xx on [0, L] with zero Dirichlet boundaries and initial value u(x,0)=sin(pi x / L). 例如：求解一维热传导方程……"
+                className="h-64 w-full resize-none rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </InputGroup>
 
             <div className="flex gap-3">
-              <ActionButton onClick={handleParse} loading={loading} label="解析题目" loadingLabel="解析中..." colorClass="bg-blue-600 hover:bg-blue-700" />
-              <ActionButton onClick={handleAutoSolve} loading={loading} label="自动求解" loadingLabel="求解中..." colorClass="bg-green-600 hover:bg-green-700" />
+              <ActionButton
+                onClick={handleParse}
+                loading={loading}
+                label="Parse 解析"
+                loadingLabel="Parsing 解析中"
+                colorClass="bg-blue-600 hover:bg-blue-700"
+              />
+              <ActionButton
+                onClick={handleAutoSolve}
+                loading={loading}
+                label="Auto Solve 自动求解"
+                loadingLabel="Solving 求解中"
+                colorClass="bg-green-600 hover:bg-green-700"
+              />
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 flex items-start gap-2">
-              <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+              <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
               <div>
-                <div className="font-semibold">错误</div>
+                <div className="font-semibold">Error 错误</div>
                 <div>{error}</div>
               </div>
             </div>
@@ -140,31 +148,31 @@ export default function QuestionPage() {
 
         <div className="space-y-6">
           {parsed ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  解析结果
+            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Parsed Result 解析结果
                 </h2>
                 <div className="flex gap-2">
-                  <IconButton title="复制" onClick={handleCopy}>
-                    <Copy className="w-4 h-4" />
+                  <IconButton title="Copy 复制" onClick={handleCopy}>
+                    <Copy className="h-4 w-4" />
                   </IconButton>
-                  <IconButton title="下载" onClick={handleDownload}>
-                    <Download className="w-4 h-4" />
+                  <IconButton title="Download 下载" onClick={handleDownload}>
+                    <Download className="h-4 w-4" />
                   </IconButton>
                 </div>
               </div>
 
-              <pre className="bg-gray-50 p-4 rounded-md overflow-auto max-h-96 text-sm">{JSON.stringify(parsed, null, 2)}</pre>
+              <pre className="max-h-96 overflow-auto rounded-md bg-gray-50 p-4 text-sm">{JSON.stringify(parsed, null, 2)}</pre>
             </div>
           ) : (
             !loading && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="text-center text-gray-500 py-12">
-                  <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                  <p>输入题目后点击“解析题目”或“自动求解”。</p>
-                  <p className="text-sm mt-2">结果会显示在这里。</p>
+              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="py-12 text-center text-gray-500">
+                  <FileText className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                  <p>Enter a question and choose Parse or Auto Solve. 输入题目后点击解析或自动求解。</p>
+                  <p className="mt-2 text-sm">The JSON result will appear here. 结构化结果会显示在这里。</p>
                 </div>
               </div>
             )
@@ -178,7 +186,7 @@ export default function QuestionPage() {
 function InputGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label className="mb-2 block text-sm font-medium text-gray-700">{label}</label>
       {children}
     </div>
   );
@@ -201,16 +209,16 @@ function ActionButton({
     <button
       onClick={onClick}
       disabled={loading}
-      className={`flex-1 text-white py-2 px-4 rounded-md transition-colors disabled:bg-gray-400 flex items-center justify-center gap-2 ${colorClass}`}
+      className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-white transition-colors disabled:bg-gray-400 ${colorClass}`}
     >
       {loading ? (
         <>
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin" />
           {loadingLabel}
         </>
       ) : (
         <>
-          <Play className="w-4 h-4" />
+          <Play className="h-4 w-4" />
           {label}
         </>
       )}
@@ -220,11 +228,7 @@ function ActionButton({
 
 function IconButton({ title, onClick, children }: { title: string; onClick: () => void; children: ReactNode }) {
   return (
-    <button
-      onClick={onClick}
-      className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-      title={title}
-    >
+    <button onClick={onClick} className="rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900" title={title}>
       {children}
     </button>
   );

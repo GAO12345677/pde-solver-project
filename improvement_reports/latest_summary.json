@@ -1,0 +1,17 @@
+{
+  "generated_at": 1774062835.5931213,
+  "iterations": [
+    {
+      "iteration": 1,
+      "rf_trained": true,
+      "mlp_trained": true,
+      "rl_trained": true,
+      "benchmark_path": "benchmark\\benchmark_1774062822.json",
+      "tests_ok": true,
+      "notes": [
+        "`dynamic_rl` 准确率偏低，建议优先扩展状态表示、奖励设计和训练轮数。",
+        "当前回归测试通过，可以继续做能力扩展。"
+      ]
+    }
+  ]
+}

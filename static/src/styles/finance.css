@@ -1,0 +1,34 @@
+.finance-dashboard-bg {
+  background-color: #f8fafc;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@keyframes flash-update {
+  0% {
+    background-color: #dcfce3;
+    color: #166534;
+  }
+
+  100% {
+    background-color: transparent;
+    color: inherit;
+  }
+}
+
+.data-flash-active {
+  animation: flash-update 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  border-radius: 0.25rem;
+  padding: 0 0.125rem;
+}
+
+.dash-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.dash-card:hover {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  border-color: #cbd5e1;
+}

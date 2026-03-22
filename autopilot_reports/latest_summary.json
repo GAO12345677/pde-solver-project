@@ -1,0 +1,137 @@
+{
+  "generated_at": 1774063355.394937,
+  "report_path": "D:\\cursorku\\autopilot_reports\\autopilot_1774063355.md",
+  "results": [
+    {
+      "phase_id": "phase0_baseline",
+      "task_id": "baseline_benchmark",
+      "title": "运行 benchmark 基线",
+      "kind": "command",
+      "ok": true,
+      "details": {
+        "command": [
+          ".venv\\Scripts\\python.exe",
+          "-m",
+          "test_case.benchmark_algorithms"
+        ],
+        "returncode": 0,
+        "stdout": "=== Selector Accuracy ===\nstatic_rf: accuracy=1.000 on 60 samples\nmlp_nn: accuracy=1.000 on 60 samples\ndynamic_rl: accuracy=0.267 on 60 samples\n\n=== Solver Accuracy ===\nheat1d / fdm: L2=1.743408e-05, Linf=2.492453e-05, elapsed=0.0838s\nheat1d / fem: L2=1.743429e-05, Linf=2.484311e-05, elapsed=0.3197s\nheat1d / spectral: L2=9.427012e-12, Linf=1.339862e-11, elapsed=0.5864s\nwave1d / fdm: L2=4.260903e-05, Linf=6.055881e-05, elapsed=0.0032s\n\nSaved benchmark report to: benchmark\\benchmark_1774063342.json\n",
+        "stderr": "",
+        "elapsed_s": 4.0998101234436035
+      }
+    },
+    {
+      "phase_id": "phase0_baseline",
+      "task_id": "baseline_tests",
+      "title": "运行核心回归测试",
+      "kind": "command",
+      "ok": true,
+      "details": {
+        "command": [
+          ".venv\\Scripts\\python.exe",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_wave1d_api.py",
+          "tests/test_mlp_selector.py"
+        ],
+        "returncode": 0,
+        "stdout": "....                                                                     [100%]\n============================== warnings summary ===============================\nmain.py:155\n  D:\\cursorku\\main.py:155: DeprecationWarning: \n          on_event is deprecated, use lifespan event handlers instead.\n  \n          Read more about it in the\n          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).\n          \n    @app.on_event(\"startup\")\n\n.venv\\lib\\site-packages\\fastapi\\applications.py:4599\n  D:\\cursorku\\.venv\\lib\\site-packages\\fastapi\\applications.py:4599: DeprecationWarning: \n          on_event is deprecated, use lifespan event handlers instead.\n  \n          Read more about it in the\n          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).\n          \n    return self.router.on_event(event_type)\n\ntests/test_wave1d_api.py::test_extract_feature_wave1d\n  D:\\cursorku\\.venv\\lib\\site-packages\\torch\\cuda\\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.\n    import pynvml  # type: ignore[import]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 3 warnings in 8.96s\n",
+        "stderr": "",
+        "elapsed_s": 12.478990316390991
+      }
+    },
+    {
+      "phase_id": "phase1_graph_data",
+      "task_id": "graph_dataset_file",
+      "title": "新增图数据构建模块",
+      "kind": "file_check",
+      "ok": false,
+      "details": {
+        "path": "algorithm/graph_dataset.py",
+        "exists": false
+      }
+    },
+    {
+      "phase_id": "phase1_graph_data",
+      "task_id": "graph_dataset_test",
+      "title": "新增图数据构建测试",
+      "kind": "file_check",
+      "ok": false,
+      "details": {
+        "path": "tests/test_graph_dataset.py",
+        "exists": false
+      }
+    },
+    {
+      "phase_id": "phase2_gnn_model",
+      "task_id": "gnn_selector_file",
+      "title": "新增 GNN 选择器模块",
+      "kind": "file_check",
+      "ok": false,
+      "details": {
+        "path": "algorithm/gnn_selector.py",
+        "exists": false
+      }
+    },
+    {
+      "phase_id": "phase2_gnn_model",
+      "task_id": "gnn_selector_test",
+      "title": "新增 GNN 选择器测试",
+      "kind": "file_check",
+      "ok": false,
+      "details": {
+        "path": "tests/test_gnn_selector.py",
+        "exists": false
+      }
+    },
+    {
+      "phase_id": "phase3_api_integration",
+      "task_id": "api_strategy_support",
+      "title": "后端接口支持 gnn_selector",
+      "kind": "content_check",
+      "ok": false,
+      "details": {
+        "path": "api/routes.py",
+        "contains": "gnn_selector",
+        "matched": false
+      }
+    },
+    {
+      "phase_id": "phase3_api_integration",
+      "task_id": "frontend_strategy_support",
+      "title": "前端下拉支持 GNN",
+      "kind": "content_check",
+      "ok": false,
+      "details": {
+        "path": "static/src/pages/SolvePage.tsx",
+        "contains": "GNN",
+        "matched": false
+      }
+    },
+    {
+      "phase_id": "phase4_report",
+      "task_id": "benchmark_mentions_gnn",
+      "title": "benchmark 脚本纳入 GNN",
+      "kind": "content_check",
+      "ok": false,
+      "details": {
+        "path": "test_case/benchmark_algorithms.py",
+        "contains": "gnn",
+        "matched": false
+      }
+    },
+    {
+      "phase_id": "phase4_report",
+      "task_id": "docs_mentions_gnn",
+      "title": "文档补充 GNN 说明",
+      "kind": "content_check",
+      "ok": false,
+      "details": {
+        "path": "README.md",
+        "contains": "GNN",
+        "matched": false
+      }
+    }
+  ]
+}

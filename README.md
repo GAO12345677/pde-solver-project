@@ -1,49 +1,125 @@
 # PDE Solver Project
 
-一个用于课程项目演示的 PDE 求解框架，包含参数化求解、特征提取、算法选择、自然语言题目解析，以及基于大模型的 PDE 自动求解流程。
+This project is a course-oriented PDE solving platform that combines:
 
-## 项目亮点
+- parameterized numerical solvers
+- feature extraction and algorithm selection
+- natural-language problem parsing
+- API and frontend demo pages
+- a finance practice module for stock dynamics and option pricing
 
-- 支持一维热传导方程与二维非线性 Poisson 方程
-- 提供前后端一体化 Web 演示页面
-- 支持自然语言题目解析
-- 支持豆包等大模型接入
-- 提供 Swagger API 文档，便于演示和调试
-- 包含算法选择、数值求解、结果评估的完整闭环
+It is designed for demos, reports, and system integration experiments rather than production scientific computing.
 
-## 主要功能
+## 3D Capability Matrix
 
-- `参数化求解`
-  通过表单直接设置 PDE 参数，执行数值求解。
+Current 3D support:
 
-- `题目解析`
-  输入自然语言 PDE 题目，解析为结构化 JSON。
+- `heat3d`: `fdm`, `fvm`, `fem`
+- `wave3d`: `fdm`, `fem`, `spectral`
+- `poisson3d`: `fdm`, `fem`, `bem`
 
-- `自动求解`
-  从自然语言题目出发，完成解析、特征提取、算法选择、求解和评估。
+Notes:
 
-- `LLM 配置`
-  支持配置豆包、OpenAI、Qwen、Gemini 等模型。
+- `heat3d` uses zero-Dirichlet manufactured-solution baselines.
+- `wave3d` now includes FDM, FEM, and spectral manufactured-solution baselines.
+- `poisson3d` includes teaching-style FEM and BEM baselines in addition to FDM.
 
-## 技术结构
+## Main Features
 
-- 后端：FastAPI
-- 前端：React + Vite
-- 数值求解：Python
-- 模型选择：规则与机器学习结合
-- 大模型接入：Doubao / OpenAI / Qwen / Gemini / Qianfan
+- FastAPI backend with Swagger docs
+- React + Vite frontend
+- algorithm recommendation strategies:
+  - `static_rf`
+  - `static_xgb`
+  - `dynamic_rl`
+  - `mlp_nn`
+  - `gnn_selector`
+- direct equation solving and natural-language auto-solve flows
+- benchmark and evaluation utilities
+- finance practice pages:
+  - `Stocks`: path simulation, terminal distribution, and risk summary
+  - `A-Shares`: live A-share snapshot, market-session status, recent close trend, and historical volatility
+  - `Options 1D`: Black-Scholes price curve, payoff curve, and Greeks
+  - `Options 2D`: two-asset basket-style price surface with correlation input
 
-## 快速开始
+## Finance Module
 
-### 1. 安装依赖
+The finance module is positioned as an application extension, not a replacement for the thesis mainline.
 
-后端：
+It is meant to show that the platform can be extended from physical PDE cases into financial modeling demos.
+
+Current finance support:
+
+- frontend page: [http://127.0.0.1:8001/app/#finance](http://127.0.0.1:8001/app/#finance)
+- `Stocks`:
+  - geometric-Brownian-motion baseline
+  - A-share live analysis with market-session awareness
+  - A-share pair analysis with correlation, dual-price trend, and rolling correlation
+  - sample paths
+  - terminal-price histogram
+  - summary statistics
+- `Options 1D`:
+  - Black-Scholes 1D call/put pricing
+  - payoff visualization
+  - Greeks: `delta`, `gamma`, `theta`, `vega`, `rho`
+  - A-share `50ETF` / `300ETF` option snapshots with expiry and strike selectors
+  - A-share index-option snapshots for `HS300`, `SSE50`, and `CSI1000`
+  - Greeks and theory-vs-market reference
+- `Options 2D`:
+  - two-asset basket-style approximate surface
+  - asset correlation control
+  - 2D heatmap visualization
+
+Finance API endpoints:
+
+- `POST /finance/stocks/simulate`
+- `POST /finance/options/black_scholes_1d`
+- `POST /finance/options/black_scholes_2d`
+- `GET /finance/ashare/stock/{symbol}`
+- `GET /finance/ashare/pair`
+- `POST /finance/ashare/etf_option`
+- `POST /finance/ashare/index_option`
+- `GET /finance/market/stock/{symbol}`
+- `GET /finance/market/pair`
+- `POST /finance/options/compare_market`
+
+Live market-data comparison support:
+
+- A-share stock snapshot with:
+  - Shanghai-time market clock
+  - last trade date
+  - quote timestamp
+  - `HV20 / HV60 / HV252`
+- latest stock `spot` fetched from market history
+- historical volatility estimated from log returns
+- risk-free proxy rate fetched for pricing inputs
+- option-chain snapshot lookup for market comparison
+- side-by-side display of:
+  - `model price`
+  - `market price`
+  - `implied volatility`
+  - `pricing gap`
+
+Reliability note:
+
+- this is a model-based analysis workflow built on a prototype market-data source
+- A-share quotes are constrained by exchange trading sessions and should be interpreted together with their timestamps
+- it is useful for demos, learning, and comparison experiments
+- it is not investment advice and should not be presented as a production trading engine
+
+## Quick Start
+
+Install backend dependencies:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-前端：
+GPU note:
+
+- The project now declares `nvidia-ml-py` instead of the deprecated `pynvml` package name for NVIDIA hardware detection.
+
+Install frontend dependencies:
 
 ```powershell
 cd static
@@ -52,52 +128,60 @@ npm run build
 cd ..
 ```
 
-### 2. 启动项目
+Start the project:
 
 ```powershell
 python main.py
 ```
 
-如果你使用项目自带虚拟环境：
+If you use the project virtual environment:
 
 ```powershell
-.\.venv\Scripts\python main.py
+.\.venv\Scripts\python.exe main.py
 ```
 
-### 3. 打开页面
+Open:
 
-- Web 页面：[http://127.0.0.1:8001/app/](http://127.0.0.1:8001/app/)
-- Swagger 文档：[http://127.0.0.1:8001/docs](http://127.0.0.1:8001/docs)
-- 健康检查：[http://127.0.0.1:8001/health](http://127.0.0.1:8001/health)
+- frontend: [http://127.0.0.1:8001/app/](http://127.0.0.1:8001/app/)
+- swagger: [http://127.0.0.1:8001/docs](http://127.0.0.1:8001/docs)
+- health: [http://127.0.0.1:8001/health](http://127.0.0.1:8001/health)
 
-## 推荐演示题目
+## Testing
 
-```text
-求解一维热传导方程 u_t = k * u_xx，在区间 [0,1] 上，边界条件 u(0,t)=u(1,t)=0，初始条件 u(x,0)=sin(pi x)
+Run the standard project checks:
+
+```powershell
+.\run_tests.ps1
 ```
 
-## 注意事项
+Run targeted 3D API tests:
 
-- 当前项目适合课程展示与系统演示
-- 当前自动求解器主要支持 PDE 题目
-- 普通力学题、运动学题、非 PDE 题目不在当前自动求解范围内
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests\test_heat3d_api.py tests\test_poisson3d_api.py tests\test_websocket_api.py -q
+```
 
-## 文档
+Run targeted finance API tests:
 
-- 使用教程：[QUICKSTART.md](/D:/cursorku/QUICKSTART.md)
-- API 文档说明：[docs/API_GUIDE.md](/D:/cursorku/docs/API_GUIDE.md)
-- 提交建议：[SUBMISSION_GUIDE.md](/D:/cursorku/SUBMISSION_GUIDE.md)
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests\test_finance_api.py -q
+```
 
-## 项目展示建议
+Run frontend finance page tests:
 
-如果用于课程汇报，建议按以下顺序演示：
+```powershell
+cd static
+npm run test -- --run FinancePage
+```
 
-1. 展示 Web 首页与功能导航
-2. 在 LLM 配置页展示豆包配置
-3. 在题目解析页演示自然语言解析
-4. 在自动求解页展示完整闭环
-5. 在 Swagger 中展示接口设计
+Run the frontend build:
 
-## License
+```powershell
+cd static
+npm run build
+```
 
-仅用于课程项目展示与学习交流。
+## Documentation
+
+- quick usage guide: [QUICKSTART.md](/D:/cursorku/QUICKSTART.md)
+- API guide: [docs/API_GUIDE.md](/D:/cursorku/docs/API_GUIDE.md)
+- submission notes: [SUBMISSION_GUIDE.md](/D:/cursorku/SUBMISSION_GUIDE.md)

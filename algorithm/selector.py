@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import os
 import pickle
+import hashlib
 from dataclasses import dataclass
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
@@ -32,7 +33,7 @@ class AlgorithmSelectionError(ValueError):
     """Raised when selection, evaluation, or model I/O fails."""
 
 
-StrategyName = Literal["static_rf", "static_xgb", "dynamic_rl"]
+StrategyName = Literal["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"]
 
 
 def _ensure_model_dir(path: str) -> None:
@@ -224,6 +225,381 @@ def build_typical_case_dataset(seed: int = 42) -> Tuple[np.ndarray, np.ndarray, 
     return X, y, label_keys
 
 
+def build_feature_graph_dataset(X: np.ndarray) -> Dict[str, np.ndarray]:
+    """Convert x13 tabular features into a richer relational graph dataset.
+
+    Nodes:
+    - 0: physics aggregate
+    - 1: hardware aggregate
+    - 2: domain aggregate
+    - 3: equation-type relation node
+    - 4: accuracy-demand node
+    - 5: realtime-demand node
+    - 6: resource-budget node
+    - 7: fdm prototype
+    - 8: fem prototype
+    - 9: spectral prototype
+    """
+    arr = np.asarray(X, dtype=np.float32)
+    if arr.ndim != 2 or arr.shape[1] != 13:
+        raise AlgorithmSelectionError("GNN 图数据构建要求输入形状为 (N, 13)。")
+
+    physics = arr[:, 0:5]
+    hardware = arr[:, 5:10]
+    domain = np.pad(arr[:, 10:13], ((0, 0), (0, 2)), mode="constant")
+
+    equation_type = np.stack(
+        [
+            arr[:, 0],
+            arr[:, 1],
+            arr[:, 2],
+            1.0 - arr[:, 0],
+            arr[:, 4],
+        ],
+        axis=1,
+    ).astype(np.float32)
+    accuracy_node = np.stack(
+        [
+            arr[:, 10],
+            arr[:, 10] ** 2,
+            1.0 - arr[:, 10],
+            arr[:, 12],
+            arr[:, 0],
+        ],
+        axis=1,
+    ).astype(np.float32)
+    realtime_node = np.stack(
+        [
+            arr[:, 11],
+            arr[:, 11] ** 2,
+            1.0 - arr[:, 11],
+            arr[:, 9],
+            arr[:, 2],
+        ],
+        axis=1,
+    ).astype(np.float32)
+    budget_node = np.stack(
+        [
+            arr[:, 12],
+            arr[:, 12] ** 2,
+            1.0 - arr[:, 12],
+            arr[:, 9],
+            arr[:, 4],
+        ],
+        axis=1,
+    ).astype(np.float32)
+
+    algo_prototypes = np.array(
+        [
+            [0.55, 0.75, 0.85, 0.35, 0.15],
+            [0.75, 0.70, 0.60, 0.65, 0.55],
+            [0.92, 0.65, 0.55, 0.85, 0.45],
+        ],
+        dtype=np.float32,
+    )
+
+    node_features = np.concatenate(
+        [
+            np.stack([physics, hardware, domain, equation_type, accuracy_node, realtime_node, budget_node], axis=1),
+            np.broadcast_to(algo_prototypes[None, :, :], (arr.shape[0], 3, 5)).copy(),
+        ],
+        axis=1,
+    ).astype(np.float32)
+
+    edges: List[Tuple[int, int, float, float]] = []
+    aggregate_nodes = [0, 1, 2]
+    relation_nodes = [3, 4, 5, 6]
+    algo_nodes = [7, 8, 9]
+
+    for i in aggregate_nodes:
+        for j in aggregate_nodes:
+            if i != j:
+                edges.append((i, j, 0.25, 0.0))
+
+    for src in aggregate_nodes:
+        for dst in relation_nodes:
+            edges.append((src, dst, 0.50, 0.5))
+            edges.append((dst, src, 0.50, -0.5))
+
+    for src in relation_nodes:
+        for dst in algo_nodes:
+            edges.append((src, dst, 0.75, 1.0))
+            edges.append((dst, src, 0.75, -1.0))
+
+    for src in aggregate_nodes:
+        for dst in algo_nodes:
+            edges.append((src, dst, 0.35, 0.25))
+
+    edge_index = np.array([[src for src, _, _, _ in edges], [dst for _, dst, _, _ in edges]], dtype=np.int64)
+    edge_features = np.zeros((arr.shape[0], len(edges), 5), dtype=np.float32)
+
+    for edge_idx, (src, dst, base_strength, direction) in enumerate(edges):
+        src_feat = node_features[:, src, :]
+        dst_feat = node_features[:, dst, :]
+        mean_abs_diff = np.mean(np.abs(src_feat - dst_feat), axis=1)
+        mean_product = np.mean(src_feat * dst_feat, axis=1)
+        if src in aggregate_nodes and dst in aggregate_nodes:
+            relation_type = 0.0
+        elif (src in aggregate_nodes and dst in relation_nodes) or (src in relation_nodes and dst in aggregate_nodes):
+            relation_type = 1.0
+        elif src in relation_nodes and dst in algo_nodes:
+            relation_type = 2.0
+        elif src in algo_nodes and dst in relation_nodes:
+            relation_type = 3.0
+        else:
+            relation_type = 4.0
+        edge_features[:, edge_idx, :] = np.stack(
+            [
+                np.full((arr.shape[0],), base_strength, dtype=np.float32),
+                mean_abs_diff.astype(np.float32),
+                mean_product.astype(np.float32),
+                np.full((arr.shape[0],), relation_type / 4.0, dtype=np.float32),
+                np.full((arr.shape[0],), 1.0 if direction > 0 else 0.0, dtype=np.float32),
+            ],
+            axis=1,
+        )
+
+    return {
+        "node_features": node_features,
+        "edge_index": edge_index,
+        "edge_features": edge_features,
+    }
+
+
+class _SimpleGraphConvNet:
+    """A relational graph selector built only with torch."""
+
+    def __init__(
+        self,
+        seed: int = 42,
+        hidden_dim: int = 16,
+        epochs: int = 180,
+        lr: float = 1e-2,
+        patience: int = 18,
+        min_delta: float = 1e-4,
+        validation_fraction: float = 0.2,
+    ) -> None:
+        try:
+            import torch
+            import torch.nn as nn
+        except Exception as e:  # noqa: BLE001
+            raise AlgorithmSelectionError("无法导入 torch，无法训练 GNN 原型。请确认 requirements 已安装。") from e
+
+        self._torch = torch
+        self._nn = nn
+        self.hidden_dim = int(hidden_dim)
+        self.epochs = int(epochs)
+        self.lr = float(lr)
+        self.seed = int(seed)
+        self.patience = int(patience)
+        self.min_delta = float(min_delta)
+        self.validation_fraction = float(validation_fraction)
+        self.num_classes: Optional[int] = None
+        self.net: Optional[Any] = None
+        self._graph_cache: Dict[str, Dict[str, np.ndarray]] = {}
+        self.training_summary: Dict[str, Any] = {}
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = {
+            "seed": self.seed,
+            "hidden_dim": self.hidden_dim,
+            "epochs": self.epochs,
+            "lr": self.lr,
+            "patience": self.patience,
+            "min_delta": self.min_delta,
+            "validation_fraction": self.validation_fraction,
+            "num_classes": self.num_classes,
+            "training_summary": self.training_summary,
+            "net_state_dict": None,
+        }
+        if self.net is not None:
+            state["net_state_dict"] = self.net.state_dict()
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__init__(
+            seed=int(state.get("seed", 42)),
+            hidden_dim=int(state.get("hidden_dim", 16)),
+            epochs=int(state.get("epochs", 180)),
+            lr=float(state.get("lr", 1e-2)),
+            patience=int(state.get("patience", 18)),
+            min_delta=float(state.get("min_delta", 1e-4)),
+            validation_fraction=float(state.get("validation_fraction", 0.2)),
+        )
+        self.num_classes = state.get("num_classes")
+        self.training_summary = state.get("training_summary", {})
+        net_state_dict = state.get("net_state_dict")
+        if self.num_classes is not None and net_state_dict is not None:
+            self.net = self._build_net(in_dim=5, edge_dim=5, num_classes=int(self.num_classes))
+            self.net.load_state_dict(net_state_dict)
+
+    def _build_net(self, in_dim: int, edge_dim: int, num_classes: int) -> Any:
+        torch = self._torch
+        nn = self._nn
+
+        class RelationalGraphBlock(nn.Module):
+            def __init__(self, in_features: int, edge_features: int, out_features: int) -> None:
+                super().__init__()
+                self.lin_self = nn.Linear(in_features, out_features)
+                self.lin_src = nn.Linear(in_features, out_features)
+                self.lin_edge = nn.Linear(edge_features, out_features)
+
+            def forward(self, x: Any, edge_index: Any, edge_attr: Any) -> Any:
+                src, dst = edge_index
+                batch_size, num_nodes, _ = x.shape
+                out_dim = self.lin_self.out_features
+                agg = torch.zeros((batch_size, num_nodes, out_dim), dtype=x.dtype, device=x.device)
+                deg = torch.zeros((batch_size, num_nodes, 1), dtype=x.dtype, device=x.device)
+
+                src_feat = x[:, src, :]
+                msg = torch.relu(self.lin_src(src_feat) + self.lin_edge(edge_attr))
+                for edge_pos in range(edge_index.shape[1]):
+                    target = int(dst[edge_pos].item())
+                    agg[:, target, :] += msg[:, edge_pos, :]
+                    deg[:, target, :] += 1.0
+
+                deg = deg.clamp(min=1.0)
+                return torch.relu(self.lin_self(x) + agg / deg)
+
+        class Net(nn.Module):
+            def __init__(self, hidden_dim: int, out_dim: int) -> None:
+                super().__init__()
+                self.block1 = RelationalGraphBlock(in_dim, edge_dim, hidden_dim)
+                self.block2 = RelationalGraphBlock(hidden_dim, edge_dim, hidden_dim)
+                self.head = nn.Sequential(
+                    nn.Linear(hidden_dim, hidden_dim),
+                    nn.ReLU(),
+                    nn.Linear(hidden_dim, out_dim),
+                )
+
+            def forward(self, x: Any, edge_index: Any, edge_attr: Any) -> Any:
+                h = self.block1(x, edge_index, edge_attr)
+                h = self.block2(h, edge_index, edge_attr)
+                algo_nodes = h[:, 7:10, :]
+                pooled = algo_nodes.mean(dim=1)
+                return self.head(pooled)
+
+        return Net(self.hidden_dim, num_classes)
+
+    @staticmethod
+    def _cache_key(X: np.ndarray) -> str:
+        arr = np.ascontiguousarray(np.asarray(X, dtype=np.float32))
+        digest = hashlib.sha1(arr.view(np.uint8)).hexdigest()
+        return f"{arr.shape}:{digest}"
+
+    def _graphify(self, X: np.ndarray) -> Dict[str, np.ndarray]:
+        key = self._cache_key(X)
+        if key not in self._graph_cache:
+            self._graph_cache[key] = build_feature_graph_dataset(np.asarray(X, dtype=np.float32))
+        return self._graph_cache[key]
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "_SimpleGraphConvNet":
+        torch = self._torch
+        torch.manual_seed(self.seed)
+        np.random.seed(self.seed)
+
+        X_arr = np.asarray(X, dtype=np.float32)
+        y_arr = np.asarray(y, dtype=np.int64).reshape(-1)
+        if X_arr.shape[0] < 8:
+            train_idx = np.arange(X_arr.shape[0])
+            val_idx = np.arange(X_arr.shape[0])
+        else:
+            rng = np.random.default_rng(self.seed)
+            indices = np.arange(X_arr.shape[0])
+            rng.shuffle(indices)
+            split = max(1, int(X_arr.shape[0] * (1.0 - self.validation_fraction)))
+            split = min(split, X_arr.shape[0] - 1)
+            train_idx = indices[:split]
+            val_idx = indices[split:]
+
+        graphs = self._graphify(X_arr)
+        labels = np.asarray(y, dtype=np.int64).reshape(-1)
+        self.num_classes = int(np.max(labels)) + 1
+        self.net = self._build_net(
+            in_dim=graphs["node_features"].shape[-1],
+            edge_dim=graphs["edge_features"].shape[-1],
+            num_classes=self.num_classes,
+        )
+
+        x_tensor = torch.tensor(graphs["node_features"], dtype=torch.float32)
+        y_tensor = torch.tensor(labels, dtype=torch.long)
+        edge_index = torch.tensor(graphs["edge_index"], dtype=torch.long)
+        edge_attr = torch.tensor(graphs["edge_features"], dtype=torch.float32)
+        train_idx_tensor = torch.tensor(train_idx, dtype=torch.long)
+        val_idx_tensor = torch.tensor(val_idx, dtype=torch.long)
+
+        optimizer = torch.optim.Adam(self.net.parameters(), lr=self.lr)
+        criterion = self._nn.CrossEntropyLoss()
+        best_state: Optional[Dict[str, Any]] = None
+        best_val_loss = float("inf")
+        stale_rounds = 0
+        best_epoch = 0
+        epochs_run = 0
+        early_stopped = False
+
+        self.net.train()
+        for epoch in range(self.epochs):
+            epochs_run = epoch + 1
+            optimizer.zero_grad()
+            logits = self.net(x_tensor, edge_index, edge_attr)
+            train_loss = criterion(logits[train_idx_tensor], y_tensor[train_idx_tensor])
+            train_loss.backward()
+            optimizer.step()
+
+            self.net.eval()
+            with torch.no_grad():
+                val_logits = self.net(x_tensor, edge_index, edge_attr)
+                val_loss = float(criterion(val_logits[val_idx_tensor], y_tensor[val_idx_tensor]).item())
+            self.net.train()
+
+            if val_loss + self.min_delta < best_val_loss:
+                best_val_loss = val_loss
+                best_epoch = epoch + 1
+                best_state = {
+                    key: value.detach().cpu().clone()
+                    for key, value in self.net.state_dict().items()
+                }
+                stale_rounds = 0
+            else:
+                stale_rounds += 1
+                if stale_rounds >= self.patience:
+                    early_stopped = True
+                    break
+
+        if best_state is not None:
+            self.net.load_state_dict(best_state)
+        self.training_summary = {
+            "epochs_configured": self.epochs,
+            "epochs_run": epochs_run,
+            "best_epoch": best_epoch,
+            "best_val_loss": best_val_loss,
+            "early_stopped": early_stopped,
+            "patience": self.patience,
+            "validation_fraction": self.validation_fraction,
+            "hidden_dim": self.hidden_dim,
+        }
+        return self
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        if self.net is None or self.num_classes is None:
+            raise AlgorithmSelectionError("GNN 模型尚未训练。")
+        torch = self._torch
+        graphs = self._graphify(np.asarray(X, dtype=np.float32))
+        x_tensor = torch.tensor(graphs["node_features"], dtype=torch.float32)
+        edge_index = torch.tensor(graphs["edge_index"], dtype=torch.long)
+        edge_attr = torch.tensor(graphs["edge_features"], dtype=torch.float32)
+
+        self.net.eval()
+        with torch.no_grad():
+            logits = self.net(x_tensor, edge_index, edge_attr)
+            probs = torch.softmax(logits, dim=-1).cpu().numpy()
+        return probs
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        probs = self.predict_proba(X)
+        return np.argmax(probs, axis=1)
+
+
 # =========================
 # Dynamic adjustment (RL): minimal Q-learning
 # =========================
@@ -309,7 +685,7 @@ class AlgorithmSelector:
     # ---------- Static selection (supervised learning) ----------
 
     def train_static(self, strategy: StrategyName = "static_rf", seed: int = 42) -> Dict[str, Any]:
-        """Train a static selector (RF or XGB) using typical-case proxy dataset."""
+        """Train a static selector (RF, XGB, MLP, or GNN prototype) using proxy data."""
         X, y, label_keys = build_typical_case_dataset(seed=seed)
 
         if strategy == "static_rf":
@@ -341,14 +717,47 @@ class AlgorithmSelector:
                 eval_metric="mlogloss",
                 tree_method="hist",
             )
+        elif strategy == "mlp_nn":
+            try:
+                from sklearn.neural_network import MLPClassifier  # type: ignore
+            except Exception as e:  # noqa: BLE001
+                raise AlgorithmSelectionError(
+                    "无法导入 sklearn.neural_network.MLPClassifier。请确认 scikit-learn 已安装。"
+                ) from e
+            model = MLPClassifier(
+                hidden_layer_sizes=(32, 16),
+                activation="relu",
+                solver="adam",
+                alpha=1e-4,
+                batch_size=32,
+                learning_rate_init=1e-3,
+                max_iter=600,
+                random_state=seed,
+                early_stopping=True,
+                validation_fraction=0.15,
+            )
+        elif strategy == "gnn_selector":
+            model = _SimpleGraphConvNet(
+                seed=seed,
+                hidden_dim=16,
+                epochs=180,
+                lr=1e-2,
+                patience=18,
+                min_delta=1e-4,
+                validation_fraction=0.2,
+            )
         else:
-            raise AlgorithmSelectionError(f"未知静态策略: {strategy!r}，请使用 static_rf/static_xgb。")
+            raise AlgorithmSelectionError(f"未知静态策略: {strategy!r}，请使用 static_rf/static_xgb/mlp_nn/gnn_selector。")
 
         model.fit(X, y)
         self.static_model = self._force_single_thread_static_model(model)
         self.static_label_keys = label_keys
         self.static_strategy = strategy
-        return {"strategy": strategy, "num_samples": int(X.shape[0]), "labels": label_keys}
+        result = {"strategy": strategy, "num_samples": int(X.shape[0]), "labels": label_keys}
+        training_summary = getattr(model, "training_summary", None)
+        if training_summary:
+            result["training_summary"] = training_summary
+        return result
 
     def save_static(self, filename: Optional[str] = None) -> str:
         """Save trained static model to model_dir."""
@@ -360,6 +769,7 @@ class AlgorithmSelector:
             "strategy": self.static_strategy,
             "label_keys": self.static_label_keys,
             "model": self.static_model,
+            "training_summary": getattr(self.static_model, "training_summary", None),
         }
         try:
             with open(path, "wb") as f:
@@ -384,9 +794,26 @@ class AlgorithmSelector:
         self.static_model = self._force_single_thread_static_model(payload.get("model"))
         self.static_label_keys = payload.get("label_keys")
         self.static_strategy = payload.get("strategy", "static_rf")
+        if self.static_model is not None and payload.get("training_summary") is not None:
+            setattr(self.static_model, "training_summary", payload.get("training_summary"))
         if self.static_model is None or not self.static_label_keys:
             raise AlgorithmSelectionError("静态模型文件内容不完整。请重新训练/保存。")
-        return {"strategy": self.static_strategy, "labels": self.static_label_keys, "path": p}
+        result = {"strategy": self.static_strategy, "labels": self.static_label_keys, "path": p}
+        training_summary = getattr(self.static_model, "training_summary", None)
+        if training_summary:
+            result["training_summary"] = training_summary
+        return result
+
+    def _load_or_train_static(self, strategy: StrategyName) -> None:
+        """Ensure the requested static selector is available."""
+        expected_path = os.path.join(self.model_dir, f"static_{strategy}.pkl")
+        if self.static_model is not None and self.static_label_keys and self.static_strategy == strategy:
+            return
+        try:
+            self.load_static(path=expected_path)
+        except AlgorithmSelectionError:
+            self.train_static(strategy=strategy)
+            self.save_static(filename=f"static_{strategy}.pkl")
 
     def predict_static(self, physics: np.ndarray, hardware: np.ndarray, domain: np.ndarray) -> Tuple[str, Dict[str, float]]:
         """Predict best algorithm key using the trained static model."""
@@ -509,12 +936,8 @@ class AlgorithmSelector:
               "static_probs": {...} (optional)
             }
         """
-        if strategy in ("static_rf", "static_xgb"):
-            if self.static_model is None or not self.static_label_keys:
-                try:
-                    self.load_static()
-                except AlgorithmSelectionError:
-                    self.train_static(strategy=strategy)
+        if strategy in ("static_rf", "static_xgb", "mlp_nn", "gnn_selector"):
+            self._load_or_train_static(strategy)
             alg_key, probs = self.predict_static(physics, hardware, domain)
             static_probs = probs
         elif strategy == "dynamic_rl":

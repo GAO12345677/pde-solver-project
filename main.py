@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import logging
 import logging.handlers
+from contextlib import asynccontextmanager
 from typing import Any, Dict
 from pathlib import Path
 
@@ -56,11 +57,35 @@ def setup_logging():
 logger = setup_logging()
 cfg = get_config()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Run startup initialization without deprecated startup hooks."""
+    logger.info("Starting ML-Driven PDE Solver Selection Framework...")
+
+    hw = hardware_info_dict()
+    logger.info(f"Hardware detected: {hw}")
+
+    logger.info("Baidu Qianfan config:")
+    logger.info("  - Set env BAIDU_QIANFAN_API_KEY / BAIDU_QIANFAN_SECRET_KEY to enable ERNIE-Speed-8K parsing.")
+    logger.info("  - Test parse: http://127.0.0.1:8001/docs -> /api/parse_question")
+    logger.info("  - Auto solve: http://127.0.0.1:8001/docs -> /api/auto_solve")
+    logger.info("  - Swagger:    http://127.0.0.1:8001/docs")
+    logger.info("  - Redoc:      http://127.0.0.1:8001/redoc")
+    logger.info("  - Key config: http://127.0.0.1:8001/api/baidu/config")
+    logger.info("  - LLM admin:  http://127.0.0.1:8001/llm/admin")
+
+    logger.info(f"Server running on http://{cfg.server.host}:{cfg.server.port}")
+    logger.info(f"Debug mode: {cfg.server.debug}")
+    logger.info(f"Proxy enabled: {cfg.proxy.enabled}")
+    yield
+
 app = FastAPI(
     title="ML-Driven PDE Solver Selection Framework",
     version="1.0.0",
     description="论文框架工程化实现：特征提取→算法选择→方程求解→结果评估/自优化（Swagger/Redoc 可调试）。",
-    debug=cfg.server.debug
+    debug=cfg.server.debug,
+    lifespan=lifespan,
 )
 
 # ========== 原有异常处理逻辑 ==========
@@ -152,26 +177,6 @@ async def root():
     return {"message": "PDE Solver API", "frontend": "/app", "docs": "/docs", "llm_admin": "/llm/admin"}
 
 # ========== 原有启动逻辑（新增 LLM 页面提示） ==========
-@app.on_event("startup")
-def on_startup() -> None:
-    """启动时初始化"""
-    logger.info("Starting ML-Driven PDE Solver Selection Framework...")
-    
-    hw = hardware_info_dict()
-    logger.info(f"Hardware detected: {hw}")
-    
-    logger.info("Baidu Qianfan config:")
-    logger.info("  - Set env BAIDU_QIANFAN_API_KEY / BAIDU_QIANFAN_SECRET_KEY to enable ERNIE-Speed-8K parsing.")
-    logger.info("  - Test parse: http://127.0.0.1:8001/docs -> /api/parse_question")
-    logger.info("  - Auto solve: http://127.0.0.1:8001/docs -> /api/auto_solve")
-    logger.info("  - Swagger:    http://127.0.0.1:8001/docs")
-    logger.info("  - Redoc:      http://127.0.0.1:8001/redoc")
-    logger.info("  - Key config: http://127.0.0.1:8001/api/baidu/config")
-    logger.info("  - LLM admin:  http://127.0.0.1:8001/llm/admin")
-    
-    logger.info(f"Server running on http://{cfg.server.host}:{cfg.server.port}")
-    logger.info(f"Debug mode: {cfg.server.debug}")
-    logger.info(f"Proxy enabled: {cfg.proxy.enabled}")
 
 
 def run() -> None:

@@ -20,6 +20,8 @@ import math
 import time
 from typing import Any, Dict, Optional
 import inspect
+import json
+import os
 
 import numpy as np
 from fastapi import APIRouter, HTTPException, Request
@@ -33,12 +35,36 @@ from feature.extractor import (
     PhysicsFeatureExtractor,
 )
 from feedback.evaluator import FeedbackError, ModelOptimizer, ResultEvaluator
+from services.ashare_market_data import AShareMarketDataError, fetch_ashare_pair_analysis, fetch_ashare_stock_analysis
+from services.ashare_option_data import AShareOptionError, fetch_etf_option_snapshot, fetch_index_option_snapshot
+from services.finance import compare_option_with_market, price_black_scholes_1d, price_black_scholes_2d, simulate_stock_dynamics
+from services.finance_features import estimate_pair_inputs, estimate_stock_inputs
 from solver.numerical_solver import (
     BoundarySpec,
     Heat1DParams,
     SolverError,
     get_solver,
+    solve_heat3d_fdm,
+    solve_heat3d_fem,
+    solve_heat3d_fvm,
+    solve_heat2d_fdm,
+    solve_heat2d_fem,
+    solve_heat2d_fvm,
+    solve_poisson3d_bem,
+    solve_poisson3d_fdm,
+    solve_poisson3d_fem,
     solve_poisson2d_nonlinear,
+    Wave1DParams,
+    solve_wave2d_fdm,
+    solve_wave2d_fem,
+    solve_wave2d_spectral,
+    solve_wave1d_fem,
+    solve_wave1d,
+    solve_wave3d_fdm,
+    solve_wave3d_fem,
+    solve_wave3d_spectral,
+    solve_wave1d_spectral,
+    solve_wave1d_spectral_v2,
 )
 from nlp.baidu_parser import GLOBAL_BAIDU_KEY_STORE, PDEQuestionBaiduParser
 from api.llm.llm_factory import LLMFactory
@@ -46,9 +72,67 @@ from api.llm.llm_config_manager import LLMConfigManager
 from api.llm.universal_parser import PDEQuestionUniversalParser
 from api.llm.llm_base import BaseParser
 from pydantic import BaseModel
+from test_case.benchmark_algorithms import build_report, save_report
 
 
 router = APIRouter()
+
+SUPPORTED_EQUATIONS = {
+    "heat1d": {
+        "name": "1D Heat Equation",
+        "algorithms": ["fdm", "fvm", "fem", "spectral", "pinn"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前是最完整、最稳定的一维热传导示例，已经接通 FDM/FVM/FEM/Spectral/PINN 多条求解链路。",
+    },
+    "wave1d": {
+        "name": "1D Wave Equation",
+        "algorithms": ["fdm", "fem", "spectral"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前稳定支持一维波动方程的 FDM、FEM 和 Spectral 方法，适合做算法对比与教学演示。",
+    },
+    "poisson1d": {
+        "name": "1D Poisson Equation",
+        "algorithms": ["fdm", "fem", "spectral", "bem"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前支持零 Dirichlet 边界下的一维 Poisson 教学基线，可比较 FDM/FEM/Spectral/BEM。",
+    },
+    "heat2d": {
+        "name": "2D Heat Equation",
+        "algorithms": ["fdm", "fvm", "fem"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前支持二维热传导方程的 FDM/FVM/FEM 基线，适合展示二维温度场与算法性能差异。",
+    },
+    "heat3d": {
+        "name": "3D Heat Equation",
+        "algorithms": ["fdm", "fvm", "fem"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前支持零 Dirichlet 边界下的三维热传导 FDM/FVM/FEM 基线，可结合切片结果查看 3D 温度场。",
+    },
+    "wave2d": {
+        "name": "2D Wave Equation",
+        "algorithms": ["fdm", "fem", "spectral"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前支持二维波动方程的 FDM/FEM/Spectral 基线，主要演示边界条件下的波传播与算法差异。",
+    },
+    "wave3d": {
+        "name": "3D Wave Equation",
+        "algorithms": ["fdm", "fem", "spectral"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前支持零 Dirichlet 边界下的三维波动 FDM/FEM/Spectral 基线，可用于 3D 波场切片展示。",
+    },
+    "poisson2d_nonlinear": {
+        "name": "2D Nonlinear Poisson Equation",
+        "algorithms": ["fdm"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前是二维非线性 Poisson 的演示型 manufactured-solution 基线，用于说明非线性问题的基本流程。",
+    },
+    "poisson3d": {
+        "name": "3D Poisson Equation",
+        "algorithms": ["fdm", "fem", "bem"],
+        "strategies": ["static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"],
+        "note": "当前支持零 Dirichlet 边界下的三维 Poisson FDM/FEM/BEM 教学基线，适合比较体方法与边界方法。",
+    },
+}
 
 class ParseQuestionIn(BaseModel):
     question: str
@@ -58,6 +142,70 @@ class AutoSolveIn(BaseModel):
     question: str
     parser_model: Optional[str] = "baidu" # Default to baidu for backward compatibility
     return_full_solution: Optional[bool] = False
+
+
+class StockSimulationIn(BaseModel):
+    initial_price: float = 100.0
+    drift: float = 0.08
+    volatility: float = 0.2
+    horizon: float = 1.0
+    steps: int = 252
+    paths: int = 2000
+
+
+class BlackScholes1DIn(BaseModel):
+    spot: float = 100.0
+    strike: float = 105.0
+    maturity: float = 0.5
+    volatility: float = 0.25
+    rate: float = 0.02
+
+
+class BlackScholes2DIn(BaseModel):
+    spot1: float = 100.0
+    spot2: float = 95.0
+    strike: float = 100.0
+    maturity: float = 0.5
+    volatility1: float = 0.25
+    volatility2: float = 0.22
+    rate: float = 0.02
+    correlation: float = 0.3
+    grid_size: int = 16
+
+
+class StockEstimateQuery(BaseModel):
+    symbol: str
+    lookback_days: int = 252
+
+
+class PairEstimateQuery(BaseModel):
+    symbol1: str
+    symbol2: str
+    lookback_days: int = 252
+
+
+class OptionCompareIn(BaseModel):
+    symbol: str
+    expiry: Optional[str] = None
+    strike: Optional[float] = None
+    option_type: str = "call"
+    maturity_years: Optional[float] = None
+    use_market_iv: bool = True
+
+
+class AShareETFOptionIn(BaseModel):
+    underlying: str = "510050"
+    option_type: str = "call"
+    expiry: Optional[str] = None
+    strike: Optional[float] = None
+    contract_code: Optional[str] = None
+
+
+class AShareIndexOptionIn(BaseModel):
+    market: str = "hs300"
+    option_type: str = "call"
+    contract_month: Optional[str] = None
+    strike: Optional[float] = None
 
 async def _get_parser_instance(model_name: str) -> BaseParser:
     # Try to create LLM-based parser
@@ -118,9 +266,12 @@ _PDE_POSITIVE_HINTS = (
     "波动方程",
     "泊松方程",
     "poisson",
+    "wave equation",
     "heat equation",
     "heat1d",
+    "wave1d",
     "u_t",
+    "u_tt",
     "u_xx",
     "u_x",
     "边界条件",
@@ -157,8 +308,8 @@ def _validate_parsed_problem(question: str, parsed: Dict[str, Any]) -> Optional[
     if has_non_pde_hint and not has_pde_hint:
         return "这道题看起来不是偏微分方程题，而是普通力学/物理应用题，当前自动求解器不支持。"
 
-    if equation_type not in ("heat1d", "poisson2d_nonlinear"):
-        return "当前仅支持热传导方程和二维非线性 Poisson 方程相关 PDE 题。"
+    if equation_type not in ("heat1d", "heat2d", "heat3d", "wave1d", "wave2d", "wave3d", "poisson1d", "poisson3d", "poisson2d_nonlinear"):
+        return "当前仅支持 heat1d、heat2d、heat3d、wave1d、wave2d、wave3d、poisson1d、poisson3d 和 poisson2d_nonlinear。"
 
     try:
         if int(problem_size) <= 0:
@@ -167,6 +318,42 @@ def _validate_parsed_problem(question: str, parsed: Dict[str, Any]) -> Optional[
         return "题目未能解析出有效的 PDE 网格规模或自由度，当前自动求解器不支持继续求解。"
 
     return None
+
+
+def _repair_fallback_parsed_problem(question: str, parsed: Dict[str, Any]) -> Dict[str, Any]:
+    if not isinstance(parsed, dict):
+        return parsed
+    text = (question or "").lower()
+    physics_params = parsed.get("physics_params")
+    if not isinstance(physics_params, dict):
+        physics_params = {}
+        parsed["physics_params"] = physics_params
+
+    is_3d = ("3d" in text) or ("三维" in text) or ("^3" in text) or ("立方体" in text)
+
+    if ("poisson" in text or "泊松" in text) and is_3d:
+        physics_params["equation_type"] = "poisson3d"
+        physics_params["dimension"] = 3
+        physics_params["linear"] = True
+        physics_params["stationary"] = True
+        physics_params["boundary_condition"] = physics_params.get("boundary_condition", "dirichlet")
+        physics_params["problem_size"] = max(int(physics_params.get("problem_size", 21 * 21 * 21)), 21 * 21 * 21)
+    elif ("heat" in text or "热传导" in text or "热方程" in text) and is_3d:
+        physics_params["equation_type"] = "heat3d"
+        physics_params["dimension"] = 3
+        physics_params["linear"] = True
+        physics_params["stationary"] = False
+        physics_params["boundary_condition"] = physics_params.get("boundary_condition", "dirichlet")
+        physics_params["problem_size"] = max(int(physics_params.get("problem_size", 11 * 11 * 11)), 11 * 11 * 11)
+    elif ("wave" in text or "波动" in text) and is_3d:
+        physics_params["equation_type"] = "wave3d"
+        physics_params["dimension"] = 3
+        physics_params["linear"] = True
+        physics_params["stationary"] = False
+        physics_params["boundary_condition"] = physics_params.get("boundary_condition", "dirichlet")
+        physics_params["problem_size"] = max(int(physics_params.get("problem_size", 15 * 15 * 15)), 15 * 15 * 15)
+
+    return parsed
 
 
 def _preview_list(values: list[float], head: int = 50, tail: int = 50) -> Dict[str, Any]:
@@ -189,6 +376,154 @@ def _preview_list(values: list[float], head: int = 50, tail: int = 50) -> Dict[s
     }
 
 
+def _validate_zero_dirichlet_3d(
+    *,
+    eq_type: str,
+    bc_type: BoundaryCondition,
+    left_bc: float,
+    right_bc: float,
+) -> Optional[Dict[str, Any]]:
+    if bc_type != BoundaryCondition.DIRICHLET:
+        return _err(f"{eq_type} currently only supports zero Dirichlet boundaries.", code="INVALID_BOUNDARY_TYPE")
+    if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+        return _err(f"{eq_type} currently requires zero Dirichlet boundaries.", code="INVALID_BOUNDARY_VALUE")
+    return None
+
+
+def _pack_3d_steady_result(
+    *,
+    eq_type: str,
+    algorithm_key: str,
+    shape: list[int],
+    solution: np.ndarray,
+    solve_info: Dict[str, Any],
+    return_full: bool,
+) -> Dict[str, Any]:
+    sol_list = solution.reshape(-1).tolist()
+    data = {
+        "shape": shape,
+        "equation_type": eq_type,
+        "recommended_algorithm": algorithm_key,
+        "executed_algorithm": solve_info.get("algorithm", algorithm_key),
+        "solve_info": solve_info,
+        "solution_preview": _preview_list(sol_list),
+    }
+    if return_full:
+        data["solution"] = sol_list
+    return data
+
+
+def _pack_3d_transient_result(
+    *,
+    eq_type: str,
+    algorithm_key: str,
+    shape: list[int],
+    solution: np.ndarray,
+    info_pack: Dict[str, Any],
+    return_full: bool,
+) -> Dict[str, Any]:
+    sol_list = solution.reshape(-1).tolist()
+    data = {
+        "shape": shape,
+        "equation_type": eq_type,
+        "recommended_algorithm": algorithm_key,
+        "executed_algorithm": info_pack["solve_info"]["algorithm"],
+        "solve_info": info_pack["solve_info"],
+        "validation": info_pack["validation"],
+        "solution_preview": _preview_list(sol_list),
+    }
+    if return_full:
+        data["solution"] = sol_list
+    return data
+
+
+def _solve_poisson3d_case(
+    *,
+    algorithm_key: str,
+    nx: int,
+    ny: int,
+    nz: int,
+    Lx: float,
+    Ly: float,
+    Lz: float,
+    return_full: bool,
+) -> Dict[str, Any]:
+    if algorithm_key == "fem":
+        sol3d, info = solve_poisson3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+    elif algorithm_key == "bem":
+        sol3d, info = solve_poisson3d_bem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+    else:
+        sol3d, info = solve_poisson3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+    return _pack_3d_steady_result(
+        eq_type="poisson3d",
+        algorithm_key=algorithm_key,
+        shape=[nz, ny, nx],
+        solution=sol3d,
+        solve_info=info,
+        return_full=return_full,
+    )
+
+
+def _solve_heat3d_case(
+    *,
+    algorithm_key: str,
+    nx: int,
+    ny: int,
+    nz: int,
+    Lx: float,
+    Ly: float,
+    Lz: float,
+    k: float,
+    t_span: tuple[float, float],
+    nt: int,
+    return_full: bool,
+) -> Dict[str, Any]:
+    if algorithm_key == "fvm":
+        sol3d, info_pack = solve_heat3d_fvm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, k=k, t_span=t_span, nt=nt)
+    elif algorithm_key == "fem":
+        sol3d, info_pack = solve_heat3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, k=k, t_span=t_span, nt=nt)
+    else:
+        sol3d, info_pack = solve_heat3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, k=k, t_span=t_span, nt=nt)
+    return _pack_3d_transient_result(
+        eq_type="heat3d",
+        algorithm_key=algorithm_key,
+        shape=[nz, ny, nx],
+        solution=sol3d,
+        info_pack=info_pack,
+        return_full=return_full,
+    )
+
+
+def _solve_wave3d_case(
+    *,
+    algorithm_key: str,
+    nx: int,
+    ny: int,
+    nz: int,
+    Lx: float,
+    Ly: float,
+    Lz: float,
+    c: float,
+    t_span: tuple[float, float],
+    nt: int,
+    return_full: bool,
+) -> Dict[str, Any]:
+    if algorithm_key == "fem":
+        sol3d, info_pack = solve_wave3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=t_span, nt=nt)
+    elif algorithm_key == "spectral":
+        sol3d, info_pack = solve_wave3d_spectral(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=t_span, nt=nt)
+    else:
+        sol3d, info_pack = solve_wave3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=t_span, nt=nt)
+    return _pack_3d_transient_result(
+        eq_type="wave3d",
+        algorithm_key=algorithm_key,
+        shape=[nz, ny, nx],
+        solution=sol3d,
+        info_pack=info_pack,
+        return_full=return_full,
+    )
+
+
 def _ok(data: Any) -> Dict[str, Any]:
     return {"status": "ok", "success": True, "error": None, "data": data}
 
@@ -200,6 +535,211 @@ def _err(message: str, *, code: str = "BAD_REQUEST", details: Optional[Any] = No
         "error": {"code": code, "message": message, "details": details},
         "data": None,
     }
+
+
+@router.get("/supported_equations")
+async def supported_equations() -> Dict[str, Any]:
+    return _ok({"equations": SUPPORTED_EQUATIONS})
+
+
+@router.get("/benchmark/latest")
+async def benchmark_latest() -> Dict[str, Any]:
+    benchmark_dir = "benchmark"
+    latest_path: Optional[str] = None
+    if os.path.isdir(benchmark_dir):
+        files = [
+            os.path.join(benchmark_dir, name)
+            for name in os.listdir(benchmark_dir)
+            if name.startswith("benchmark_") and name.endswith(".json")
+        ]
+        if files:
+            latest_path = max(files, key=os.path.getmtime)
+
+    if latest_path is None:
+        report = build_report()
+        latest_path = save_report(report, output_dir=benchmark_dir)
+    else:
+        with open(latest_path, "r", encoding="utf-8") as f:
+            report = json.load(f)
+
+    return _ok({"report": report, "path": latest_path})
+
+
+@router.post("/finance/stocks/simulate")
+async def finance_simulate_stocks(payload: StockSimulationIn) -> Dict[str, Any]:
+    data = simulate_stock_dynamics(
+        initial_price=payload.initial_price,
+        drift=payload.drift,
+        volatility=payload.volatility,
+        horizon=payload.horizon,
+        steps=payload.steps,
+        paths=payload.paths,
+    )
+    return _ok(data)
+
+
+@router.post("/finance/options/black_scholes_1d")
+async def finance_black_scholes_1d(payload: BlackScholes1DIn) -> Dict[str, Any]:
+    data = price_black_scholes_1d(
+        spot=payload.spot,
+        strike=payload.strike,
+        maturity=payload.maturity,
+        volatility=payload.volatility,
+        rate=payload.rate,
+    )
+    return _ok(data)
+
+
+@router.post("/finance/options/black_scholes_2d")
+async def finance_black_scholes_2d(payload: BlackScholes2DIn) -> Dict[str, Any]:
+    data = price_black_scholes_2d(
+        spot1=payload.spot1,
+        spot2=payload.spot2,
+        strike=payload.strike,
+        maturity=payload.maturity,
+        volatility1=payload.volatility1,
+        volatility2=payload.volatility2,
+        rate=payload.rate,
+        correlation=payload.correlation,
+        grid_size=payload.grid_size,
+    )
+    return _ok(data)
+
+
+@router.get("/finance/market/stock/{symbol}")
+async def finance_market_stock(symbol: str, lookback_days: int = 252) -> Dict[str, Any]:
+    data = estimate_stock_inputs(symbol, lookback_days)
+    return _ok(data)
+
+
+@router.get("/finance/market/pair")
+async def finance_market_pair(symbol1: str, symbol2: str, lookback_days: int = 252) -> Dict[str, Any]:
+    data = estimate_pair_inputs(symbol1, symbol2, lookback_days)
+    return _ok(data)
+
+
+@router.post("/finance/options/compare_market")
+async def finance_option_compare_market(payload: OptionCompareIn) -> Dict[str, Any]:
+    data = compare_option_with_market(
+        symbol=payload.symbol,
+        expiry=payload.expiry,
+        strike=payload.strike,
+        option_type=payload.option_type,
+        maturity_years=payload.maturity_years,
+        use_market_iv=payload.use_market_iv,
+    )
+    return _ok(data)
+
+
+@router.get("/finance/ashare/stock/{symbol}")
+async def finance_ashare_stock(symbol: str, lookback_days: int = 252, force_history_only: bool = False) -> Dict[str, Any]:
+    try:
+        data = fetch_ashare_stock_analysis(symbol, lookback_days, force_history_only=force_history_only)
+        return _ok(data)
+    except AShareMarketDataError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股数据源暂时不可用，可能是免费行情源断连、限流或当前网络链路不稳定，请稍后重试。",
+                code="ASHARE_DATA_UNAVAILABLE",
+                details={"source": "akshare", "message": str(exc)},
+            ),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股实时数据抓取失败，当前免费数据源连接不稳定，请稍后重试。",
+                code="ASHARE_DATA_UPSTREAM_ERROR",
+                details={"source": "akshare", "message": str(exc), "symbol": symbol},
+            ),
+        ) from exc
+
+
+@router.get("/finance/ashare/pair")
+async def finance_ashare_pair(symbol1: str, symbol2: str, lookback_days: int = 252) -> Dict[str, Any]:
+    try:
+        data = fetch_ashare_pair_analysis(symbol1, symbol2, lookback_days)
+        return _ok(data)
+    except AShareMarketDataError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股双股票数据抓取失败，通常是上游免费数据源断连或短时不可用，请稍后重试。",
+                code="ASHARE_PAIR_UNAVAILABLE",
+                details={"source": "akshare", "symbol1": symbol1, "symbol2": symbol2, "message": str(exc)},
+            ),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股双股票联动数据抓取失败，当前免费数据源连接不稳定，请稍后重试。",
+                code="ASHARE_PAIR_UPSTREAM_ERROR",
+                details={"source": "akshare", "symbol1": symbol1, "symbol2": symbol2, "message": str(exc)},
+            ),
+        ) from exc
+
+
+@router.post("/finance/ashare/etf_option")
+async def finance_ashare_etf_option(payload: AShareETFOptionIn) -> Dict[str, Any]:
+    try:
+        data = fetch_etf_option_snapshot(
+            underlying=payload.underlying,
+            option_type=payload.option_type,
+            expiry=payload.expiry,
+            strike=payload.strike,
+            contract_code=payload.contract_code,
+        )
+        return _ok(data)
+    except AShareOptionError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股ETF期权数据源暂时不可用，请稍后重试。",
+                code="ASHARE_ETF_OPTION_UNAVAILABLE",
+                details={"source": "akshare", "underlying": payload.underlying, "message": str(exc)},
+            ),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股ETF期权数据抓取失败，当前免费数据源连接不稳定，请稍后重试。",
+                code="ASHARE_ETF_OPTION_UPSTREAM_ERROR",
+                details={"source": "akshare", "underlying": payload.underlying, "message": str(exc)},
+            ),
+        ) from exc
+
+
+@router.post("/finance/ashare/index_option")
+async def finance_ashare_index_option(payload: AShareIndexOptionIn) -> Dict[str, Any]:
+    try:
+        data = fetch_index_option_snapshot(
+            market=payload.market,
+            option_type=payload.option_type,
+            contract_month=payload.contract_month,
+            strike=payload.strike,
+        )
+        return _ok(data)
+    except AShareOptionError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股股指期权数据源暂时不可用，请稍后重试。",
+                code="ASHARE_INDEX_OPTION_UNAVAILABLE",
+                details={"source": "akshare", "market": payload.market, "message": str(exc)},
+            ),
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=503,
+            detail=_err(
+                "A股股指期权数据抓取失败，当前免费数据源连接不稳定，请稍后重试。",
+                code="ASHARE_INDEX_OPTION_UPSTREAM_ERROR",
+                details={"source": "akshare", "market": payload.market, "message": str(exc)},
+            ),
+        ) from exc
 
 
 async def _read_payload(request: Request) -> Dict[str, Any]:
@@ -252,8 +792,8 @@ async def extract_feature(request: Request) -> Dict[str, Any]:
 
     Input:
     - physics: structured params. Minimal required keys:
-      - equation_type: "heat1d" or "poisson2d_nonlinear"
-      - (for heat1d) dimension/linearity/stationarity/boundary_condition/problem_size or inferable keys
+      - equation_type: "heat1d", "wave1d" or "poisson2d_nonlinear"
+      - (for heat1d/wave1d) dimension/linearity/stationarity/boundary_condition/problem_size or inferable keys
     - domain: accuracy/realtime/resource_budget
     Output:
     - normalized physics/hardware/domain vectors
@@ -264,7 +804,43 @@ async def extract_feature(request: Request) -> Dict[str, Any]:
         eq_type = str(payload.get("equation_type", "heat1d")).strip().lower()
 
         # Physics features (normalized)
-        if eq_type == "heat1d":
+        if eq_type in ("heat1d", "poisson1d"):
+            nx = _to_int(payload.get("nx", 101), "nx")
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 1,
+                    "linearity": 0,
+                    "stationarity": 0 if eq_type == "poisson1d" else 1,
+                    "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
+                    "problem_size": nx,
+                }
+            )
+        elif eq_type == "heat2d":
+            nx = _to_int(payload.get("nx", 41), "nx")
+            ny = _to_int(payload.get("ny", 41), "ny")
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 2,
+                    "linearity": 0,
+                    "stationarity": 1,
+                    "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
+                    "problem_size": nx * ny,
+                }
+            )
+        elif eq_type == "heat3d":
+            nx = _to_int(payload.get("nx", 11), "nx")
+            ny = _to_int(payload.get("ny", 11), "ny")
+            nz = _to_int(payload.get("nz", 11), "nz")
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 3,
+                    "linearity": 0,
+                    "stationarity": 1,
+                    "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
+                    "problem_size": nx * ny * nz,
+                }
+            )
+        elif eq_type == "wave1d":
             nx = _to_int(payload.get("nx", 101), "nx")
             physics_out = PhysicsFeatureExtractor.extract_from_params(
                 {
@@ -273,6 +849,31 @@ async def extract_feature(request: Request) -> Dict[str, Any]:
                     "stationarity": 1,
                     "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
                     "problem_size": nx,
+                }
+            )
+        elif eq_type == "wave2d":
+            nx = _to_int(payload.get("nx", 41), "nx")
+            ny = _to_int(payload.get("ny", 41), "ny")
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 2,
+                    "linearity": 0,
+                    "stationarity": 1,
+                    "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
+                    "problem_size": nx * ny,
+                }
+            )
+        elif eq_type == "wave3d":
+            nx = _to_int(payload.get("nx", 15), "nx")
+            ny = _to_int(payload.get("ny", 15), "ny")
+            nz = _to_int(payload.get("nz", 15), "nz")
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 3,
+                    "linearity": 0,
+                    "stationarity": 1,
+                    "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
+                    "problem_size": nx * ny * nz,
                 }
             )
         elif eq_type == "poisson2d_nonlinear":
@@ -287,8 +888,21 @@ async def extract_feature(request: Request) -> Dict[str, Any]:
                     "problem_size": nx * ny,
                 }
             )
+        elif eq_type == "poisson3d":
+            nx = _to_int(payload.get("nx", 21), "nx")
+            ny = _to_int(payload.get("ny", 21), "ny")
+            nz = _to_int(payload.get("nz", 21), "nz")
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 3,
+                    "linearity": 0,
+                    "stationarity": 0,
+                    "boundary_condition": str(payload.get("boundary_condition", "dirichlet")),
+                    "problem_size": nx * ny * nz,
+                }
+            )
         else:
-            return _err("equation_type 必须是 heat1d 或 poisson2d_nonlinear。", code="INVALID_EQUATION_TYPE")
+            return _err("equation_type 必须是 heat1d、heat2d、heat3d、wave1d、wave2d、wave3d、poisson1d、poisson3d 或 poisson2d_nonlinear。", code="INVALID_EQUATION_TYPE")
 
         physics_vec = PhysicsFeatureExtractor.normalize(physics_out["vector"])
 
@@ -329,18 +943,16 @@ async def select_algorithm(request: Request) -> Dict[str, Any]:
     payload = await _read_payload(request)
     try:
         strategy = str(payload.get("strategy", "static_rf")).strip().lower()
-        if strategy not in ("static_rf", "static_xgb", "dynamic_rl"):
-            return _err("strategy 必须是 static_rf/static_xgb/dynamic_rl。", code="INVALID_STRATEGY")
+        if strategy not in ("static_rf", "static_xgb", "dynamic_rl", "mlp_nn", "gnn_selector"):
+            return _err("strategy 必须是 static_rf/static_xgb/dynamic_rl/mlp_nn/gnn_selector。", code="INVALID_STRATEGY")
 
         physics = np.array(payload.get("physics", []), dtype=float)
         hardware = np.array(payload.get("hardware", []), dtype=float)
         domain = np.array(payload.get("domain", []), dtype=float)
 
         # Auto-load/train to keep the service "no extra config" runnable.
-        if strategy in ("static_rf", "static_xgb"):
-            if selector.static_model is None:
-                selector.train_static(strategy=strategy)  # train typical-case proxy dataset
-                selector.save_static()
+        if strategy in ("static_rf", "static_xgb", "mlp_nn", "gnn_selector"):
+            selector._load_or_train_static(strategy)  # type: ignore[attr-defined]
         else:
             if selector.rl_agent is None:
                 selector.train_dynamic(episodes=120)  # small default for quick runnable service
@@ -362,13 +974,178 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
     try:
         eq_type = str(payload.get("equation_type", "heat1d")).strip().lower()
         algorithm_key = str(payload.get("algorithm_key", "")).strip().lower()
-        if algorithm_key not in ("fdm", "fem", "spectral"):
-            return _err("algorithm_key 必须是 fdm/fem/spectral。", code="INVALID_ALGORITHM_KEY")
+        if algorithm_key not in ("fdm", "fvm", "fem", "spectral", "pinn", "bem"):
+            return _err("algorithm_key 必须是 fdm/fvm/fem/spectral。", code="INVALID_ALGORITHM_KEY")
 
         # Default: do NOT return huge solution arrays in Swagger.
         return_full = str(payload.get("return_full_solution", "false")).strip().lower() in ("1", "true", "yes")
 
         # DEBUG_BREAKPOINT_API_SOLVE: set breakpoint here.
+        if eq_type == "poisson3d":
+            if algorithm_key not in ("fdm", "fem", "bem"):
+                return _err("poisson3d currently only supports FDM/FEM/BEM.", code="UNSUPPORTED_ALGORITHM")
+            nx = _to_int(payload.get("nx", 21), "nx")
+            ny = _to_int(payload.get("ny", 21), "ny")
+            nz = _to_int(payload.get("nz", 21), "nz")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            Lz = _to_float(payload.get("Lz", payload.get("L", 1.0)), "Lz")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            bc_error = _validate_zero_dirichlet_3d(eq_type=eq_type, bc_type=bc_type, left_bc=left_bc, right_bc=right_bc)
+            if bc_error is not None:
+                return bc_error
+            return _ok(
+                _solve_poisson3d_case(
+                    algorithm_key=algorithm_key,
+                    nx=nx,
+                    ny=ny,
+                    nz=nz,
+                    Lx=Lx,
+                    Ly=Ly,
+                    Lz=Lz,
+                    return_full=True,
+                )
+            )
+
+        if eq_type == "heat3d":
+            if algorithm_key not in ("fdm", "fvm", "fem"):
+                return _err("heat3d currently only supports FDM/FVM/FEM.", code="UNSUPPORTED_ALGORITHM")
+            k = _to_float(payload.get("k", 1.0), "k")
+            nx = _to_int(payload.get("nx", 11), "nx")
+            ny = _to_int(payload.get("ny", 11), "ny")
+            nz = _to_int(payload.get("nz", 11), "nz")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            Lz = _to_float(payload.get("Lz", payload.get("L", 1.0)), "Lz")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.02), "t1")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            bc_error = _validate_zero_dirichlet_3d(eq_type=eq_type, bc_type=bc_type, left_bc=left_bc, right_bc=right_bc)
+            if bc_error is not None:
+                return bc_error
+            return _ok(
+                _solve_heat3d_case(
+                    algorithm_key=algorithm_key,
+                    nx=nx,
+                    ny=ny,
+                    nz=nz,
+                    Lx=Lx,
+                    Ly=Ly,
+                    Lz=Lz,
+                    k=k,
+                    t_span=(t0, t1),
+                    nt=nt,
+                    return_full=True,
+                )
+            )
+
+        if eq_type == "wave3d":
+            if algorithm_key not in ("fdm", "fem", "spectral"):
+                return _err("wave3d currently only supports FDM/FEM/spectral.", code="UNSUPPORTED_ALGORITHM")
+            c = _to_float(payload.get("c", 1.0), "c")
+            nx = _to_int(payload.get("nx", 15), "nx")
+            ny = _to_int(payload.get("ny", 15), "ny")
+            nz = _to_int(payload.get("nz", 15), "nz")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            Lz = _to_float(payload.get("Lz", payload.get("L", 1.0)), "Lz")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.15), "t1")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            bc_error = _validate_zero_dirichlet_3d(eq_type=eq_type, bc_type=bc_type, left_bc=left_bc, right_bc=right_bc)
+            if bc_error is not None:
+                return bc_error
+            return _ok(
+                _solve_wave3d_case(
+                    algorithm_key=algorithm_key,
+                    nx=nx,
+                    ny=ny,
+                    nz=nz,
+                    Lx=Lx,
+                    Ly=Ly,
+                    Lz=Lz,
+                    c=c,
+                    t_span=(t0, t1),
+                    nt=nt,
+                    return_full=True,
+                )
+            )
+
+        if eq_type == "poisson1d":
+            if algorithm_key in ("fvm", "pinn"):
+                return _err("poisson1d 当前尚未实现 FVM。", code="UNSUPPORTED_ALGORITHM")
+            L = _to_float(payload.get("L", 1.0), "L")
+            nx = _to_int(payload.get("nx", 101), "nx")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("poisson1d 当前仅支持 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            params = Heat1DParams(k=1.0, L=L, nx=nx, t_span=(0.0, 0.0), enforce_nonnegativity=False)
+            bc = BoundarySpec(bc_type=bc_type, left_value=lambda t: left_bc, right_value=lambda t: right_bc)
+
+            def initial_fn(x: np.ndarray) -> np.ndarray:
+                return np.zeros_like(x, dtype=float)
+
+            def source_fn(x: np.ndarray, t: float) -> np.ndarray:
+                return (math.pi ** 2) * np.sin(math.pi * x / float(L))
+
+            solver = get_solver(algorithm_key)
+            sol, info, validation = solver.solve(params=params, bc=bc, initial=initial_fn, source=source_fn)
+            sol_list = sol.tolist()
+            data = {
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info.algorithm,
+                "solve_info": info.__dict__,
+                "validation": validation,
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
+        if eq_type == "poisson3d":
+            if algorithm_key not in ("fdm", "fem", "bem"):
+                return _err("poisson3d 当前仅支持 FDM/FEM/BEM。", code="UNSUPPORTED_ALGORITHM")
+            nx = _to_int(payload.get("nx", 21), "nx")
+            ny = _to_int(payload.get("ny", 21), "ny")
+            nz = _to_int(payload.get("nz", 21), "nz")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            Lz = _to_float(payload.get("Lz", payload.get("L", 1.0)), "Lz")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("poisson3d 当前仅支持 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("poisson3d 当前要求零 Dirichlet 边界。", code="INVALID_BOUNDARY_VALUE")
+            if algorithm_key == "fem":
+                sol3d, info = solve_poisson3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+            elif algorithm_key == "bem":
+                sol3d, info = solve_poisson3d_bem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+            else:
+                sol3d, info = solve_poisson3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+            sol_list = sol3d.reshape(-1).tolist()
+            data = {
+                "shape": [nz, ny, nx],
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info.get("algorithm", algorithm_key),
+                "solve_info": info,
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
         if eq_type == "heat1d":
             k = _to_float(payload.get("k", 1.0), "k")
             L = _to_float(payload.get("L", 1.0), "L")
@@ -403,6 +1180,230 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
             sol, info, validation = solver.solve(params=params, bc=bc, initial=initial_fn)
             sol_list = sol.tolist()
             data = {
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info.algorithm,
+                "solve_info": info.__dict__,
+                "validation": validation,
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
+        if eq_type == "heat3d":
+            if algorithm_key not in ("fdm", "fvm", "fem"):
+                return _err("heat3d currently only supports FDM/FVM/FEM.", code="UNSUPPORTED_ALGORITHM")
+            k = _to_float(payload.get("k", 1.0), "k")
+            nx = _to_int(payload.get("nx", 11), "nx")
+            ny = _to_int(payload.get("ny", 11), "ny")
+            nz = _to_int(payload.get("nz", 11), "nz")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            Lz = _to_float(payload.get("Lz", payload.get("L", 1.0)), "Lz")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.02), "t1")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("heat3d currently only supports zero Dirichlet boundaries.", code="INVALID_BOUNDARY_TYPE")
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("heat3d currently requires zero Dirichlet boundaries.", code="INVALID_BOUNDARY_VALUE")
+
+            if algorithm_key == "fvm":
+                sol3d, info_pack = solve_heat3d_fvm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, k=k, t_span=(t0, t1), nt=nt)
+            elif algorithm_key == "fem":
+                sol3d, info_pack = solve_heat3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, k=k, t_span=(t0, t1), nt=nt)
+            else:
+                sol3d, info_pack = solve_heat3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, k=k, t_span=(t0, t1), nt=nt)
+            sol_list = sol3d.reshape(-1).tolist()
+            data = {
+                "shape": [nz, ny, nx],
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
+        if eq_type == "wave3d":
+            if algorithm_key not in ("fdm", "fem", "spectral"):
+                return _err("wave3d currently only supports FDM/FEM/spectral.", code="UNSUPPORTED_ALGORITHM")
+            c = _to_float(payload.get("c", 1.0), "c")
+            nx = _to_int(payload.get("nx", 15), "nx")
+            ny = _to_int(payload.get("ny", 15), "ny")
+            nz = _to_int(payload.get("nz", 15), "nz")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            Lz = _to_float(payload.get("Lz", payload.get("L", 1.0)), "Lz")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.15), "t1")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("wave3d currently only supports zero Dirichlet boundaries.", code="INVALID_BOUNDARY_TYPE")
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("wave3d currently requires zero Dirichlet boundaries.", code="INVALID_BOUNDARY_VALUE")
+            if algorithm_key == "fem":
+                sol3d, info_pack = solve_wave3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=(t0, t1), nt=nt)
+            elif algorithm_key == "spectral":
+                sol3d, info_pack = solve_wave3d_spectral(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=(t0, t1), nt=nt)
+            else:
+                sol3d, info_pack = solve_wave3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=(t0, t1), nt=nt)
+            sol_list = sol3d.reshape(-1).tolist()
+            data = {
+                "shape": [nz, ny, nx],
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
+        if eq_type == "heat2d":
+            if algorithm_key not in ("fdm", "fvm", "fem"):
+                return _err("heat2d 当前仅支持 FDM/FVM/FEM。", code="UNSUPPORTED_ALGORITHM")
+            k = _to_float(payload.get("k", 1.0), "k")
+            nx = _to_int(payload.get("nx", 41), "nx")
+            ny = _to_int(payload.get("ny", 41), "ny")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.05), "t1")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("heat2d 当前仅支持零 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("heat2d 当前要求零 Dirichlet 边界。", code="INVALID_BOUNDARY_VALUE")
+
+            if algorithm_key == "fvm":
+                sol2d, info_pack = solve_heat2d_fvm(nx=nx, ny=ny, Lx=Lx, Ly=Ly, k=k, t_span=(t0, t1), nt=nt)
+            elif algorithm_key == "fem":
+                sol2d, info_pack = solve_heat2d_fem(nx=nx, ny=ny, Lx=Lx, Ly=Ly, k=k, t_span=(t0, t1), nt=nt)
+            else:
+                sol2d, info_pack = solve_heat2d_fdm(nx=nx, ny=ny, Lx=Lx, Ly=Ly, k=k, t_span=(t0, t1), nt=nt)
+            sol_list = sol2d.reshape(-1).tolist()
+            data = {
+                "shape": [ny, nx],
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
+        if eq_type == "wave2d":
+            if algorithm_key not in ("fdm", "fem", "spectral"):
+                return _err("wave2d currently only supports FDM/FEM/spectral.", code="UNSUPPORTED_ALGORITHM")
+            c = _to_float(payload.get("c", 1.0), "c")
+            nx = _to_int(payload.get("nx", 41), "nx")
+            ny = _to_int(payload.get("ny", 41), "ny")
+            Lx = _to_float(payload.get("Lx", payload.get("L", 1.0)), "Lx")
+            Ly = _to_float(payload.get("Ly", payload.get("L", 1.0)), "Ly")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.2), "t1")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("wave2d currently only supports zero Dirichlet boundaries.", code="INVALID_BOUNDARY_TYPE")
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("wave2d currently requires zero Dirichlet boundaries.", code="INVALID_BOUNDARY_VALUE")
+
+            if algorithm_key == "fem":
+                sol2d, info_pack = solve_wave2d_fem(nx=nx, ny=ny, Lx=Lx, Ly=Ly, c=c, t_span=(t0, t1), nt=nt)
+            elif algorithm_key == "spectral":
+                sol2d, info_pack = solve_wave2d_spectral(nx=nx, ny=ny, Lx=Lx, Ly=Ly, c=c, t_span=(t0, t1))
+            else:
+                sol2d, info_pack = solve_wave2d_fdm(nx=nx, ny=ny, Lx=Lx, Ly=Ly, c=c, t_span=(t0, t1), nt=nt)
+            sol_list = sol2d.reshape(-1).tolist()
+            data = {
+                "shape": [ny, nx],
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+                "solution": sol_list,
+            }
+            return _ok(data)
+
+        # Canonical wave1d fallback rule: only spectral with non-Dirichlet BC falls back to FDM.
+        if eq_type == "wave1d":
+            if algorithm_key == "fvm":
+                return _err("wave1d 当前尚未实现 FVM。", code="UNSUPPORTED_ALGORITHM")
+            c = _to_float(payload.get("c", 1.0), "c")
+            L = _to_float(payload.get("L", 1.0), "L")
+            nx = _to_int(payload.get("nx", 101), "nx")
+            nt = _to_int(payload.get("nt", 200), "nt")
+            t0 = _to_float(payload.get("t0", 0.0), "t0")
+            t1 = _to_float(payload.get("t1", 0.5), "t1")
+            bc_type = BoundaryCondition(str(payload.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = _to_float(payload.get("left_bc", 0.0), "left_bc")
+            right_bc = _to_float(payload.get("right_bc", 0.0), "right_bc")
+
+            params = Wave1DParams(c=c, L=L, nx=nx, t_span=(t0, t1), nt=nt)
+            if bc_type == BoundaryCondition.DIRICHLET:
+                bc = BoundarySpec(bc_type=bc_type, left_value=lambda t: left_bc, right_value=lambda t: right_bc)
+            elif bc_type == BoundaryCondition.NEUMANN:
+                bc = BoundarySpec(bc_type=bc_type, left_value=lambda t: left_bc, right_value=lambda t: right_bc)
+            else:
+                return _err("wave1d 当前仅支持 Dirichlet 或 Neumann 边界。", code="INVALID_BOUNDARY_TYPE")
+
+            initial_kind = str(payload.get("initial", "sine")).strip().lower()
+            velocity_value = _to_float(payload.get("initial_velocity", 0.0), "initial_velocity")
+
+            def initial_fn(x: np.ndarray) -> np.ndarray:
+                if initial_kind == "constant":
+                    return np.full_like(x, 1.0, dtype=float)
+                return np.sin(np.pi * x / float(L))
+
+            def velocity_fn(x: np.ndarray) -> np.ndarray:
+                return np.full_like(x, velocity_value, dtype=float)
+
+            if algorithm_key == "spectral":
+                sol, info, validation = solve_wave1d_spectral_v2(
+                    params=params,
+                    bc=bc,
+                    initial_displacement=initial_fn,
+                    initial_velocity=velocity_fn,
+                )
+            elif algorithm_key == "fem":
+                sol, info, validation = solve_wave1d_fem(
+                    params=params,
+                    bc=bc,
+                    initial_displacement=initial_fn,
+                    initial_velocity=velocity_fn,
+                )
+            else:
+                sol, info, validation = solve_wave1d(
+                    params=params,
+                    bc=bc,
+                    initial_displacement=initial_fn,
+                    initial_velocity=velocity_fn,
+                )
+            sol_list = sol.tolist()
+            data = {
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info.algorithm,
                 "solve_info": info.__dict__,
                 "validation": validation,
                 "solution_preview": _preview_list(sol_list),
@@ -411,6 +1412,8 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
             return _ok(data)
 
         if eq_type == "poisson2d_nonlinear":
+            if algorithm_key == "fvm":
+                return _err("poisson2d_nonlinear 当前尚未实现 FVM。", code="UNSUPPORTED_ALGORITHM")
             nx = _to_int(payload.get("nx", 41), "nx")
             ny = _to_int(payload.get("ny", 41), "ny")
             Lx = _to_float(payload.get("Lx", 1.0), "Lx")
@@ -421,13 +1424,16 @@ async def solve_equation(request: Request) -> Dict[str, Any]:
             sol_list = sol2d.reshape(-1).tolist()
             data = {
                 "shape": [ny, nx],
+                "equation_type": eq_type,
+                "recommended_algorithm": algorithm_key,
+                "executed_algorithm": info.get("algorithm", algorithm_key) if isinstance(info, dict) else algorithm_key,
                 "solve_info": info,
                 "solution_preview": _preview_list(sol_list),
                 "solution": sol_list,
             }
             return _ok(data)
 
-        return _err("equation_type 必须是 heat1d 或 poisson2d_nonlinear。", code="INVALID_EQUATION_TYPE")
+        return _err("equation_type 必须是 heat1d、heat2d、heat3d、wave1d、wave2d、wave3d、poisson1d、poisson3d 或 poisson2d_nonlinear。", code="INVALID_EQUATION_TYPE")
     except (SolverError, ValueError) as e:
         return _err(str(e), code="SOLVER_ERROR")
     except Exception as e:  # noqa: BLE001
@@ -530,7 +1536,16 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
                 parsed = pde_question_parser.parse(question)
         except Exception as parse_e:
             print(f"Error during parsing with {parser_model} parser: {parse_e}")
-            return _err(f"解析失败: {parse_e}", code="PARSE_ERROR")
+            try:
+                fallback_parser = PDEQuestionBaiduParser()
+                parsed = fallback_parser.parse(question)
+                if isinstance(parsed, dict):
+                    parsed["parser_mode"] = "rule_based_fallback"
+                    parsed["parser_error"] = str(parse_e)
+                    parsed = _repair_fallback_parsed_problem(question, parsed)
+            except Exception:
+                return _err(f"解析失败: {parse_e}", code="PARSE_ERROR")
+        parsed = _repair_fallback_parsed_problem(question, parsed)
         validation_error = _validate_parsed_problem(question, parsed)
         if validation_error:
             return _err(
@@ -551,17 +1566,28 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
         dim = int(physics_params.get("dimension", 1))
         linear = bool(physics_params.get("linear", True))
         stationary = bool(physics_params.get("stationary", True))
+        if eq_type == "wave1d":
+            stationary = False
 
         # 3) Feature extraction (reuse existing endpoint logic)
         feature_payload: Dict[str, Any] = {
-            "equation_type": "heat1d" if eq_type == "heat1d" else "poisson2d_nonlinear",
+            "equation_type": eq_type if eq_type in ("heat1d", "wave1d", "wave2d", "wave3d", "poisson1d", "poisson3d", "heat2d", "heat3d", "poisson2d_nonlinear") else "heat1d",
             "accuracy": acc_level,
             "realtime": rt_level,
             "resource_budget": rb,
             "boundary_condition": str(physics_params.get("boundary_condition", "dirichlet")),
         }
-        if feature_payload["equation_type"] == "heat1d":
+        if feature_payload["equation_type"] in ("heat1d", "wave1d", "poisson1d"):
             feature_payload["nx"] = int(physics_params.get("problem_size", 101))
+        elif feature_payload["equation_type"] in ("poisson3d", "heat3d", "wave3d"):
+            n = round(int(physics_params.get("problem_size", 21 * 21 * 21)) ** (1.0 / 3.0))
+            feature_payload["nx"] = max(5, n)
+            feature_payload["ny"] = max(5, n)
+            feature_payload["nz"] = max(5, n)
+        elif feature_payload["equation_type"] in ("heat2d", "wave2d"):
+            n = int(math.sqrt(int(physics_params.get("problem_size", 41 * 41))))
+            feature_payload["nx"] = max(5, n)
+            feature_payload["ny"] = max(5, n)
         else:
             # For 2D demo we assume square grid
             n = int(math.sqrt(int(physics_params.get("problem_size", 41 * 41))))
@@ -571,7 +1597,7 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
         # Call internal logic directly (same as /extract_feature)
         # DEBUG_BREAKPOINT_AUTO_SOLVE_FEATURE: set breakpoint here.
         # physics
-        if feature_payload["equation_type"] == "heat1d":
+        if feature_payload["equation_type"] in ("heat1d", "wave1d", "poisson1d"):
             physics_out = PhysicsFeatureExtractor.extract_from_params(
                 {
                     "dimension": 1,
@@ -579,6 +1605,36 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
                     "stationarity": 1 if not stationary else 0,  # extractor uses 0=steady,1=unsteady
                     "boundary_condition": feature_payload["boundary_condition"],
                     "problem_size": int(feature_payload["nx"]),
+                }
+            )
+        elif feature_payload["equation_type"] == "heat2d":
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 2,
+                    "linearity": 0,
+                    "stationarity": 1,
+                    "boundary_condition": feature_payload["boundary_condition"],
+                    "problem_size": int(feature_payload["nx"]) * int(feature_payload["ny"]),
+                }
+            )
+        elif feature_payload["equation_type"] == "wave2d":
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 2,
+                    "linearity": 0,
+                    "stationarity": 1,
+                    "boundary_condition": feature_payload["boundary_condition"],
+                    "problem_size": int(feature_payload["nx"]) * int(feature_payload["ny"]),
+                }
+            )
+        elif feature_payload["equation_type"] in ("poisson3d", "heat3d", "wave3d"):
+            physics_out = PhysicsFeatureExtractor.extract_from_params(
+                {
+                    "dimension": 3,
+                    "linearity": 0,
+                    "stationarity": 0 if feature_payload["equation_type"] == "poisson3d" else 1,
+                    "boundary_condition": feature_payload["boundary_condition"],
+                    "problem_size": int(feature_payload["nx"]) * int(feature_payload["ny"]) * int(feature_payload["nz"]),
                 }
             )
         else:
@@ -613,25 +1669,276 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
         }
 
         # 4) Algorithm selection
-        strategy = "dynamic_rl" if (feature_payload["equation_type"] != "heat1d" or not stationary) else "static_rf"
-        if feature_payload["equation_type"] == "heat1d":
-            strategy = "static_rf"  # for the hydrology-like case
+        strategy = "dynamic_rl" if (feature_payload["equation_type"] not in ("heat1d", "wave1d", "heat2d") or not stationary) else "static_rf"
+        if feature_payload["equation_type"] in ("heat1d", "poisson1d"):
+            strategy = "static_rf"
+        elif feature_payload["equation_type"] in ("heat2d", "wave2d", "wave3d"):
+            strategy = "gnn_selector"
+        elif feature_payload["equation_type"] == "wave1d":
+            strategy = "mlp_nn"
 
         # DEBUG_BREAKPOINT_AUTO_SOLVE_SELECT: set breakpoint here.
-        if strategy in ("static_rf", "static_xgb"):
-            if selector.static_model is None:
-                selector.train_static(strategy=strategy)
-                selector.save_static()
+        if strategy in ("static_rf", "static_xgb", "mlp_nn", "gnn_selector"):
+            selector._load_or_train_static(strategy)  # type: ignore[attr-defined]
         else:
             if selector.rl_agent is None:
                 selector.train_dynamic(episodes=120)
                 selector.save_dynamic()
 
         selection = selector.select(physics=physics_vec, hardware=hw_vec, domain=domain_vec, strategy=strategy)  # type: ignore[arg-type]
+        if False:
+            original_key = selection["algorithm_key"]
+            original_name = selection.get("algorithm_name", original_key)
+            selection["algorithm_key"] = "spectral"
+            selection["algorithm_name"] = "有限差分法 (FDM)"
+            selection["selected_algorithm"] = "spectral"
+            selection["reason"] = (
+                f"{selection['reason']} 当前 wave1d 数值求解器仅实现 FDM，"
+                f"因此将推荐结果从 {original_name}({original_key}) 回退到 fdm 执行。"
+            )
+            selection["rationale"] = selection["reason"]
+
+        if False:
+            boundary_name = str(physics_params.get("bc_type", physics_params.get("boundary_condition", "dirichlet"))).strip().lower()
+            if boundary_name != "dirichlet" and selection["algorithm_key"] in ("fem", "spectral"):
+                original_key = selection["algorithm_key"]
+                selection["algorithm_key"] = "spectral"
+                selection["algorithm_name"] = "有限差分法 (FDM)"
+                selection["selected_algorithm"] = "spectral"
+                selection["reason"] = (
+                    f"{selection['reason']} 当前 wave1d 的 {original_key} 实现仅支持 Dirichlet 边界，"
+                    "因此自动回退到 fdm 执行。"
+                )
+                selection["rationale"] = selection["reason"]
+
+        if eq_type == "wave1d":
+            boundary_name = str(physics_params.get("bc_type", physics_params.get("boundary_condition", "dirichlet"))).strip().lower()
+            corrected_selection = selector.select(
+                physics=physics_vec,
+                hardware=hw_vec,
+                domain=domain_vec,
+                strategy=strategy,
+            )  # type: ignore[arg-type]
+            if boundary_name != "dirichlet" and corrected_selection["algorithm_key"] == "spectral":
+                corrected_selection["algorithm_key"] = "fdm"
+                corrected_selection["algorithm_name"] = "有限差分法 (FDM)"
+                corrected_selection["selected_algorithm"] = "fdm"
+                corrected_selection["reason"] = (
+                    f"{corrected_selection['reason']} 当前 wave1d 的 spectral 实现仅支持 Dirichlet 边界，"
+                    "因此自动回退到 fdm 执行。"
+                )
+                corrected_selection["rationale"] = corrected_selection["reason"]
+            selection = corrected_selection
+        elif eq_type == "wave2d" and selection["algorithm_key"] not in ("fdm", "fem", "spectral"):
+            original_key = selection["algorithm_key"]
+            selection["algorithm_key"] = "fdm"
+            selection["algorithm_name"] = "有限差分法 (FDM)"
+            selection["selected_algorithm"] = "fdm"
+            selection["reason"] = (
+                f"{selection['reason']} 当前 {eq_type} 只实现了 FDM，"
+                f"因此将推荐结果从 {original_key} 回退到 fdm 执行。"
+            )
+            selection["rationale"] = selection["reason"]
+        elif eq_type == "wave3d" and selection["algorithm_key"] not in ("fdm", "fem", "spectral"):
+            original_key = selection["algorithm_key"]
+            selection["algorithm_key"] = "spectral"
+            selection["algorithm_name"] = "Spectral Method"
+            selection["selected_algorithm"] = "spectral"
+            selection["reason"] = (
+                f"{selection['reason']} ?? wave3d ??? FDM/FEM/spectral?"
+                f"???????? {original_key} ??? spectral ???"
+            )
+            selection["rationale"] = selection["reason"]
+        elif eq_type == "heat3d" and selection["algorithm_key"] not in ("fdm", "fvm", "fem"):
+            original_key = selection["algorithm_key"]
+            selection["algorithm_key"] = "fdm"
+            selection["algorithm_name"] = "有限差分法(FDM)"
+            selection["selected_algorithm"] = "fdm"
+            selection["reason"] = (
+                f"{selection['reason']} 当前 heat3d 已实现 fdm/fvm/fem，"
+                f"但自动选择器返回的 {original_key} 尚未接入该方程，因此回退到 fdm 执行。"
+            )
+            selection["rationale"] = selection["reason"]
+        elif eq_type == "poisson3d" and selection["algorithm_key"] not in ("fdm", "fem", "bem"):
+            original_key = selection["algorithm_key"]
+            selection["algorithm_key"] = "fdm"
+            selection["algorithm_name"] = "鏈夐檺宸垎娉?(FDM)"
+            selection["selected_algorithm"] = "fdm"
+            selection["reason"] = (
+                f"{selection['reason']} 当前 poisson3d 仅实现了 FDM，"
+                f"因此将推荐结果从 {original_key} 回退到 fdm 执行。"
+            )
+            selection["rationale"] = selection["reason"]
 
         # 5) Solve equation
         # DEBUG_BREAKPOINT_AUTO_SOLVE_SOLVE: set breakpoint here.
-        if extracted["equation_type"] == "heat1d":
+        if extracted["equation_type"] == "poisson3d":
+            nx = int(feature_payload.get("nx", 21))
+            ny = int(feature_payload.get("ny", 21))
+            nz = int(feature_payload.get("nz", 21))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            Lz = float(physics_params.get("Lz", physics_params.get("L", 1.0)))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            bc_error = _validate_zero_dirichlet_3d(eq_type=extracted["equation_type"], bc_type=bc_type, left_bc=left_bc, right_bc=right_bc)
+            if bc_error is not None:
+                return bc_error
+            solved = _solve_poisson3d_case(
+                algorithm_key=selection["algorithm_key"],
+                nx=nx,
+                ny=ny,
+                nz=nz,
+                Lx=Lx,
+                Ly=Ly,
+                Lz=Lz,
+                return_full=True,
+            )
+            sol_list = solved.get("solution", [])
+            if not return_full:
+                solved.pop("solution", None)
+        elif extracted["equation_type"] == "heat3d":
+            nx = int(feature_payload.get("nx", 11))
+            ny = int(feature_payload.get("ny", 11))
+            nz = int(feature_payload.get("nz", 11))
+            k = float(physics_params.get("k", 1.0))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            Lz = float(physics_params.get("Lz", physics_params.get("L", 1.0)))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            bc_error = _validate_zero_dirichlet_3d(eq_type=extracted["equation_type"], bc_type=bc_type, left_bc=left_bc, right_bc=right_bc)
+            if bc_error is not None:
+                return bc_error
+            t_span = (0.0, 0.0) if stationary else (0.0, 0.02)
+            t0_val, t1_val = t_span
+            if t1_val > t0_val:
+                dx = Lx / max(nx - 1, 1)
+                dy = Ly / max(ny - 1, 1)
+                dz = Lz / max(nz - 1, 1)
+                stability_limit = 1.0 / (2.0 * k * ((1.0 / dx**2) + (1.0 / dy**2) + (1.0 / dz**2)))
+                nt = max(nt, int(math.ceil((t1_val - t0_val) / stability_limit)))
+            solved = _solve_heat3d_case(
+                algorithm_key=selection["algorithm_key"],
+                nx=nx,
+                ny=ny,
+                nz=nz,
+                Lx=Lx,
+                Ly=Ly,
+                Lz=Lz,
+                k=k,
+                t_span=t_span,
+                nt=nt,
+                return_full=True,
+            )
+            sol_list = solved.get("solution", [])
+            if not return_full:
+                solved.pop("solution", None)
+        elif extracted["equation_type"] == "wave3d":
+            nx = int(feature_payload.get("nx", 15))
+            ny = int(feature_payload.get("ny", 15))
+            nz = int(feature_payload.get("nz", 15))
+            c = float(physics_params.get("c", 1.0))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            Lz = float(physics_params.get("Lz", physics_params.get("L", 1.0)))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            bc_error = _validate_zero_dirichlet_3d(eq_type=extracted["equation_type"], bc_type=bc_type, left_bc=left_bc, right_bc=right_bc)
+            if bc_error is not None:
+                return bc_error
+            t_span = (0.0, 0.0) if stationary else (0.0, 0.15)
+            t0_val, t1_val = t_span
+            if t1_val > t0_val:
+                dx = Lx / max(nx - 1, 1)
+                dy = Ly / max(ny - 1, 1)
+                dz = Lz / max(nz - 1, 1)
+                stability_limit = 1.0 / (c * math.sqrt((1.0 / dx**2) + (1.0 / dy**2) + (1.0 / dz**2)))
+                nt = max(nt, int(math.ceil((t1_val - t0_val) / stability_limit)))
+            solved = _solve_wave3d_case(
+                algorithm_key=selection["algorithm_key"],
+                nx=nx,
+                ny=ny,
+                nz=nz,
+                Lx=Lx,
+                Ly=Ly,
+                Lz=Lz,
+                c=c,
+                t_span=t_span,
+                nt=nt,
+                return_full=True,
+            )
+            sol_list = solved.get("solution", [])
+            if not return_full:
+                solved.pop("solution", None)
+        elif extracted["equation_type"] == "poisson1d":
+            nx = int(feature_payload.get("nx", 101))
+            L = float(physics_params.get("L", 1.0))
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("poisson1d 当前仅支持 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            params = Heat1DParams(k=1.0, L=L, nx=nx, t_span=(0.0, 0.0), enforce_nonnegativity=False)
+            bc = BoundarySpec(bc_type=bc_type, left_value=lambda t: left_bc, right_value=lambda t: right_bc)
+
+            def initial_poisson(x: np.ndarray) -> np.ndarray:
+                return np.zeros_like(x, dtype=float)
+
+            def poisson_source(x: np.ndarray, t: float) -> np.ndarray:
+                return (math.pi ** 2) * np.sin(math.pi * x / float(L))
+
+            solver = get_solver(selection["algorithm_key"])
+            sol, info, validation = solver.solve(params=params, bc=bc, initial=initial_poisson, source=poisson_source)
+            sol_list = sol.tolist()
+            solved = {
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info.algorithm,
+                "solve_info": info.__dict__,
+                "validation": validation,
+                "solution_preview": _preview_list(sol_list),
+            }
+            if return_full:
+                solved["solution"] = sol_list
+        elif extracted["equation_type"] == "poisson3d":
+            nx = int(feature_payload.get("nx", 21))
+            ny = int(feature_payload.get("ny", 21))
+            nz = int(feature_payload.get("nz", 21))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            Lz = float(physics_params.get("Lz", physics_params.get("L", 1.0)))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("poisson3d 当前仅支持 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("poisson3d 当前要求零 Dirichlet 边界。", code="INVALID_BOUNDARY_VALUE")
+
+            if selection["algorithm_key"] == "fem":
+                sol3d, info = solve_poisson3d_fem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+            elif selection["algorithm_key"] == "bem":
+                sol3d, info = solve_poisson3d_bem(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+            else:
+                sol3d, info = solve_poisson3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz)
+            sol_list = sol3d.reshape(-1).tolist()
+            solved = {
+                "shape": [nz, ny, nx],
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info.get("algorithm", selection["algorithm_key"]),
+                "solve_info": info,
+                "solution_preview": _preview_list(sol_list),
+            }
+            if return_full:
+                solved["solution"] = sol_list
+        elif extracted["equation_type"] == "heat1d":
             nx = int(feature_payload.get("nx", 101))
             k = float(physics_params.get("k", 1.0))
             L = float(physics_params.get("L", 1.0))
@@ -662,7 +1969,310 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
             solver = get_solver(selection["algorithm_key"])
             sol, info, validation = solver.solve(params=params, bc=bc, initial=initial_fn)
             sol_list = sol.tolist()
-            solved = {"solve_info": info.__dict__, "validation": validation, "solution_preview": _preview_list(sol_list)}
+            solved = {
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info.algorithm,
+                "solve_info": info.__dict__,
+                "validation": validation,
+                "solution_preview": _preview_list(sol_list),
+            }
+            if return_full:
+                solved["solution"] = sol_list
+        elif extracted["equation_type"] == "heat3d":
+            nx = int(feature_payload.get("nx", 11))
+            ny = int(feature_payload.get("ny", 11))
+            nz = int(feature_payload.get("nz", 11))
+            k = float(physics_params.get("k", 1.0))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            Lz = float(physics_params.get("Lz", physics_params.get("L", 1.0)))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("heat3d currently only supports zero Dirichlet boundaries.", code="INVALID_BOUNDARY_TYPE")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("heat3d currently requires zero Dirichlet boundaries.", code="INVALID_BOUNDARY_VALUE")
+            t_span = (0.0, 0.0) if stationary else (0.0, 0.02)
+            t0_val, t1_val = t_span
+            if t1_val > t0_val:
+                dx = Lx / max(nx - 1, 1)
+                dy = Ly / max(ny - 1, 1)
+                dz = Lz / max(nz - 1, 1)
+                stability_limit = 1.0 / (2.0 * k * ((1.0 / dx**2) + (1.0 / dy**2) + (1.0 / dz**2)))
+                nt = max(nt, int(math.ceil((t1_val - t0_val) / stability_limit)))
+
+            if selection["algorithm_key"] == "fvm":
+                sol3d, info_pack = solve_heat3d_fvm(
+                    nx=nx,
+                    ny=ny,
+                    nz=nz,
+                    Lx=Lx,
+                    Ly=Ly,
+                    Lz=Lz,
+                    k=k,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            elif selection["algorithm_key"] == "fem":
+                sol3d, info_pack = solve_heat3d_fem(
+                    nx=nx,
+                    ny=ny,
+                    nz=nz,
+                    Lx=Lx,
+                    Ly=Ly,
+                    Lz=Lz,
+                    k=k,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            else:
+                sol3d, info_pack = solve_heat3d_fdm(
+                    nx=nx,
+                    ny=ny,
+                    nz=nz,
+                    Lx=Lx,
+                    Ly=Ly,
+                    Lz=Lz,
+                    k=k,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            sol_list = sol3d.reshape(-1).tolist()
+            solved = {
+                "shape": [nz, ny, nx],
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+            }
+            if return_full:
+                solved["solution"] = sol_list
+        elif extracted["equation_type"] == "wave3d":
+            nx = int(feature_payload.get("nx", 15))
+            ny = int(feature_payload.get("ny", 15))
+            nz = int(feature_payload.get("nz", 15))
+            c = float(physics_params.get("c", 1.0))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            Lz = float(physics_params.get("Lz", physics_params.get("L", 1.0)))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("wave3d currently only supports zero Dirichlet boundaries.", code="INVALID_BOUNDARY_TYPE")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("wave3d currently requires zero Dirichlet boundaries.", code="INVALID_BOUNDARY_VALUE")
+            t_span = (0.0, 0.0) if stationary else (0.0, 0.15)
+            t0_val, t1_val = t_span
+            if t1_val > t0_val:
+                dx = Lx / max(nx - 1, 1)
+                dy = Ly / max(ny - 1, 1)
+                dz = Lz / max(nz - 1, 1)
+                stability_limit = 1.0 / (c * math.sqrt((1.0 / dx**2) + (1.0 / dy**2) + (1.0 / dz**2)))
+                nt = max(nt, int(math.ceil((t1_val - t0_val) / stability_limit)))
+            solved = _solve_wave3d_case(
+                algorithm_key=selection["algorithm_key"],
+                nx=nx,
+                ny=ny,
+                nz=nz,
+                Lx=Lx,
+                Ly=Ly,
+                Lz=Lz,
+                c=c,
+                t_span=t_span,
+                nt=nt,
+                return_full=return_full,
+            )
+        elif extracted["equation_type"] == "heat2d":
+            nx = int(feature_payload.get("nx", 41))
+            ny = int(feature_payload.get("ny", 41))
+            k = float(physics_params.get("k", 1.0))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("heat2d 当前仅支持零 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("heat2d 当前要求零 Dirichlet 边界。", code="INVALID_BOUNDARY_VALUE")
+            t_span = (0.0, 0.0) if stationary else (0.0, 0.05)
+            t0_val, t1_val = t_span
+            if t1_val > t0_val:
+                dx = Lx / max(nx - 1, 1)
+                dy = Ly / max(ny - 1, 1)
+                stability_limit = 1.0 / (2.0 * k * ((1.0 / dx**2) + (1.0 / dy**2)))
+                nt = max(nt, int(math.ceil((t1_val - t0_val) / stability_limit)))
+
+            if selection["algorithm_key"] == "fvm":
+                sol2d, info_pack = solve_heat2d_fvm(
+                    nx=nx,
+                    ny=ny,
+                    Lx=Lx,
+                    Ly=Ly,
+                    k=k,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            elif selection["algorithm_key"] == "fem":
+                sol2d, info_pack = solve_heat2d_fem(
+                    nx=nx,
+                    ny=ny,
+                    Lx=Lx,
+                    Ly=Ly,
+                    k=k,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            else:
+                sol2d, info_pack = solve_heat2d_fdm(
+                    nx=nx,
+                    ny=ny,
+                    Lx=Lx,
+                    Ly=Ly,
+                    k=k,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            sol_list = sol2d.reshape(-1).tolist()
+            solved = {
+                "shape": [ny, nx],
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+            }
+            if return_full:
+                solved["solution"] = sol_list
+        elif extracted["equation_type"] == "wave2d":
+            nx = int(feature_payload.get("nx", 41))
+            ny = int(feature_payload.get("ny", 41))
+            c = float(physics_params.get("c", 1.0))
+            Lx = float(physics_params.get("Lx", physics_params.get("L", 1.0)))
+            Ly = float(physics_params.get("Ly", physics_params.get("L", 1.0)))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            if bc_type != BoundaryCondition.DIRICHLET:
+                return _err("wave2d 当前仅支持零 Dirichlet 边界。", code="INVALID_BOUNDARY_TYPE")
+            if abs(left_bc) > 1e-12 or abs(right_bc) > 1e-12:
+                return _err("wave2d 当前要求零 Dirichlet 边界。", code="INVALID_BOUNDARY_VALUE")
+
+            t_span = (0.0, 0.0) if stationary else (0.0, 0.2)
+            t0_val, t1_val = t_span
+            if t1_val > t0_val:
+                dx = Lx / max(nx - 1, 1)
+                dy = Ly / max(ny - 1, 1)
+                stability_limit = 1.0 / (c * math.sqrt((1.0 / dx**2) + (1.0 / dy**2)))
+                nt = max(nt, int(math.ceil((t1_val - t0_val) / stability_limit)))
+
+            if selection["algorithm_key"] == "fem":
+                sol2d, info_pack = solve_wave2d_fem(
+                    nx=nx,
+                    ny=ny,
+                    Lx=Lx,
+                    Ly=Ly,
+                    c=c,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            elif selection["algorithm_key"] == "spectral":
+                sol2d, info_pack = solve_wave2d_spectral(
+                    nx=nx,
+                    ny=ny,
+                    Lx=Lx,
+                    Ly=Ly,
+                    c=c,
+                    t_span=t_span,
+                )
+            else:
+                sol2d, info_pack = solve_wave2d_fdm(
+                    nx=nx,
+                    ny=ny,
+                    Lx=Lx,
+                    Ly=Ly,
+                    c=c,
+                    t_span=t_span,
+                    nt=nt,
+                )
+            sol_list = sol2d.reshape(-1).tolist()
+            solved = {
+                "shape": [ny, nx],
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info_pack["solve_info"]["algorithm"],
+                "solve_info": info_pack["solve_info"],
+                "validation": info_pack["validation"],
+                "solution_preview": _preview_list(sol_list),
+            }
+            if return_full:
+                solved["solution"] = sol_list
+        elif extracted["equation_type"] == "wave1d":
+            nx = int(feature_payload.get("nx", 101))
+            c = float(physics_params.get("c", 1.0))
+            L = float(physics_params.get("L", 1.0))
+            left_bc = float(physics_params.get("left_bc", 0.0))
+            right_bc = float(physics_params.get("right_bc", 0.0))
+            nt = int(physics_params.get("nt", 200))
+            bc_type = BoundaryCondition(str(physics_params.get("bc_type", "dirichlet")).strip().lower())
+            if bc_type == BoundaryCondition.MIXED:
+                return _err("wave1d 当前仅支持 Dirichlet 或 Neumann 边界。", code="INVALID_BOUNDARY_TYPE")
+
+            wave_params = Wave1DParams(
+                c=c,
+                L=L,
+                nx=nx,
+                t_span=(0.0, 0.0) if stationary else (0.0, 0.5),
+                nt=nt,
+            )
+            bc = BoundarySpec(bc_type=bc_type, left_value=lambda t: left_bc, right_value=lambda t: right_bc)
+
+            def initial_wave(x: np.ndarray) -> np.ndarray:
+                return np.sin(np.pi * x / float(L))
+
+            def velocity_wave(x: np.ndarray) -> np.ndarray:
+                return np.zeros_like(x, dtype=float)
+
+            if selection["algorithm_key"] == "spectral":
+                sol, info, validation = solve_wave1d_spectral_v2(
+                    params=wave_params,
+                    bc=bc,
+                    initial_displacement=initial_wave,
+                    initial_velocity=velocity_wave,
+                )
+            elif selection["algorithm_key"] == "fem":
+                sol, info, validation = solve_wave1d_fem(
+                    params=wave_params,
+                    bc=bc,
+                    initial_displacement=initial_wave,
+                    initial_velocity=velocity_wave,
+                )
+            else:
+                sol, info, validation = solve_wave1d(
+                    params=wave_params,
+                    bc=bc,
+                    initial_displacement=initial_wave,
+                    initial_velocity=velocity_wave,
+                )
+            sol_list = sol.tolist()
+            solved = {
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info.algorithm,
+                "solve_info": info.__dict__,
+                "validation": validation,
+                "solution_preview": _preview_list(sol_list),
+            }
             if return_full:
                 solved["solution"] = sol_list
         else:
@@ -671,6 +2281,9 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
             sol_list = sol2d.reshape(-1).tolist()
             solved = {
                 "shape": [int(feature_payload["ny"]), int(feature_payload["nx"])],
+                "equation_type": extracted["equation_type"],
+                "recommended_algorithm": selection["algorithm_key"],
+                "executed_algorithm": info.get("algorithm", selection["algorithm_key"]) if isinstance(info, dict) else selection["algorithm_key"],
                 "solve_info": info,
                 "solution_preview": _preview_list(sol_list),
             }
@@ -715,7 +2328,7 @@ async def api_auto_solve(request_body: AutoSolveIn) -> Dict[str, Any]:
                 "notes": [
                     "若未配置百度 Key，系统会自动降级为规则解析，不会崩溃。",
                     "2D 非定常泊松在当前示例中会使用稳态制造解求解器做演示闭环（可后续扩展非定常求解）。"
-                    if extracted["equation_type"] != "heat1d"
+                    if extracted["equation_type"] not in ("heat1d", "wave1d")
                     else "",
                 ],
             }

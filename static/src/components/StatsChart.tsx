@@ -28,10 +28,10 @@ export default function StatsChart({ stats }: StatsChartProps) {
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis label={{ value: '值', angle: -90, position: 'insideLeft' }} />
+          <YAxis label={{ value: '数值', angle: -90, position: 'insideLeft' }} />
           <Tooltip formatter={(value: number) => value.toFixed(6)} />
           <Legend />
-          <Bar dataKey="value" fill="#8884d8" name="统计值" />
+          <Bar dataKey="value" fill="#7c3aed" name="统计值" />
         </BarChart>
       </ResponsiveContainer>
     </div>
