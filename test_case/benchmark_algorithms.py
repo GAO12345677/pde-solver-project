@@ -40,6 +40,8 @@ from solver.numerical_solver import (
     solve_wave1d_fem,
     solve_wave1d,
     solve_wave3d_fdm,
+    solve_wave3d_fem,
+    solve_wave3d_spectral,
     solve_wave1d_spectral_v2,
 )
 
@@ -75,6 +77,19 @@ class SolverBenchmark:
     elapsed_s: float
     solver_status: str
     details: Dict[str, Any] | None = None
+
+
+@dataclass
+class SelectorVsBenchmark:
+    case_name: str
+    equation_type: str
+    strategy: str
+    selector_pick: str
+    benchmark_best_by_error: str
+    benchmark_best_by_time: str
+    benchmark_best_balanced: str
+    matches_best_balanced: bool
+    details: Dict[str, Any]
 
 
 def benchmark_selector_strategies(seed: int = 7) -> List[SelectorBenchmark]:
@@ -364,18 +379,26 @@ def benchmark_wave3d_solver() -> List[SolverBenchmark]:
     Z, Y, X = np.meshgrid(z, y, x, indexing="ij")
     omega = c * np.pi * np.sqrt((1.0 / Lx**2) + (1.0 / Ly**2) + (1.0 / Lz**2))
     exact = np.cos(omega * t1) * np.sin(np.pi * X / Lx) * np.sin(np.pi * Y / Ly) * np.sin(np.pi * Z / Lz)
-    sol3d, info_pack = solve_wave3d_fdm(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=(0.0, t1), nt=nt)
-    diff = sol3d - exact
-    return [
-        SolverBenchmark(
-            equation_type="wave3d",
-            algorithm="fdm",
-            l2_error=float(np.linalg.norm(diff.reshape(-1)) / np.sqrt(diff.size)),
-            linf_error=float(np.max(np.abs(diff))),
-            elapsed_s=float(info_pack["solve_info"]["elapsed_s"]),
-            solver_status=str(info_pack["solve_info"]["status"]),
+    out: List[SolverBenchmark] = []
+    for algorithm, solve_fn in (
+        ("fdm", solve_wave3d_fdm),
+        ("fem", solve_wave3d_fem),
+        ("spectral", solve_wave3d_spectral),
+    ):
+        sol3d, info_pack = solve_fn(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, c=c, t_span=(0.0, t1), nt=nt)
+        diff = sol3d - exact
+        out.append(
+            SolverBenchmark(
+                equation_type="wave3d",
+                algorithm=algorithm,
+                l2_error=float(info_pack["solve_info"].get("l2_error", np.linalg.norm(diff.reshape(-1)) / np.sqrt(diff.size))),
+                linf_error=float(info_pack["solve_info"].get("linf_error", np.max(np.abs(diff)))),
+                elapsed_s=float(info_pack["solve_info"]["elapsed_s"]),
+                solver_status=str(info_pack["solve_info"]["status"]),
+                details={"boundary_residual": float(info_pack["solve_info"].get("boundary_residual", 0.0))},
+            )
         )
-    ]
+    return out
 
 
 def benchmark_wave2d_solver() -> List[SolverBenchmark]:
@@ -615,7 +638,7 @@ def benchmark_solver_sweeps() -> Dict[str, Any]:
             "mean_elapsed_s": float(np.mean([item["elapsed_s"] for item in runs])),
         }
 
-    wave3d_runs: List[Dict[str, Any]] = []
+    wave3d_runs_by_algorithm: Dict[str, List[Dict[str, Any]]] = {"fdm": [], "fem": [], "spectral": []}
     for n in (9, 11, 15):
         x = np.linspace(0.0, 1.0, n)
         y = np.linspace(0.0, 1.0, n)
@@ -627,24 +650,30 @@ def benchmark_solver_sweeps() -> Dict[str, Any]:
         nt = int(np.ceil(t1 / stability_limit))
         omega = np.pi * np.sqrt(3.0)
         exact = np.cos(omega * t1) * np.sin(np.pi * X) * np.sin(np.pi * Y) * np.sin(np.pi * Z)
-        sol3d, info_pack = solve_wave3d_fdm(nx=n, ny=n, nz=n, Lx=1.0, Ly=1.0, Lz=1.0, c=1.0, t_span=(0.0, t1), nt=nt)
-        diff = sol3d - exact
-        wave3d_runs.append(
-            {
-                "nx": n,
-                "ny": n,
-                "nz": n,
-                "nt": nt,
-                "l2_error": float(np.linalg.norm(diff.reshape(-1)) / np.sqrt(diff.size)),
-                "elapsed_s": float(info_pack["solve_info"]["elapsed_s"]),
-            }
-        )
-    sweep_report["wave3d"]["fdm"] = {
-        "runs": wave3d_runs,
-        "mean_l2_error": float(np.mean([item["l2_error"] for item in wave3d_runs])),
-        "max_l2_error": float(np.max([item["l2_error"] for item in wave3d_runs])),
-        "mean_elapsed_s": float(np.mean([item["elapsed_s"] for item in wave3d_runs])),
-    }
+        for algorithm, solve_fn in (
+            ("fdm", solve_wave3d_fdm),
+            ("fem", solve_wave3d_fem),
+            ("spectral", solve_wave3d_spectral),
+        ):
+            sol3d, info_pack = solve_fn(nx=n, ny=n, nz=n, Lx=1.0, Ly=1.0, Lz=1.0, c=1.0, t_span=(0.0, t1), nt=nt)
+            diff = sol3d - exact
+            wave3d_runs_by_algorithm[algorithm].append(
+                {
+                    "nx": n,
+                    "ny": n,
+                    "nz": n,
+                    "nt": nt,
+                    "l2_error": float(info_pack["solve_info"].get("l2_error", np.linalg.norm(diff.reshape(-1)) / np.sqrt(diff.size))),
+                    "elapsed_s": float(info_pack["solve_info"]["elapsed_s"]),
+                }
+            )
+    for algorithm, runs in wave3d_runs_by_algorithm.items():
+        sweep_report["wave3d"][algorithm] = {
+            "runs": runs,
+            "mean_l2_error": float(np.mean([item["l2_error"] for item in runs])),
+            "max_l2_error": float(np.max([item["l2_error"] for item in runs])),
+            "mean_elapsed_s": float(np.mean([item["elapsed_s"] for item in runs])),
+        }
 
     poisson3d_runs_by_algorithm: Dict[str, List[Dict[str, Any]]] = {"fdm": [], "fem": [], "bem": []}
     for n in (11, 15):
@@ -722,6 +751,121 @@ def benchmark_selector_recommendations() -> Dict[str, Any]:
     return report
 
 
+def benchmark_selector_vs_solver_best(solver_rows: List[SolverBenchmark]) -> List[SelectorVsBenchmark]:
+    """Compare selector picks against empirically best solver choices on aligned demo cases.
+
+    Since the selector currently chooses among fdm/fem/spectral only, comparisons are restricted
+    to equations where at least two of those candidates exist in solver benchmarks.
+    """
+    cases = [
+        {
+            "case_name": "heat1d_accuracy_oriented",
+            "equation_type": "heat1d",
+            "physics": np.array([0.0, 0.0, 0.0, 0.1, 0.4], dtype=float),
+            "hardware": np.array([0.3, 0.4, 0.4, 0.3, 0.6], dtype=float),
+            "domain": np.array([1.0, 0.2, 0.8], dtype=float),
+        },
+        {
+            "case_name": "wave1d_balanced",
+            "equation_type": "wave1d",
+            "physics": np.array([0.0, 0.0, 1.0, 0.0, 0.3], dtype=float),
+            "hardware": np.array([0.0, 0.3, 0.2, 0.0, 0.4], dtype=float),
+            "domain": np.array([0.5, 0.5, 0.7], dtype=float),
+        },
+        {
+            "case_name": "heat2d_standard",
+            "equation_type": "heat2d",
+            "physics": np.array([0.5, 0.0, 0.2, 0.2, 0.5], dtype=float),
+            "hardware": np.array([0.2, 0.3, 0.2, 0.1, 0.5], dtype=float),
+            "domain": np.array([0.7, 0.6, 0.6], dtype=float),
+        },
+        {
+            "case_name": "wave2d_accuracy_oriented",
+            "equation_type": "wave2d",
+            "physics": np.array([0.5, 0.0, 0.8, 0.2, 0.5], dtype=float),
+            "hardware": np.array([0.4, 0.5, 0.4, 0.2, 0.8], dtype=float),
+            "domain": np.array([1.0, 0.3, 0.7], dtype=float),
+        },
+        {
+            "case_name": "heat3d_balanced",
+            "equation_type": "heat3d",
+            "physics": np.array([1.0, 0.0, 0.3, 0.3, 0.6], dtype=float),
+            "hardware": np.array([0.5, 0.6, 0.5, 0.4, 0.8], dtype=float),
+            "domain": np.array([0.7, 0.6, 0.6], dtype=float),
+        },
+        {
+            "case_name": "wave3d_accuracy_oriented",
+            "equation_type": "wave3d",
+            "physics": np.array([1.0, 0.0, 0.8, 0.2, 0.6], dtype=float),
+            "hardware": np.array([0.6, 0.7, 0.6, 0.5, 0.9], dtype=float),
+            "domain": np.array([1.0, 0.4, 0.7], dtype=float),
+        },
+    ]
+
+    selector = AlgorithmSelector(model_dir="model")
+    selector._load_or_train_static("static_rf")
+    selector._load_or_train_static("mlp_nn")
+    selector._load_or_train_static("gnn_selector")
+    if selector.rl_agent is None:
+        selector.train_dynamic(episodes=200)
+
+    out: List[SelectorVsBenchmark] = []
+    strategies = ("static_rf", "mlp_nn", "gnn_selector", "dynamic_rl")
+    candidate_keys = {"fdm", "fem", "spectral"}
+
+    for case in cases:
+        rows = [
+            row for row in solver_rows
+            if row.equation_type == case["equation_type"] and row.algorithm in candidate_keys
+        ]
+        if not rows:
+            continue
+
+        best_by_error = min(rows, key=lambda r: r.l2_error)
+        best_by_time = min(rows, key=lambda r: r.elapsed_s)
+        min_err = min(r.l2_error for r in rows)
+        max_err = max(r.l2_error for r in rows)
+        min_t = min(r.elapsed_s for r in rows)
+        max_t = max(r.elapsed_s for r in rows)
+
+        def balanced_score(row: SolverBenchmark) -> float:
+            err = 0.0 if max_err == min_err else (row.l2_error - min_err) / (max_err - min_err)
+            tim = 0.0 if max_t == min_t else (row.elapsed_s - min_t) / (max_t - min_t)
+            return 0.65 * err + 0.35 * tim
+
+        best_balanced = min(rows, key=balanced_score)
+        ranking = sorted(
+            [{"algorithm": row.algorithm, "balanced_score": float(balanced_score(row))} for row in rows],
+            key=lambda item: item["balanced_score"],
+        )
+
+        for strategy in strategies:
+            selected = selector.select(
+                physics=case["physics"],
+                hardware=case["hardware"],
+                domain=case["domain"],
+                strategy=strategy,  # type: ignore[arg-type]
+            )
+            pick = str(selected["algorithm_key"])
+            out.append(
+                SelectorVsBenchmark(
+                    case_name=str(case["case_name"]),
+                    equation_type=str(case["equation_type"]),
+                    strategy=strategy,
+                    selector_pick=pick,
+                    benchmark_best_by_error=best_by_error.algorithm,
+                    benchmark_best_by_time=best_by_time.algorithm,
+                    benchmark_best_balanced=best_balanced.algorithm,
+                    matches_best_balanced=pick == best_balanced.algorithm,
+                    details={
+                        "benchmark_ranking": ranking,
+                        "selector_reason": str(selected["reason"]),
+                    },
+                )
+            )
+    return out
+
+
 def build_report() -> Dict[str, Any]:
     selector_benchmarks = benchmark_selector_strategies()
     solver_benchmarks = (
@@ -735,6 +879,7 @@ def build_report() -> Dict[str, Any]:
         + benchmark_wave3d_solver()
     )
     recommendation_examples = benchmark_selector_recommendations()
+    selector_vs_benchmark = benchmark_selector_vs_solver_best(solver_benchmarks)
 
     return {
         "generated_at": time.time(),
@@ -742,6 +887,7 @@ def build_report() -> Dict[str, Any]:
         "solver_accuracy": [asdict(item) for item in solver_benchmarks],
         "solver_sweeps": benchmark_solver_sweeps(),
         "recommendation_examples": recommendation_examples,
+        "selector_vs_benchmark": [asdict(item) for item in selector_vs_benchmark],
         "notes": [
             "Selector accuracy is measured on the project's synthetic representative dataset.",
             "Solver accuracy is measured against simple analytical solutions for heat1d, poisson1d, poisson3d, wave1d, heat2d, heat3d, wave2d and wave3d.",
@@ -752,7 +898,7 @@ def build_report() -> Dict[str, Any]:
             "heat2d currently benchmarks zero-Dirichlet FDM/FVM/FEM baselines on square domains.",
             "heat3d currently benchmarks zero-Dirichlet FDM/FVM/FEM manufactured-solution baselines on cubic domains.",
             "wave2d currently benchmarks zero-Dirichlet FDM/FEM/spectral baselines on square domains.",
-            "wave3d currently benchmarks a zero-Dirichlet FDM manufactured-solution baseline on cubic domains.",
+            "wave3d currently benchmarks zero-Dirichlet FDM/FEM/spectral manufactured-solution baselines on cubic domains.",
             "poisson3d currently benchmarks zero-Dirichlet FDM/FEM/BEM manufactured-solution baselines on cubic domains.",
         ],
     }
@@ -795,6 +941,15 @@ def print_summary(report: Dict[str, Any], path: str) -> None:
                     f"max_L2={item['max_l2_error']:.6e}, "
                     f"mean_elapsed={item['mean_elapsed_s']:.4f}s"
                 )
+
+    if "selector_vs_benchmark" in report:
+        print("\n=== Selector vs Benchmark ===")
+        for item in report["selector_vs_benchmark"]:
+            print(
+                f"{item['case_name']} / {item['strategy']}: "
+                f"pick={item['selector_pick']}, balanced_best={item['benchmark_best_balanced']}, "
+                f"match={item['matches_best_balanced']}"
+            )
 
     print(f"\nSaved benchmark report to: {path}")
 
