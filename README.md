@@ -180,8 +180,17 @@ cd static
 npm run build
 ```
 
+## Open Source Statement
+
+This repository is released under the [MIT License](LICENSE) as the public code artifact for academic citation and reproducibility.
+
+If you refer to this project in a paper, cite the GitHub repository:
+
+- repository: [https://github.com/GAO12345677/pde-solver-project](https://github.com/GAO12345677/pde-solver-project)
+- citation metadata: [CITATION.cff](CITATION.cff)
+
 ## Documentation
 
-- quick usage guide: [QUICKSTART.md](/D:/cursorku/QUICKSTART.md)
-- API guide: [docs/API_GUIDE.md](/D:/cursorku/docs/API_GUIDE.md)
-- submission notes: [SUBMISSION_GUIDE.md](/D:/cursorku/SUBMISSION_GUIDE.md)
+- quick usage guide: [QUICKSTART.md](QUICKSTART.md)
+- API guide: [docs/API_GUIDE.md](docs/API_GUIDE.md)
+- submission notes: [SUBMISSION_GUIDE.md](SUBMISSION_GUIDE.md)

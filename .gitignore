@@ -18,6 +18,11 @@ log/
 result/
 output/
 model/*.pkl
+model/pinn_cache/
+
+# Local thesis drafts
+thesis_defense_source.docx
+thesis_extracted.txt
 
 # Frontend
 static/node_modules/

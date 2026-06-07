@@ -1,0 +1,110 @@
+{
+  "generated_at": 1775107858.595878,
+  "config": {
+    "dataset_path": "real_world_benchmark\\selector_training_dataset_diverse_200.json",
+    "model_names": [
+      "rf"
+    ],
+    "test_fraction": 0.25,
+    "seed": 42,
+    "target_mode": "strict_tolerant",
+    "relative_tolerance": 0.03,
+    "feature_mode": "engineered_v1"
+  },
+  "label_distribution": {
+    "spectral": 121,
+    "fdm": 66,
+    "fvm": 13
+  },
+  "results": {
+    "rf": {
+      "model_name": "rf",
+      "label_keys": [
+        "fdm",
+        "fvm",
+        "spectral"
+      ],
+      "num_samples": 200,
+      "num_train": 151,
+      "num_test": 49,
+      "train_accuracy": 1.0,
+      "test_accuracy": 0.9183673469387755,
+      "training_time_s": 0.266507625579834,
+      "confusion_matrix": {
+        "spectral": {
+          "spectral": 29,
+          "fdm": 1
+        },
+        "fdm": {
+          "fdm": 16
+        },
+        "fvm": {
+          "fdm": 3
+        }
+      },
+      "accuracy_by_equation": {
+        "heat1d": {
+          "total": 13,
+          "correct": 13,
+          "accuracy": 1.0
+        },
+        "wave1d": {
+          "total": 11,
+          "correct": 11,
+          "accuracy": 1.0
+        },
+        "wave2d": {
+          "total": 5,
+          "correct": 4,
+          "accuracy": 0.8
+        },
+        "heat2d": {
+          "total": 9,
+          "correct": 7,
+          "accuracy": 0.7777777777777778
+        },
+        "wave3d": {
+          "total": 4,
+          "correct": 4,
+          "accuracy": 1.0
+        },
+        "heat3d": {
+          "total": 4,
+          "correct": 3,
+          "accuracy": 0.75
+        },
+        "poisson3d": {
+          "total": 3,
+          "correct": 3,
+          "accuracy": 1.0
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_rf_strict_tolerant.pkl"
+    }
+  },
+  "dataset_summary": {
+    "equation_distribution": {
+      "wave2d": 29,
+      "heat1d": 50,
+      "wave3d": 23,
+      "heat2d": 30,
+      "wave1d": 40,
+      "poisson3d": 11,
+      "heat3d": 17
+    },
+    "best_algorithm_distribution": {
+      "spectral": 116,
+      "fem": 50,
+      "fdm": 25,
+      "fvm": 9
+    },
+    "elapsed_s": 87.38116693496704
+  },
+  "source_config": {
+    "num_problems_input": 200,
+    "num_problems_output": 200,
+    "num_runs": 1,
+    "seed": 123,
+    "source": "diverse_problem_generator"
+  }
+}

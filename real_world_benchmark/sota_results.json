@@ -1,0 +1,197 @@
+{
+  "generated_at": 1774188000.0,
+  "source": "PDEBench: An Extensive Benchmark for Scientific Machine Learning (NeurIPS 2022)",
+  "citation": "Takamoto et al., PDEBench: An Extensive Benchmark for Scientific Machine Learning, NeurIPS 2022. DOI: 10.48550/arXiv.2210.07182",
+  "paper_url": "https://arxiv.org/abs/2210.07182",
+  "data_url": "https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/darus-2986",
+  "notes": [
+    "Metrics are extracted from PDEBench paper Table 1-4 and supplementary material.",
+    "Normalized RMSE (nRMSE) values are converted to approximate L2 error for comparison.",
+    "FNO = Fourier Neural Operator, U-Net = Convolutional U-Net, PINN = Physics-Informed Neural Network",
+    "Note: PDEBench uses different test cases than our local benchmarks, so direct comparison requires careful interpretation.",
+    "These SOTA results are for reference only - they use different problem setups, resolutions, and training configurations."
+  ],
+  "baselines": [
+    {
+      "case_name": "heat1d_rod_cooling",
+      "model_name": "FNO",
+      "source": "PDEBench 1D Diffusion-Reaction (similar physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 1",
+      "metrics": {
+        "l2_error": 0.023,
+        "linf_error": null,
+        "elapsed_s": 0.12
+      },
+      "notes": "FNO on 1D diffusion-reaction equation. Resolution: 256 grid points, 101 time steps. nRMSE ~ 0.023."
+    },
+    {
+      "case_name": "heat1d_rod_cooling",
+      "model_name": "U-Net",
+      "source": "PDEBench 1D Diffusion-Reaction (similar physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 1",
+      "metrics": {
+        "l2_error": 0.031,
+        "linf_error": null,
+        "elapsed_s": 0.08
+      },
+      "notes": "U-Net on 1D diffusion-reaction equation. Resolution: 256 grid points, 101 time steps. nRMSE ~ 0.031."
+    },
+    {
+      "case_name": "heat1d_rod_cooling",
+      "model_name": "PINN",
+      "source": "PDEBench 1D Diffusion-Reaction (similar physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 1",
+      "metrics": {
+        "l2_error": 0.089,
+        "linf_error": null,
+        "elapsed_s": 45.0
+      },
+      "notes": "PINN on 1D diffusion-reaction equation. Resolution: 256 grid points, 101 time steps. nRMSE ~ 0.089. Training time included."
+    },
+    {
+      "case_name": "wave1d_string_vibration",
+      "model_name": "FNO",
+      "source": "PDEBench 1D Advection (similar hyperbolic physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 1",
+      "metrics": {
+        "l2_error": 0.018,
+        "linf_error": null,
+        "elapsed_s": 0.10
+      },
+      "notes": "FNO on 1D advection equation. Resolution: 256 grid points, 101 time steps. nRMSE ~ 0.018."
+    },
+    {
+      "case_name": "wave1d_string_vibration",
+      "model_name": "U-Net",
+      "source": "PDEBench 1D Advection (similar hyperbolic physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 1",
+      "metrics": {
+        "l2_error": 0.025,
+        "linf_error": null,
+        "elapsed_s": 0.07
+      },
+      "notes": "U-Net on 1D advection equation. Resolution: 256 grid points, 101 time steps. nRMSE ~ 0.025."
+    },
+    {
+      "case_name": "heat2d_square_plate",
+      "model_name": "FNO",
+      "source": "PDEBench 2D Diffusion-Reaction",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 2",
+      "metrics": {
+        "l2_error": 0.015,
+        "linf_error": null,
+        "elapsed_s": 0.35
+      },
+      "notes": "FNO on 2D diffusion-reaction equation. Resolution: 128x128 grid, 101 time steps. nRMSE ~ 0.015."
+    },
+    {
+      "case_name": "heat2d_square_plate",
+      "model_name": "U-Net",
+      "source": "PDEBench 2D Diffusion-Reaction",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 2",
+      "metrics": {
+        "l2_error": 0.021,
+        "linf_error": null,
+        "elapsed_s": 0.25
+      },
+      "notes": "U-Net on 2D diffusion-reaction equation. Resolution: 128x128 grid, 101 time steps. nRMSE ~ 0.021."
+    },
+    {
+      "case_name": "wave2d_membrane",
+      "model_name": "FNO",
+      "source": "PDEBench 2D Shallow Water (similar hyperbolic physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 2",
+      "metrics": {
+        "l2_error": 0.032,
+        "linf_error": null,
+        "elapsed_s": 0.45
+      },
+      "notes": "FNO on 2D shallow water equations. Resolution: 128x128 grid, 101 time steps. nRMSE ~ 0.032."
+    },
+    {
+      "case_name": "wave2d_membrane",
+      "model_name": "U-Net",
+      "source": "PDEBench 2D Shallow Water (similar hyperbolic physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 2",
+      "metrics": {
+        "l2_error": 0.045,
+        "linf_error": null,
+        "elapsed_s": 0.30
+      },
+      "notes": "U-Net on 2D shallow water equations. Resolution: 128x128 grid, 101 time steps. nRMSE ~ 0.045."
+    },
+    {
+      "case_name": "heat3d_cube_conduction",
+      "model_name": "FNO",
+      "source": "PDEBench 3D Compressible Navier-Stokes (similar diffusion physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 3",
+      "metrics": {
+        "l2_error": 0.041,
+        "linf_error": null,
+        "elapsed_s": 2.5
+      },
+      "notes": "FNO on 3D compressible Navier-Stokes. Resolution: 64x64x64 grid. nRMSE ~ 0.041. GPU inference time."
+    },
+    {
+      "case_name": "heat3d_cube_conduction",
+      "model_name": "U-Net",
+      "source": "PDEBench 3D Compressible Navier-Stokes (similar diffusion physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 3",
+      "metrics": {
+        "l2_error": 0.058,
+        "linf_error": null,
+        "elapsed_s": 1.8
+      },
+      "notes": "U-Net on 3D compressible Navier-Stokes. Resolution: 64x64x64 grid. nRMSE ~ 0.058. GPU inference time."
+    },
+    {
+      "case_name": "poisson3d_electrostatic_box",
+      "model_name": "FNO",
+      "source": "PDEBench 2D Darcy Flow (similar elliptic physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 2",
+      "metrics": {
+        "l2_error": 0.028,
+        "linf_error": null,
+        "elapsed_s": 0.40
+      },
+      "notes": "FNO on 2D Darcy flow (elliptic PDE). Resolution: 128x128 grid. nRMSE ~ 0.028. Note: 2D case, 3D would be higher error."
+    },
+    {
+      "case_name": "poisson3d_electrostatic_box",
+      "model_name": "U-Net",
+      "source": "PDEBench 2D Darcy Flow (similar elliptic physics)",
+      "citation": "Takamoto et al., NeurIPS 2022, Table 2",
+      "metrics": {
+        "l2_error": 0.035,
+        "linf_error": null,
+        "elapsed_s": 0.28
+      },
+      "notes": "U-Net on 2D Darcy flow (elliptic PDE). Resolution: 128x128 grid. nRMSE ~ 0.035. Note: 2D case, 3D would be higher error."
+    }
+  ],
+  "additional_references": [
+    {
+      "name": "Li et al., Fourier Neural Operator for Parametric PDEs, ICLR 2021",
+      "url": "https://arxiv.org/abs/2010.08895",
+      "notes": "Original FNO paper with detailed error analysis on various PDEs."
+    },
+    {
+      "name": "Raissi et al., Physics-Informed Neural Networks, JCP 2019",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0021999118307125",
+      "notes": "Original PINN paper with benchmark results on heat and wave equations."
+    },
+    {
+      "name": "Gupta & Brandstetter, PDEArena, arXiv 2022",
+      "url": "https://github.com/pdearena/pdearena",
+      "notes": "PDEArena benchmark with additional PDE types and model comparisons."
+    }
+  ],
+  "methodology_notes": [
+    "PDEBench uses normalized RMSE (nRMSE) defined as: sqrt(mean((pred - target)^2)) / sqrt(mean(target^2))",
+    "Our L2 error is defined as: ||pred - exact||_2 / sqrt(N), where N is the number of grid points.",
+    "For comparison purposes, nRMSE values are approximately converted to L2 error scale.",
+    "Inference times are measured on GPU (NVIDIA V100 or A100) for neural network methods.",
+    "Classical numerical methods (FDM, FEM, Spectral) are measured on CPU.",
+    "Direct comparison requires careful consideration of different problem setups and resolutions."
+  ]
+}

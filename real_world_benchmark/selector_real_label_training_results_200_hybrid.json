@@ -1,0 +1,103 @@
+{
+  "generated_at": 1775102696.6826293,
+  "config": {
+    "dataset_path": "real_world_benchmark\\selector_training_dataset_200.json",
+    "model_names": [
+      "rf",
+      "mlp"
+    ],
+    "test_fraction": 0.25,
+    "seed": 42,
+    "target_mode": "hybrid"
+  },
+  "label_distribution": {
+    "spectral": 45,
+    "fem": 12,
+    "fdm": 19,
+    "fvm": 3
+  },
+  "results": {
+    "rf": {
+      "model_name": "rf",
+      "label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "num_samples": 79,
+      "num_train": 59,
+      "num_test": 20,
+      "train_accuracy": 1.0,
+      "test_accuracy": 0.85,
+      "training_time_s": 0.24799251556396484,
+      "confusion_matrix": {
+        "spectral": {
+          "spectral": 10,
+          "fdm": 1
+        },
+        "fvm": {
+          "spectral": 1
+        },
+        "fdm": {
+          "fdm": 5
+        },
+        "fem": {
+          "fdm": 1,
+          "fem": 2
+        }
+      },
+      "accuracy_by_equation": {
+        "heat1d": {
+          "total": 20,
+          "correct": 17,
+          "accuracy": 0.85
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_rf_hybrid.pkl"
+    },
+    "mlp": {
+      "model_name": "mlp",
+      "label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "num_samples": 79,
+      "num_train": 59,
+      "num_test": 20,
+      "train_accuracy": 0.9491525423728814,
+      "test_accuracy": 0.9,
+      "training_time_s": 0.27040863037109375,
+      "confusion_matrix": {
+        "spectral": {
+          "spectral": 10,
+          "fdm": 1
+        },
+        "fvm": {
+          "spectral": 1
+        },
+        "fdm": {
+          "fdm": 5
+        },
+        "fem": {
+          "fem": 3
+        }
+      },
+      "accuracy_by_equation": {
+        "heat1d": {
+          "total": 20,
+          "correct": 18,
+          "accuracy": 0.9
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_mlp_hybrid.pkl"
+    }
+  },
+  "source_config": {
+    "num_problems_input": 200,
+    "num_problems_output": 79,
+    "num_runs": 1
+  }
+}

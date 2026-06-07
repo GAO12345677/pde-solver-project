@@ -1,0 +1,865 @@
+{
+  "version": "1.0",
+  "description": "高质量 PDE 问题模板库，用于算法选择器训练",
+  "design_principles": [
+    "确保题型多样性（边界条件、解的光滑性、时间属性、频率结构）",
+    "保证候选最优算法尽量均衡分布",
+    "模板可读、可解释、可扩展",
+    "采样规则明确，避免呆板和失控"
+  ],
+  "templates": [
+    {
+      "template_id": "heat1d_classic_sine_dirichlet",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "name": "一维热传导经典正弦解",
+      "description": "经典的一维热传导方程，初值为正弦函数，两端 Dirichlet 边界条件，有解析解",
+      "governing_form": "∂u/∂t = k ∂²u/∂x²",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u(0,t) = 0, u(L,t) = 0",
+      "initial_condition_family": "single_mode_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.25, 0.5, 1.0, 2.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [0.5, 1.0, 1.5, 2.0], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [1, 2, 3, 4], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [51, 101, 201], "sampling": "weighted", "weights": [0.4, 0.4, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.5 * L^2 / k / mode^2", "constraint": "ensure_decay_factor_0.01_to_0.5"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "single_mode",
+        "temporal_behavior": "exponential_decay",
+        "gradient_profile": "smooth",
+        "spectral_quality": "excellent_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["basic", "canonical", "benchmark"],
+      "sampling_rules": [
+        "k 和 L 独立采样",
+        "mode 选择 1-4，避免过高频率导致网格要求严格",
+        "t_final 确保解有衰减但不完全消失"
+      ]
+    },
+    {
+      "template_id": "heat1d_periodic_smooth",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "name": "一维周期边界热传导",
+      "description": "周期边界条件下的热传导，多模正弦展开，光滑解",
+      "governing_form": "∂u/∂t = k ∂²u/∂x²",
+      "boundary_type": "periodic",
+      "boundary_detail": "u(x+L,t) = u(x,t)",
+      "initial_condition_family": "multi_mode_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.5, 1.0, 1.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 2.0, 6.28318], "sampling": "uniform"},
+        "modes": {"type": "discrete", "values": [[1,2,3], [2,4,6], [1,3,5,7]], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [64, 128, 256], "sampling": "weighted", "weights": [0.2, 0.5, 0.3]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.2 * L^2 / k", "constraint": "ensure_visible_decay"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "multi_mode_low",
+        "temporal_behavior": "multi_exponential_decay",
+        "gradient_profile": "smooth",
+        "spectral_quality": "excellent_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["periodic", "smooth", "spectral_advantage"],
+      "sampling_rules": [
+        "优先选择低频模态组合",
+        "周期边界天然适合 spectral 方法",
+        "避免过高模态导致 Gibbs 现象"
+      ]
+    },
+    {
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "name": "一维混合边界热传导",
+      "description": "左端 Dirichlet，右端 Neumann 混合边界，体现复杂边界处理能力",
+      "governing_form": "∂u/∂t = k ∂²u/∂x²",
+      "boundary_type": "mixed_dirichlet_neumann",
+      "boundary_detail": "u(0,t) = T_left, ∂u/∂x(L,t) = flux_right",
+      "initial_condition_family": "linear_profile",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.2, 0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [0.5, 1.0, 1.5], "sampling": "uniform"},
+        "T_left": {"type": "discrete", "values": [0.0, 50.0, 100.0], "sampling": "uniform"},
+        "flux_right": {"type": "discrete", "values": [0.0, -10.0, 10.0], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [51, 101], "sampling": "uniform"}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.1, "max": 0.5}
+      },
+      "solution_characteristics": {
+        "smoothness": "smooth_to_moderate",
+        "spatial_frequency": "low",
+        "temporal_behavior": "transient_to_steady",
+        "gradient_profile": "moderate_at_boundary",
+        "spectral_quality": "good_for_fem"
+      },
+      "expected_algorithm_bias": "fem_friendly",
+      "difficulty_tags": ["mixed_boundary", "heterogeneous", "fem_strength"],
+      "sampling_rules": [
+        "混合边界给 FEM 创造优势",
+        "Neumann 边界需要特殊处理",
+        "避免极端通量值"
+      ]
+    },
+    {
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "name": "一维陡峭梯度热传导",
+      "description": "初始时刻有局部高梯度区域，需要细网格捕捉",
+      "governing_form": "∂u/∂t = k ∂²u/∂x²",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u(0,t) = 0, u(L,t) = 1 (step-like)",
+      "initial_condition_family": "step_or_heaviside",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.01, 0.05, 0.1], "sampling": "weighted", "weights": [0.5, 0.3, 0.2]},
+        "L": {"type": "discrete", "values": [1.0, 2.0], "sampling": "uniform"},
+        "gradient_position": {"type": "discrete", "values": [0.25, 0.5, 0.75], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [101, 201, 401], "sampling": "weighted", "weights": [0.2, 0.4, 0.4]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.01, "max": 0.1}
+      },
+      "solution_characteristics": {
+        "smoothness": "initially_discontinuous",
+        "spatial_frequency": "high_localized",
+        "temporal_behavior": "diffusion_smoothing",
+        "gradient_profile": "initially_steep",
+        "spectral_quality": "poor_initially"
+      },
+      "expected_algorithm_bias": "fvm_friendly",
+      "difficulty_tags": ["steep_gradient", "localized_feature", "flux_aware"],
+      "sampling_rules": [
+        "高 k 值有助于快速平滑",
+        "网格必须足够细以捕捉梯度",
+        "这是 FVM 通量优势场景"
+      ]
+    },
+    {
+      "template_id": "wave1d_classic_sine_dirichlet",
+      "equation_type": "wave1d",
+      "dimension": 1,
+      "name": "一维波动方程经典正弦解",
+      "description": "经典一维波动方程，单模正弦初值，两端固定",
+      "governing_form": "∂²u/∂t² = c² ∂²u/∂x²",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u(0,t) = 0, u(L,t) = 0",
+      "initial_condition_family": "single_mode_sine_displacement",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0, 1.5, 2.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5, 2.0], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [1, 2, 3], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [51, 101, 201], "sampling": "weighted", "weights": [0.3, 0.5, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.5 * L / c / mode", "constraint": "one_to_two_periods"},
+        "nt_factor": {"type": "fixed", "value": 200}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "single_mode",
+        "temporal_behavior": "oscillatory",
+        "gradient_profile": "smooth",
+        "spectral_quality": "excellent_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["basic", "canonical", "oscillatory"],
+      "sampling_rules": [
+        "确保 t_final 包含至少一个完整周期",
+        "CFL 稳定性条件决定 nt",
+        "低模态适合 spectral"
+      ]
+    },
+    {
+      "template_id": "wave1d_periodic_smooth",
+      "equation_type": "wave1d",
+      "dimension": 1,
+      "name": "一维周期边界波动",
+      "description": "周期边界条件下的波动方程，多模平滑初始条件",
+      "governing_form": "∂²u/∂t² = c² ∂²u/∂x²",
+      "boundary_type": "periodic",
+      "boundary_detail": "u(x+L,t) = u(x,t)",
+      "initial_condition_family": "multi_mode_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0, 1.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [6.28318, 12.56636], "sampling": "uniform"},
+        "modes": {"type": "discrete", "values": [[1,2], [1,3], [2,3,4]], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [64, 128, 256], "sampling": "weighted", "weights": [0.2, 0.5, 0.3]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.3 * L / c", "constraint": "visible_wave_motion"},
+        "nt_factor": {"type": "fixed", "value": 400}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "multi_mode_moderate",
+        "temporal_behavior": "complex_oscillatory",
+        "gradient_profile": "smooth",
+        "spectral_quality": "excellent_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["periodic", "smooth", "spectral_advantage"],
+      "sampling_rules": [
+        "周期边界天然适合 spectral",
+        "避免过高模态组合",
+        "确保有足够的波动周期"
+      ]
+    },
+    {
+      "template_id": "wave1d_robin_boundary",
+      "equation_type": "wave1d",
+      "dimension": 1,
+      "name": "一维 Robin 边界波动",
+      "description": "Robin 边界条件（阻尼边界），模拟开放边界或吸收边界",
+      "governing_form": "∂²u/∂t² = c² ∂²u/∂x²",
+      "boundary_type": "robin",
+      "boundary_detail": "∂u/∂x - αu = 0 at boundaries",
+      "initial_condition_family": "single_mode_sine_displacement",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0, 1.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5, 2.0], "sampling": "uniform"},
+        "alpha": {"type": "discrete", "values": [0.0, 0.1, 0.5, 1.0], "sampling": "weighted", "weights": [0.3, 0.3, 0.2, 0.2]}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [51, 101], "sampling": "uniform"}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.2, "max": 1.0}
+      },
+      "solution_characteristics": {
+        "smoothness": "smooth",
+        "spatial_frequency": "low_to_moderate",
+        "temporal_behavior": "damped_oscillatory",
+        "gradient_profile": "moderate",
+        "spectral_quality": "good_for_fem"
+      },
+      "expected_algorithm_bias": "fem_friendly",
+      "difficulty_tags": ["robin_boundary", "damping", "fem_strength"],
+      "sampling_rules": [
+        "Robin 边界给 FEM 创造优势",
+        "alpha=0 即 Neumann 边界",
+        "避免过大 alpha 导致数值不稳定"
+      ]
+    },
+    {
+      "template_id": "wave1d_high_frequency",
+      "equation_type": "wave1d",
+      "dimension": 1,
+      "name": "一维高频波动",
+      "description": "高模态初始条件，频率较高，网格要求严格",
+      "governing_form": "∂²u/∂t² = c² ∂²u/∂x²",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u(0,t) = 0, u(L,t) = 0",
+      "initial_condition_family": "high_mode_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0, 1.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [5, 6, 7, 8, 10], "sampling": "weighted", "weights": [0.2, 0.2, 0.2, 0.2, 0.2]}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [101, 201, 301], "sampling": "weighted", "weights": [0.2, 0.4, 0.4]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.2 * L / c / mode", "constraint": "one_period_minimum"}
+      },
+      "solution_characteristics": {
+        "smoothness": "smooth",
+        "spatial_frequency": "high",
+        "temporal_behavior": "high_frequency_oscillatory",
+        "gradient_profile": "high_frequency",
+        "spectral_quality": "good_for_spectral_if_resolved"
+      },
+      "expected_algorithm_bias": "mixed",
+      "difficulty_tags": ["high_frequency", "resolution_demanding", "algorithm_discrimination"],
+      "sampling_rules": [
+        "高频模态制造算法选择边界",
+        "网格必须足够细",
+        "不同算法会有明显差异"
+      ]
+    },
+    {
+      "template_id": "heat2d_classic_sine",
+      "equation_type": "heat2d",
+      "dimension": 2,
+      "name": "二维热传导经典正弦解",
+      "description": "经典二维热传导，双正弦模式，有解析解",
+      "governing_form": "∂u/∂t = k(∂²u/∂x² + ∂²u/∂y²)",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u=0 on all boundaries",
+      "initial_condition_family": "product_sine_2d",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.25, 0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5, 2.0], "sampling": "uniform"},
+        "mx": {"type": "discrete", "values": [1, 2], "sampling": "uniform"},
+        "my": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [21, 31, 41], "sampling": "weighted", "weights": [0.4, 0.4, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.3 * L^2 / k / (mx^2 + my^2)", "constraint": "visible_decay"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "low_2d_mode",
+        "temporal_behavior": "exponential_decay",
+        "gradient_profile": "smooth",
+        "spectral_quality": "good_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["basic_2d", "canonical", "benchmark"],
+      "sampling_rules": [
+        "2D 问题比 1D 更复杂",
+        "模态组合 (mx, my) 选择 1-2",
+        "确保有足够衰减可见"
+      ]
+    },
+    {
+      "template_id": "heat2d_periodic_smooth",
+      "equation_type": "heat2d",
+      "dimension": 2,
+      "name": "二维周期边界热传导",
+      "description": "周期边界条件，二维多模正弦展开",
+      "governing_form": "∂u/∂t = k(∂²u/∂x² + ∂²u/∂y²)",
+      "boundary_type": "periodic",
+      "boundary_detail": "periodic in x and y",
+      "initial_condition_family": "double_periodic_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 6.28318], "sampling": "uniform"},
+        "modes": {"type": "discrete", "values": [[1,2], [2,3], [1,1,2]], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [32, 64, 128], "sampling": "weighted", "weights": [0.2, 0.5, 0.3]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.05, "max": 0.2}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "multi_mode_2d",
+        "temporal_behavior": "multi_decay",
+        "gradient_profile": "smooth",
+        "spectral_quality": "excellent_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["periodic_2d", "smooth_2d", "spectral_advantage"],
+      "sampling_rules": [
+        "2D 周期边界强烈推荐 spectral",
+        "2D 网格点数 = nx*ny",
+        "注意计算量增长"
+      ]
+    },
+    {
+      "template_id": "heat2d_mixed_boundary",
+      "equation_type": "heat2d",
+      "dimension": 2,
+      "name": "二维混合边界热传导",
+      "description": "部分边界 Dirichlet，部分 Neumann，体现 FEM 优势",
+      "governing_form": "∂u/∂t = k(∂²u/∂x² + ∂²u/∂y²)",
+      "boundary_type": "mixed",
+      "boundary_detail": "Dirichlet on left/bottom, Neumann on right/top",
+      "initial_condition_family": "linear_gradient_2d",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5], "sampling": "uniform"},
+        "neumann_flux": {"type": "discrete", "values": [-1.0, 0.0, 1.0], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [21, 31], "sampling": "uniform"}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.1, "max": 0.3}
+      },
+      "solution_characteristics": {
+        "smoothness": "moderate",
+        "spatial_frequency": "low",
+        "temporal_behavior": "transient",
+        "gradient_profile": "moderate_at_neumann",
+        "spectral_quality": "degraded_by_boundary"
+      },
+      "expected_algorithm_bias": "fem_friendly",
+      "difficulty_tags": ["mixed_boundary_2d", "fem_strength", "complex_geometry_style"],
+      "sampling_rules": [
+        "混合边界强烈推荐 FEM",
+        "Neumann 边界条件增加复杂度",
+        "2D 问题放大了边界处理差异"
+      ]
+    },
+    {
+      "template_id": "heat2d_flux_sensitive",
+      "equation_type": "heat2d",
+      "dimension": 2,
+      "name": "二维通量敏感热传导",
+      "description": "模拟流体流动或输运问题，通量导向，体现 FVM 优势",
+      "governing_form": "∂u/∂t + ∇·(v u) = k∇²u",
+      "boundary_type": "inlet_outlet",
+      "boundary_detail": "inlet: u=1, outlet: du/dn=0",
+      "initial_condition_family": "localized_peak",
+      "source_term_family": "advection_dominated",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.01, 0.05, 0.1], "sampling": "weighted", "weights": [0.5, 0.3, 0.2]},
+        "v_magnitude": {"type": "discrete", "values": [0.5, 1.0, 2.0], "sampling": "uniform"},
+        "peclet": {"type": "derived", "formula": "v*L/k"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [31, 41, 51], "sampling": "weighted", "weights": [0.3, 0.4, 0.3]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.5 * L / v_magnitude", "constraint": "advective_time_scale"}
+      },
+      "solution_characteristics": {
+        "smoothness": "possibly_discontinuous",
+        "spatial_frequency": "boundary_layer",
+        "temporal_behavior": "transport_dominated",
+        "gradient_profile": "steep_at_boundary_layer",
+        "spectral_quality": "poor"
+      },
+      "expected_algorithm_bias": "fvm_friendly",
+      "difficulty_tags": ["advection", "flux", "fvm_strength", "boundary_layer"],
+      "sampling_rules": [
+        "高 Peclet 数体现 FVM 优势",
+        "对流主导问题 FVM 更稳定",
+        "避免完全扩散主导情况"
+      ]
+    },
+    {
+      "template_id": "wave2d_classic_smooth",
+      "equation_type": "wave2d",
+      "dimension": 2,
+      "name": "二维波动方程经典解",
+      "description": "二维波动方程，低模态正弦解",
+      "governing_form": "∂²u/∂t² = c²(∂²u/∂x² + ∂²u/∂y²)",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u=0 on all boundaries",
+      "initial_condition_family": "product_sine_2d_displacement",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0, 1.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5, 2.0], "sampling": "uniform"},
+        "mx": {"type": "discrete", "values": [1, 2], "sampling": "uniform"},
+        "my": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [21, 31, 41], "sampling": "weighted", "weights": [0.4, 0.4, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.3 * L / c / sqrt(mx**2 + my**2)", "constraint": "visible_wave_motion"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "low_2d_mode",
+        "temporal_behavior": "oscillatory_2d",
+        "gradient_profile": "smooth",
+        "spectral_quality": "good_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["wave_2d", "basic", "canonical"],
+      "sampling_rules": [
+        "2D 波动问题需要更小的时间步",
+        "低模态适合 spectral",
+        "注意 CFL 稳定性"
+      ]
+    },
+    {
+      "template_id": "wave2d_periodic",
+      "equation_type": "wave2d",
+      "dimension": 2,
+      "name": "二维周期边界波动",
+      "description": "周期边界二维波动",
+      "governing_form": "∂²u/∂t² = c²(∂²u/∂x² + ∂²u/∂y²)",
+      "boundary_type": "periodic",
+      "boundary_detail": "periodic in x and y",
+      "initial_condition_family": "diagonal_wave",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0, 1.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [6.28318], "sampling": "fixed"},
+        "kx": {"type": "discrete", "values": [1, 2], "sampling": "uniform"},
+        "ky": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [32, 64, 128], "sampling": "weighted", "weights": [0.2, 0.5, 0.3]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.1, "max": 0.5}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "moderate_2d",
+        "temporal_behavior": "oscillatory",
+        "gradient_profile": "smooth",
+        "spectral_quality": "excellent_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["periodic_wave_2d", "spectral_advantage"],
+      "sampling_rules": [
+        "2D 周期边界强烈 spectral",
+        "对角方向波动更有趣",
+        "2D 网格敏感"
+      ]
+    },
+    {
+      "template_id": "wave2d_mixed_boundary",
+      "equation_type": "wave2d",
+      "dimension": 2,
+      "name": "二维混合边界波动",
+      "description": "部分 Dirichlet 部分 Neumann 边界",
+      "governing_form": "∂²u/∂t² = c²(∂²u/∂x² + ∂²u/∂y²)",
+      "boundary_type": "mixed",
+      "boundary_detail": "mixed dirichlet/neumann",
+      "initial_condition_family": "centered_gaussian_2d",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [21, 31], "sampling": "uniform"}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.1, "max": 0.3}
+      },
+      "solution_characteristics": {
+        "smoothness": "moderate",
+        "spatial_frequency": "low",
+        "temporal_behavior": "complex_reflection",
+        "gradient_profile": "moderate",
+        "spectral_quality": "degraded"
+      },
+      "expected_algorithm_bias": "fem_friendly",
+      "difficulty_tags": ["wave_2d", "mixed", "fem_strength"],
+      "sampling_rules": [
+        "混合边界增加反射复杂性",
+        "FEM 处理混合边界更自然",
+        "2D 边界效应更明显"
+      ]
+    },
+    {
+      "template_id": "heat3d_classic_sine",
+      "equation_type": "heat3d",
+      "dimension": 3,
+      "name": "三维热传导经典解",
+      "description": "三维热传导，三维正弦模式",
+      "governing_form": "∂u/∂t = k(∂²u/∂x² + ∂²u/∂y² + ∂²u/∂z²)",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u=0 on all boundaries",
+      "initial_condition_family": "triple_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.25, 0.5], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [11, 13, 15], "sampling": "weighted", "weights": [0.4, 0.4, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.2 * L^2 / k / mode^2", "constraint": "visible_decay"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "low_3d",
+        "temporal_behavior": "exponential_decay",
+        "gradient_profile": "smooth",
+        "spectral_quality": "good_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["heat_3d", "basic", "canonical"],
+      "sampling_rules": [
+        "3D 问题计算量大",
+        "选择较小网格",
+        "模态通常取 1-2"
+      ]
+    },
+    {
+      "template_id": "heat3d_flux_oriented",
+      "equation_type": "heat3d",
+      "dimension": 3,
+      "name": "三维通量导向热传导",
+      "description": "3D 通量敏感问题，体现 FVM 优势",
+      "governing_form": "∂u/∂t + ∇·(v u) = k∇²u",
+      "boundary_type": "inlet_outlet_3d",
+      "boundary_detail": "inlet: u=1, outlet: du/dn=0",
+      "initial_condition_family": "localized_source_3d",
+      "source_term_family": "advection_dominated",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.01, 0.05], "sampling": "weighted", "weights": [0.6, 0.4]},
+        "v": {"type": "discrete", "values": [0.5, 1.0], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [11, 13], "sampling": "uniform"}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.05, "max": 0.15}
+      },
+      "solution_characteristics": {
+        "smoothness": "possibly_discontinuous",
+        "spatial_frequency": "boundary_layer_3d",
+        "temporal_behavior": "transport_dominated",
+        "gradient_profile": "steep",
+        "spectral_quality": "poor"
+      },
+      "expected_algorithm_bias": "fvm_friendly",
+      "difficulty_tags": ["heat_3d", "flux", "fvm_strength", "expensive"],
+      "sampling_rules": [
+        "3D FVM 计算量大",
+        "选择较小网格",
+        "高 Peclet 体现 FVM 优势"
+      ]
+    },
+    {
+      "template_id": "wave3d_classic",
+      "equation_type": "wave3d",
+      "dimension": 3,
+      "name": "三维波动方程经典解",
+      "description": "三维波动方程，低模态",
+      "governing_form": "∂²u/∂t² = c²(∂²u/∂x² + ∂²u/∂y² + ∂²u/∂z²)",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u=0 on all boundaries",
+      "initial_condition_family": "spherical_harmonic_style",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 1.5], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [11, 13, 15], "sampling": "weighted", "weights": [0.4, 0.4, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "derived", "formula": "0.15 * L / c / mode", "constraint": "short_duration"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "low_3d",
+        "temporal_behavior": "oscillatory_3d",
+        "gradient_profile": "smooth",
+        "spectral_quality": "good_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["wave_3d", "basic", "expensive"],
+      "sampling_rules": [
+        "3D 波动最计算密集",
+        "时间步受 CFL 限制",
+        "选择低模态"
+      ]
+    },
+    {
+      "template_id": "wave3d_mixed_boundary",
+      "equation_type": "wave3d",
+      "dimension": 3,
+      "name": "三维混合边界波动",
+      "description": "3D 混合边界波动",
+      "governing_form": "∂²u/∂t² = c²∇²u",
+      "boundary_type": "mixed_3d",
+      "boundary_detail": "mixed",
+      "initial_condition_family": "centered_gaussian_3d",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "c": {"type": "discrete", "values": [0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0], "sampling": "fixed"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [11, 13], "sampling": "uniform"}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.05, "max": 0.15}
+      },
+      "solution_characteristics": {
+        "smoothness": "moderate",
+        "spatial_frequency": "low",
+        "temporal_behavior": "complex",
+        "gradient_profile": "moderate",
+        "spectral_quality": "degraded"
+      },
+      "expected_algorithm_bias": "fem_friendly",
+      "difficulty_tags": ["wave_3d", "mixed", "fem_strength", "expensive"],
+      "sampling_rules": [
+        "3D FEM 计算量大",
+        "混合边界复杂",
+        "适合区分算法"
+      ]
+    },
+    {
+      "template_id": "poisson3d_classic",
+      "equation_type": "poisson3d",
+      "dimension": 3,
+      "name": "三维 Poisson 方程经典解",
+      "description": "稳态 Poisson 方程，三维正弦源项",
+      "governing_form": "∇²u = f",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u=0 on all boundaries",
+      "initial_condition_family": "n_a",
+      "source_term_family": "sine_source_3d",
+      "parameter_ranges": {
+        "L": {"type": "discrete", "values": [1.0, 1.5, 2.0], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [11, 13, 15, 21], "sampling": "weighted", "weights": [0.3, 0.3, 0.2, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "fixed", "value": 0, "note": "steady_state"}
+      },
+      "solution_characteristics": {
+        "smoothness": "very_smooth",
+        "spatial_frequency": "low_3d",
+        "temporal_behavior": "steady_state",
+        "gradient_profile": "smooth",
+        "spectral_quality": "good_for_spectral"
+      },
+      "expected_algorithm_bias": "spectral_friendly",
+      "difficulty_tags": ["poisson_3d", "steady", "canonical"],
+      "sampling_rules": [
+        "稳态问题",
+        "无时间维度",
+        "适合 spectral"
+      ]
+    },
+    {
+      "template_id": "poisson3d_mixed_boundary",
+      "equation_type": "poisson3d",
+      "dimension": 3,
+      "name": "三维混合边界 Poisson",
+      "description": "部分 Dirichlet 部分 Neumann",
+      "governing_form": "∇²u = f",
+      "boundary_type": "mixed_3d",
+      "boundary_detail": "mixed dirichlet/neumann",
+      "initial_condition_family": "n_a",
+      "source_term_family": "nonuniform_source",
+      "parameter_ranges": {
+        "L": {"type": "discrete", "values": [1.0, 1.5], "sampling": "uniform"},
+        "mode": {"type": "discrete", "values": [1, 2], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [11, 13, 15], "sampling": "weighted", "weights": [0.4, 0.4, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "fixed", "value": 0}
+      },
+      "solution_characteristics": {
+        "smoothness": "moderate",
+        "spatial_frequency": "low",
+        "temporal_behavior": "steady",
+        "gradient_profile": "moderate",
+        "spectral_quality": "degraded"
+      },
+      "expected_algorithm_bias": "fem_friendly",
+      "difficulty_tags": ["poisson_3d", "mixed", "fem_strength"],
+      "sampling_rules": [
+        "稳态 + 混合边界",
+        "FEM 优势明显",
+        "3D 问题计算量大"
+      ]
+    },
+    {
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "name": "一维稳态热传导",
+      "description": "稳态热传导（简化 Poisson）",
+      "governing_form": "d²u/dx² = -f",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u(0) = T1, u(L) = T2",
+      "initial_condition_family": "n_a",
+      "source_term_family": "linear_or_quadratic",
+      "parameter_ranges": {
+        "L": {"type": "discrete", "values": [0.5, 1.0, 1.5, 2.0], "sampling": "uniform"},
+        "T1": {"type": "discrete", "values": [0.0, 20.0, 50.0], "sampling": "uniform"},
+        "T2": {"type": "discrete", "values": [0.0, 50.0, 100.0], "sampling": "uniform"},
+        "source_type": {"type": "discrete", "values": ["linear", "quadratic", "constant"], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [21, 41, 51, 101], "sampling": "weighted", "weights": [0.2, 0.3, 0.3, 0.2]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "fixed", "value": 0}
+      },
+      "solution_characteristics": {
+        "smoothness": "smooth_to_linear",
+        "spatial_frequency": "low",
+        "temporal_behavior": "steady",
+        "gradient_profile": "linear_or_smooth",
+        "spectral_quality": "good_for_fdmfem"
+      },
+      "expected_algorithm_bias": "mixed",
+      "difficulty_tags": ["steady", "simple", "baseline"],
+      "sampling_rules": [
+        "稳态问题无时间维度",
+        "线性源项产生线性解",
+        "适合所有算法"
+      ]
+    },
+    {
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "name": "一维多尺度热传导",
+      "description": "多尺度初始条件，多个频率成分",
+      "governing_form": "∂u/∂t = k ∂²u/∂x²",
+      "boundary_type": "dirichlet",
+      "boundary_detail": "u(0,t) = 0, u(L,t) = 0",
+      "initial_condition_family": "multi_scale_sine",
+      "source_term_family": "homogeneous",
+      "parameter_ranges": {
+        "k": {"type": "discrete", "values": [0.1, 0.5, 1.0], "sampling": "uniform"},
+        "L": {"type": "discrete", "values": [1.0, 2.0], "sampling": "uniform"},
+        "scale_ratio": {"type": "discrete", "values": [5, 10, 20], "sampling": "uniform"}
+      },
+      "grid_ranges": {
+        "nx": {"type": "discrete", "values": [101, 201, 401], "sampling": "weighted", "weights": [0.2, 0.4, 0.4]}
+      },
+      "time_ranges": {
+        "t_final": {"type": "range", "min": 0.01, "max": 0.1}
+      },
+      "solution_characteristics": {
+        "smoothness": "initially_multi_scale",
+        "spatial_frequency": "multi_scale",
+        "temporal_behavior": "scale_separation",
+        "gradient_profile": "multi_scale",
+        "spectral_quality": "mixed"
+      },
+      "expected_algorithm_bias": "mixed",
+      "difficulty_tags": ["multi_scale", "resolution_demanding", "algorithm_discrimination"],
+      "sampling_rules": [
+        "多尺度问题制造算法选择边界",
+        "不同算法对不同尺度敏感",
+        "高分辨率场景"
+      ]
+    }
+  ]
+}

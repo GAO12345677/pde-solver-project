@@ -1,0 +1,191 @@
+{
+  "generated_at": 1775106961.941019,
+  "config": {
+    "dataset_path": "real_world_benchmark\\selector_training_dataset_diverse_200.json",
+    "model_names": [
+      "rf",
+      "mlp"
+    ],
+    "test_fraction": 0.25,
+    "seed": 42,
+    "target_mode": "strict"
+  },
+  "label_distribution": {
+    "spectral": 116,
+    "fem": 50,
+    "fdm": 25,
+    "fvm": 9
+  },
+  "results": {
+    "rf": {
+      "model_name": "rf",
+      "label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "num_samples": 200,
+      "num_train": 151,
+      "num_test": 49,
+      "train_accuracy": 1.0,
+      "test_accuracy": 0.7755102040816326,
+      "training_time_s": 0.27793145179748535,
+      "confusion_matrix": {
+        "fem": {
+          "fem": 10,
+          "spectral": 2
+        },
+        "spectral": {
+          "spectral": 25,
+          "fem": 4
+        },
+        "fvm": {
+          "fem": 1,
+          "fvm": 1
+        },
+        "fdm": {
+          "fdm": 2,
+          "fem": 3,
+          "spectral": 1
+        }
+      },
+      "accuracy_by_equation": {
+        "wave3d": {
+          "total": 5,
+          "correct": 4,
+          "accuracy": 0.8
+        },
+        "heat1d": {
+          "total": 12,
+          "correct": 12,
+          "accuracy": 1.0
+        },
+        "heat2d": {
+          "total": 6,
+          "correct": 3,
+          "accuracy": 0.5
+        },
+        "heat3d": {
+          "total": 5,
+          "correct": 3,
+          "accuracy": 0.6
+        },
+        "wave1d": {
+          "total": 11,
+          "correct": 11,
+          "accuracy": 1.0
+        },
+        "wave2d": {
+          "total": 8,
+          "correct": 3,
+          "accuracy": 0.375
+        },
+        "poisson3d": {
+          "total": 2,
+          "correct": 2,
+          "accuracy": 1.0
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_rf_strict.pkl"
+    },
+    "mlp": {
+      "model_name": "mlp",
+      "label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "num_samples": 200,
+      "num_train": 151,
+      "num_test": 49,
+      "train_accuracy": 0.9139072847682119,
+      "test_accuracy": 0.7142857142857143,
+      "training_time_s": 0.7988786697387695,
+      "confusion_matrix": {
+        "fem": {
+          "fem": 6,
+          "spectral": 5,
+          "fvm": 1
+        },
+        "spectral": {
+          "spectral": 25,
+          "fdm": 2,
+          "fem": 2
+        },
+        "fvm": {
+          "fvm": 2
+        },
+        "fdm": {
+          "fdm": 2,
+          "fem": 3,
+          "spectral": 1
+        }
+      },
+      "accuracy_by_equation": {
+        "wave3d": {
+          "total": 5,
+          "correct": 3,
+          "accuracy": 0.6
+        },
+        "heat1d": {
+          "total": 12,
+          "correct": 12,
+          "accuracy": 1.0
+        },
+        "heat2d": {
+          "total": 6,
+          "correct": 2,
+          "accuracy": 0.3333333333333333
+        },
+        "heat3d": {
+          "total": 5,
+          "correct": 3,
+          "accuracy": 0.6
+        },
+        "wave1d": {
+          "total": 11,
+          "correct": 11,
+          "accuracy": 1.0
+        },
+        "wave2d": {
+          "total": 8,
+          "correct": 2,
+          "accuracy": 0.25
+        },
+        "poisson3d": {
+          "total": 2,
+          "correct": 2,
+          "accuracy": 1.0
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_mlp_strict.pkl"
+    }
+  },
+  "dataset_summary": {
+    "equation_distribution": {
+      "wave2d": 29,
+      "heat1d": 50,
+      "wave3d": 23,
+      "heat2d": 30,
+      "wave1d": 40,
+      "poisson3d": 11,
+      "heat3d": 17
+    },
+    "best_algorithm_distribution": {
+      "spectral": 116,
+      "fem": 50,
+      "fdm": 25,
+      "fvm": 9
+    },
+    "elapsed_s": 87.38116693496704
+  },
+  "source_config": {
+    "num_problems_input": 200,
+    "num_problems_output": 200,
+    "num_runs": 1,
+    "seed": 123,
+    "source": "diverse_problem_generator"
+  }
+}

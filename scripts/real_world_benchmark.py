@@ -6,6 +6,7 @@ and reuses existing benchmark entry points without modifying solver code.
 Commands:
   python scripts/real_world_benchmark.py collect
   python scripts/real_world_benchmark.py run-local
+  python scripts/real_world_benchmark.py run-statistical [--runs 100]
   python scripts/real_world_benchmark.py compare
   python scripts/real_world_benchmark.py all
 """
@@ -14,11 +15,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 import time
 from collections import defaultdict
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
+
+import numpy as np
 
 from test_case.benchmark_algorithms import (
     benchmark_heat2d_solver,
@@ -27,7 +31,7 @@ from test_case.benchmark_algorithms import (
     benchmark_poisson1d_solvers,
     benchmark_poisson3d_solver,
     benchmark_selector_strategies,
-    benchmark_wave1d_solver as benchmark_wave_solver,
+    benchmark_wave_solver,
     benchmark_wave2d_solver,
     benchmark_wave3d_solver,
 )
@@ -39,6 +43,7 @@ MANIFEST_PATH = OUT_DIR / "literature_cases.json"
 SOTA_TEMPLATE_PATH = OUT_DIR / "sota_results.template.json"
 SOTA_RESULTS_PATH = OUT_DIR / "sota_results.json"
 LOCAL_LATEST_PATH = OUT_DIR / "latest_local_results.json"
+STATISTICAL_RESULTS_PATH = OUT_DIR / "statistical_results.json"
 REPORT_LATEST_PATH = OUT_DIR / "latest_report.md"
 
 
@@ -86,7 +91,7 @@ def default_manifest() -> Dict[str, Any]:
                 "doi_or_url": "https://doi.org/10.18419/DARUS-2987",
                 "citation": "PDEBench pretrained FNO / U-Net / PINN baselines.",
                 "pdes": ["Aligned with PDEBench datasets"],
-                "notes": "Can be used later as external baseline references without rewriting core project code.",
+                "notes": "Can be used later as external baseline references without rewriting core solver code.",
             },
         ],
         "runnable_aligned_cases": [
@@ -247,6 +252,35 @@ def _balanced_pick(rows: List[Dict[str, Any]]) -> str:
     return min(rows, key=score)["algorithm"]
 
 
+def compute_statistics(values: List[float]) -> Dict[str, float]:
+    if not values:
+        return {"mean": 0.0, "std": 0.0, "min": 0.0, "max": 0.0, "ci_95_lower": 0.0, "ci_95_upper": 0.0}
+    
+    arr = np.array(values)
+    mean = float(np.mean(arr))
+    std = float(np.std(arr, ddof=1)) if len(arr) > 1 else 0.0
+    min_val = float(np.min(arr))
+    max_val = float(np.max(arr))
+    
+    if len(arr) > 1:
+        se = std / np.sqrt(len(arr))
+        ci_margin = 1.96 * se
+        ci_lower = mean - ci_margin
+        ci_upper = mean + ci_margin
+    else:
+        ci_lower = mean
+        ci_upper = mean
+    
+    return {
+        "mean": mean,
+        "std": std,
+        "min": min_val,
+        "max": max_val,
+        "ci_95_lower": ci_lower,
+        "ci_95_upper": ci_upper,
+    }
+
+
 def run_local() -> Dict[str, Any]:
     ensure_dir()
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8")) if MANIFEST_PATH.exists() else collect_sources()
@@ -294,6 +328,94 @@ def run_local() -> Dict[str, Any]:
     stamped = OUT_DIR / f"local_results_{timestamp()}.json"
     write_json(stamped, payload)
     write_json(LOCAL_LATEST_PATH, payload)
+    return payload
+
+
+def run_statistical(num_runs: int = 100) -> Dict[str, Any]:
+    ensure_dir()
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8")) if MANIFEST_PATH.exists() else collect_sources()
+    
+    statistical_cases: List[Dict[str, Any]] = []
+    total_runs = 0
+    start_time = time.time()
+    
+    for case in manifest["runnable_aligned_cases"]:
+        eq = case["equation_type"]
+        runner = RUNNERS.get(eq)
+        if not runner:
+            continue
+        
+        case_results: Dict[str, Dict[str, List[float]]] = {}
+        
+        print(f"Running {case['case_name']} with {num_runs} iterations...")
+        
+        for run_idx in range(num_runs):
+            rows = [asdict(item) for item in runner()]
+            for row in rows:
+                algo = row["algorithm"]
+                if algo not in case["algorithms"]:
+                    continue
+                if algo not in case_results:
+                    case_results[algo] = {
+                        "l2_errors": [],
+                        "linf_errors": [],
+                        "elapsed_s": [],
+                    }
+                case_results[algo]["l2_errors"].append(row["l2_error"])
+                case_results[algo]["linf_errors"].append(row["linf_error"])
+                case_results[algo]["elapsed_s"].append(row["elapsed_s"])
+            total_runs += 1
+            
+            if (run_idx + 1) % 10 == 0:
+                print(f"  Progress: {run_idx + 1}/{num_runs}")
+        
+        algo_stats: List[Dict[str, Any]] = []
+        for algo, metrics in case_results.items():
+            l2_stats = compute_statistics(metrics["l2_errors"])
+            linf_stats = compute_statistics(metrics["linf_errors"])
+            elapsed_stats = compute_statistics(metrics["elapsed_s"])
+            
+            algo_stats.append({
+                "algorithm": algo,
+                "l2_error_stats": l2_stats,
+                "linf_error_stats": linf_stats,
+                "elapsed_s_stats": elapsed_stats,
+                "raw_l2_errors": metrics["l2_errors"][:10],
+            })
+        
+        if algo_stats:
+            best_by_error = min(algo_stats, key=lambda x: x["l2_error_stats"]["mean"])["algorithm"]
+            best_by_time = min(algo_stats, key=lambda x: x["elapsed_s_stats"]["mean"])["algorithm"]
+            
+            statistical_cases.append({
+                **case,
+                "num_runs": num_runs,
+                "algorithm_stats": algo_stats,
+                "best_by_error": best_by_error,
+                "best_by_time": best_by_time,
+            })
+    
+    elapsed_total = time.time() - start_time
+    
+    payload = {
+        "generated_at": time.time(),
+        "manifest_path": str(MANIFEST_PATH),
+        "num_runs_per_case": num_runs,
+        "total_solver_calls": total_runs,
+        "total_elapsed_s": elapsed_total,
+        "statistical_cases": statistical_cases,
+        "notes": [
+            f"Each case was run {num_runs} times to compute statistical measures.",
+            "Statistics include: mean, std, min, max, 95% confidence interval.",
+            "95% CI calculated as: mean ± 1.96 * (std / sqrt(n))",
+        ],
+    }
+    
+    write_json(STATISTICAL_RESULTS_PATH, payload)
+    print(f"[ok] Statistical results saved to: {STATISTICAL_RESULTS_PATH}")
+    print(f"[info] Total solver calls: {total_runs}")
+    print(f"[info] Total elapsed time: {elapsed_total:.2f}s")
+    
     return payload
 
 
@@ -404,6 +526,38 @@ def render_markdown(local_payload: Dict[str, Any], comparison_payload: Dict[str,
     return "\n".join(lines) + "\n"
 
 
+def render_statistical_markdown(stat_payload: Dict[str, Any]) -> str:
+    lines: List[str] = []
+    lines.append("# Statistical Benchmark Report (100 Runs)")
+    lines.append("")
+    lines.append(f"- Generated at: `{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stat_payload['generated_at']))}`")
+    lines.append(f"- Runs per case: `{stat_payload['num_runs_per_case']}`")
+    lines.append(f"- Total solver calls: `{stat_payload['total_solver_calls']}`")
+    lines.append(f"- Total elapsed time: `{stat_payload['total_elapsed_s']:.2f}s`")
+    lines.append("")
+    
+    for case in stat_payload["statistical_cases"]:
+        lines.append(f"## {case['case_name']}")
+        lines.append("")
+        lines.append(f"- Equation: `{case['equation_type']}`")
+        lines.append(f"- Application: {case['application']}")
+        lines.append(f"- Best by mean error: `{case['best_by_error']}`")
+        lines.append(f"- Best by mean time: `{case['best_by_time']}`")
+        lines.append("")
+        lines.append("| Algorithm | L2 Mean | L2 Std | L2 95% CI | Time Mean (s) | Time Std |")
+        lines.append("| --- | ---: | ---: | ---: | ---: | ---: |")
+        for algo in case["algorithm_stats"]:
+            l2 = algo["l2_error_stats"]
+            elapsed = algo["elapsed_s_stats"]
+            ci_str = f"[{l2['ci_95_lower']:.2e}, {l2['ci_95_upper']:.2e}]"
+            lines.append(
+                f"| {algo['algorithm']} | {l2['mean']:.6e} | {l2['std']:.6e} | {ci_str} | {elapsed['mean']:.6f} | {elapsed['std']:.6f} |"
+            )
+        lines.append("")
+    
+    return "\n".join(lines) + "\n"
+
+
 def all_in_one() -> Dict[str, Any]:
     collect_sources()
     local_payload = run_local()
@@ -420,7 +574,8 @@ def all_in_one() -> Dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Real-world-inspired PDE benchmark helper.")
-    parser.add_argument("command", choices=["collect", "run-local", "compare", "all"])
+    parser.add_argument("command", choices=["collect", "run-local", "run-statistical", "compare", "all"])
+    parser.add_argument("--runs", type=int, default=100, help="Number of runs for statistical analysis")
     args = parser.parse_args()
 
     if args.command == "collect":
@@ -431,6 +586,12 @@ def main() -> None:
         payload = run_local()
         print(f"[ok] wrote local results: {LOCAL_LATEST_PATH}")
         print(f"[info] runnable cases: {len(payload['local_cases'])}")
+    elif args.command == "run-statistical":
+        payload = run_statistical(args.runs)
+        report_md = render_statistical_markdown(payload)
+        stat_report_path = OUT_DIR / "statistical_report.md"
+        stat_report_path.write_text(report_md, encoding="utf-8")
+        print(f"[ok] wrote statistical report: {stat_report_path}")
     elif args.command == "compare":
         payload = compare_with_sota()
         report_md = render_markdown(json.loads(LOCAL_LATEST_PATH.read_text(encoding='utf-8')), payload)

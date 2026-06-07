@@ -1,0 +1,91 @@
+{
+  "generated_at": 1775100967.160582,
+  "config": {
+    "dataset_path": "real_world_benchmark\\selector_training_dataset_smoke.json",
+    "model_names": [
+      "rf",
+      "mlp"
+    ],
+    "test_fraction": 0.25,
+    "seed": 42
+  },
+  "dataset_summary": {
+    "total_input_problems": 12,
+    "accepted_records": 3,
+    "skipped_records": 9,
+    "elapsed_s": 0.18674206733703613,
+    "equation_distribution": {
+      "wave1d": 2,
+      "heat2d": 1
+    },
+    "template_distribution": {
+      "wave1d_high_frequency": 2,
+      "heat2d_classic_sine": 1
+    },
+    "best_by_error_distribution": {
+      "spectral": 2,
+      "fem": 1
+    },
+    "best_supported_algorithm_distribution": {
+      "spectral": 2,
+      "fem": 1
+    },
+    "skip_reason_distribution": {
+      "unsupported_template_for_exact_labeling": 9
+    }
+  },
+  "results": {
+    "rf": {
+      "model_name": "rf",
+      "label_keys": [
+        "fem",
+        "spectral"
+      ],
+      "num_samples": 3,
+      "num_train": 2,
+      "num_test": 1,
+      "train_accuracy": 1.0,
+      "test_accuracy": 1.0,
+      "training_time_s": 0.23674988746643066,
+      "confusion_matrix": {
+        "spectral": {
+          "spectral": 1
+        }
+      },
+      "accuracy_by_equation": {
+        "wave1d": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_rf.pkl"
+    },
+    "mlp": {
+      "model_name": "mlp",
+      "label_keys": [
+        "fem",
+        "spectral"
+      ],
+      "num_samples": 3,
+      "num_train": 2,
+      "num_test": 1,
+      "train_accuracy": 1.0,
+      "test_accuracy": 1.0,
+      "training_time_s": 0.08449053764343262,
+      "confusion_matrix": {
+        "spectral": {
+          "spectral": 1
+        }
+      },
+      "accuracy_by_equation": {
+        "wave1d": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        }
+      },
+      "saved_model_path": "D:\\cursorku\\model\\selector_real_labels_mlp.pkl"
+    }
+  }
+}

@@ -1,0 +1,6065 @@
+{
+  "generated_at": 1775102116.1410835,
+  "config": {
+    "num_problems_input": 200,
+    "num_problems_output": 79,
+    "num_runs": 1
+  },
+  "problems": [
+    {
+      "problem_id": 3,
+      "template_id": "heat1d_classic_sine_dirichlet",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.25,
+        "L": 2.0,
+        "mode": 2,
+        "nx": 101,
+        "t_final": 0.5
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.320992112159729,
+        0.5842607021331787,
+        0.3099006414413452,
+        0.22155320644378662,
+        0.46125608682632446
+      ],
+      "domain_features": [
+        0.9123637676239014,
+        0.5159347653388977,
+        0.5035736560821533
+      ],
+      "metadata": {
+        "template_name": "一维热传导经典正弦解",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "single_mode",
+          "temporal_behavior": "exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "basic",
+          "canonical",
+          "benchmark"
+        ],
+        "source_type": "canonical",
+        "source_reference": "canonical_heat1d_benchmark_family",
+        "variation_notes": "Derived from a standard heat1d teaching/benchmark pattern with controlled parameter sampling and dirichlet boundaries."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 8.316760589590425e-05,
+          "std_error": 0.0,
+          "mean_time": 0.033360958099365234
+        },
+        "fvm": {
+          "mean_error": 0.00016643102648829542,
+          "std_error": 0.0,
+          "mean_time": 0.006539106369018555
+        },
+        "fem": {
+          "mean_error": 8.315573472247828e-05,
+          "std_error": 0.0,
+          "mean_time": 0.11881041526794434
+        },
+        "spectral": {
+          "mean_error": 8.725866921560029e-12,
+          "std_error": 0.0,
+          "mean_time": 0.1881556510925293
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 8.725866921560029e-12
+    },
+    {
+      "problem_id": 11,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "scale_ratio": 5,
+        "nx": 401,
+        "t_final": 0.04904011245903338
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.38773077726364136,
+        0.34520187973976135,
+        0.2542780041694641,
+        0.272131085395813,
+        0.3178596496582031
+      ],
+      "domain_features": [
+        0.5465704798698425,
+        0.6168237328529358,
+        0.4960790276527405
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 6.985006412602122e-07,
+          "std_error": 0.0,
+          "mean_time": 0.5271062850952148
+        },
+        "fvm": {
+          "mean_error": 1.3792726868291734e-06,
+          "std_error": 0.0,
+          "mean_time": 0.09453892707824707
+        },
+        "fem": {
+          "mean_error": 6.936991431717048e-07,
+          "std_error": 0.0,
+          "mean_time": 9.046173334121704
+        },
+        "spectral": {
+          "mean_error": 1.2818224474088613e-11,
+          "std_error": 0.0,
+          "mean_time": 4.48399019241333
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.2818224474088613e-11
+    },
+    {
+      "problem_id": 12,
+      "template_id": "heat1d_periodic_smooth",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 6.28318,
+        "modes": [
+          1,
+          2,
+          3
+        ],
+        "nx": 64,
+        "t_final": 7.89567018248
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.20000000298023224,
+        0.1358974426984787
+      ],
+      "hardware_features": [
+        0.27538973093032837,
+        0.4032423198223114,
+        0.22904305160045624,
+        0.2841959297657013,
+        0.4619976282119751
+      ],
+      "domain_features": [
+        0.9617938995361328,
+        0.8897668719291687,
+        0.3322941064834595
+      ],
+      "metadata": {
+        "template_name": "一维周期边界热传导",
+        "boundary_type": "periodic",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "multi_mode_low",
+          "temporal_behavior": "multi_exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "periodic",
+          "smooth",
+          "spectral_advantage"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and periodic boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.986781329436022e-05,
+          "std_error": 0.0,
+          "mean_time": 0.0870518684387207
+        },
+        "fvm": {
+          "mean_error": 7.97160349513483e-05,
+          "std_error": 0.0,
+          "mean_time": 0.01604175567626953
+        },
+        "fem": {
+          "mean_error": 3.985810567515477e-05,
+          "std_error": 0.0,
+          "mean_time": 0.2636549472808838
+        },
+        "spectral": {
+          "mean_error": 6.36306318227526e-12,
+          "std_error": 0.0,
+          "mean_time": 0.4362485408782959
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 6.36306318227526e-12
+    },
+    {
+      "problem_id": 16,
+      "template_id": "heat1d_periodic_smooth",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 6.28318,
+        "modes": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "nx": 256,
+        "t_final": 78.95670182479999
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.20000000298023224,
+        0.6282051205635071
+      ],
+      "hardware_features": [
+        0.23993241786956787,
+        0.3322208821773529,
+        0.23459793627262115,
+        0.18587078154087067,
+        0.3487875759601593
+      ],
+      "domain_features": [
+        0.9704764485359192,
+        0.8017085790634155,
+        0.6279235482215881
+      ],
+      "metadata": {
+        "template_name": "一维周期边界热传导",
+        "boundary_type": "periodic",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "multi_mode_low",
+          "temporal_behavior": "multi_exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "periodic",
+          "smooth",
+          "spectral_advantage"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and periodic boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.4477789116631077e-06,
+          "std_error": 0.0,
+          "mean_time": 1.5859489440917969
+        },
+        "fvm": {
+          "mean_error": 4.8949890903113835e-06,
+          "std_error": 0.0,
+          "mean_time": 0.296008825302124
+        },
+        "fem": {
+          "mean_error": 2.4476883057206464e-06,
+          "std_error": 0.0,
+          "mean_time": 14.006276369094849
+        },
+        "spectral": {
+          "mean_error": 1.1450192337747954e-11,
+          "std_error": 0.0,
+          "mean_time": 15.922888278961182
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.1450192337747954e-11
+    },
+    {
+      "problem_id": 18,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 0.0,
+        "T2": 100.0,
+        "source_type": "constant",
+        "nx": 21,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.025641025975346565
+      ],
+      "hardware_features": [
+        0.5324450731277466,
+        0.3459852933883667,
+        0.2537804841995239,
+        0.17981483042240143,
+        0.6498247981071472
+      ],
+      "domain_features": [
+        0.5392869114875793,
+        0.16206473112106323,
+        0.6109619140625
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.028678417205810547
+        },
+        "fvm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6900655593423543
+    },
+    {
+      "problem_id": 20,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.0,
+        "scale_ratio": 5,
+        "nx": 401,
+        "t_final": 0.07438664166542215
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.4955936074256897,
+        0.33931732177734375,
+        0.23712614178657532,
+        0.2782687544822693,
+        0.45903128385543823
+      ],
+      "domain_features": [
+        0.5601897239685059,
+        0.6954336166381836,
+        0.5651456713676453
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.3078417083405865e-06,
+          "std_error": 0.0,
+          "mean_time": 1.5589582920074463
+        },
+        "fvm": {
+          "mean_error": 2.558111390246445e-06,
+          "std_error": 0.0,
+          "mean_time": 0.282850980758667
+        },
+        "fem": {
+          "mean_error": 1.2821298870858026e-06,
+          "std_error": 0.0,
+          "mean_time": 26.751018047332764
+        },
+        "spectral": {
+          "mean_error": 1.037055441807748e-11,
+          "std_error": 0.0,
+          "mean_time": 19.163193702697754
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.037055441807748e-11
+    },
+    {
+      "problem_id": 22,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 50.0,
+        "T2": 100.0,
+        "source_type": "quadratic",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.41308891773223877,
+        0.48987528681755066,
+        0.2864466905593872,
+        0.2204679548740387,
+        0.3809618353843689
+      ],
+      "domain_features": [
+        0.6389596462249756,
+        0.27214381098747253,
+        0.3528411388397217
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0009984970092773438
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0005021095275878906
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 28,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.05,
+        "L": 1.0,
+        "gradient_position": 0.25,
+        "nx": 201,
+        "t_final": 0.06092111974366816
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.36536329984664917,
+        0.5471736788749695,
+        0.2770165205001831,
+        0.29093146324157715,
+        0.6138888001441956
+      ],
+      "domain_features": [
+        0.6935185790061951,
+        0.8352546095848083,
+        0.3568415641784668
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 4.424974509532307e-07,
+          "std_error": 0.0,
+          "mean_time": 0.013797998428344727
+        },
+        "fvm": {
+          "mean_error": 8.446111252701527e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0032415390014648438
+        },
+        "fem": {
+          "mean_error": 7.481285211040684e-07,
+          "std_error": 0.0,
+          "mean_time": 0.09215140342712402
+        },
+        "spectral": {
+          "mean_error": 5.011600143189668e-12,
+          "std_error": 0.0,
+          "mean_time": 0.07254672050476074
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 5.011600143189668e-12
+    },
+    {
+      "problem_id": 29,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 50.0,
+        "T2": 50.0,
+        "source_type": "constant",
+        "nx": 41,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.07692307978868484
+      ],
+      "hardware_features": [
+        0.3319444954395294,
+        0.34335726499557495,
+        0.23102089762687683,
+        0.17629337310791016,
+        0.3682371973991394
+      ],
+      "domain_features": [
+        0.6850240230560303,
+        0.2162122279405594,
+        0.43874791264533997
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6984302957695783
+    },
+    {
+      "problem_id": 31,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 50.0,
+        "T2": 0.0,
+        "source_type": "constant",
+        "nx": 41,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.07692307978868484
+      ],
+      "hardware_features": [
+        0.20761366188526154,
+        0.34964632987976074,
+        0.4175550043582916,
+        0.21242737770080566,
+        0.5954321622848511
+      ],
+      "domain_features": [
+        0.5634306073188782,
+        0.27800390124320984,
+        0.5375322103500366
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0015370845794677734
+        },
+        "spectral": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6984302957695783
+    },
+    {
+      "problem_id": 36,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 2.0,
+        "T1": 20.0,
+        "T2": 100.0,
+        "source_type": "quadratic",
+        "nx": 21,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.025641025975346565
+      ],
+      "hardware_features": [
+        0.2974669933319092,
+        0.5530765056610107,
+        0.39127659797668457,
+        0.19474472105503082,
+        0.5680813193321228
+      ],
+      "domain_features": [
+        0.6525806188583374,
+        0.11162169277667999,
+        0.4466433525085449
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6900655593423543
+    },
+    {
+      "problem_id": 41,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.05,
+        "L": 2.0,
+        "gradient_position": 0.25,
+        "nx": 201,
+        "t_final": 0.0808800026376895
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.45294201374053955,
+        0.5787487626075745,
+        0.494301438331604,
+        0.012703834101557732,
+        0.47797510027885437
+      ],
+      "domain_features": [
+        0.6093975305557251,
+        0.5586972832679749,
+        0.4345143437385559
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.5086946491496407e-07,
+          "std_error": 0.0,
+          "mean_time": 0.001529693603515625
+        },
+        "fvm": {
+          "mean_error": 2.859369012843305e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0030341148376464844
+        },
+        "fem": {
+          "mean_error": 1.6387544898504356e-07,
+          "std_error": 0.0,
+          "mean_time": 0.14839911460876465
+        },
+        "spectral": {
+          "mean_error": 3.3229799220720155e-11,
+          "std_error": 0.0,
+          "mean_time": 0.02054429054260254
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 3.3229799220720155e-11
+    },
+    {
+      "problem_id": 42,
+      "template_id": "heat1d_classic_sine_dirichlet",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.5,
+        "mode": 4,
+        "nx": 101,
+        "t_final": 0.140625
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.37161046266555786,
+        0.42932289838790894,
+        0.2107696682214737,
+        0.16038022935390472,
+        0.6974171996116638
+      ],
+      "domain_features": [
+        0.9917414784431458,
+        0.3121197819709778,
+        0.5823187828063965
+      ],
+      "metadata": {
+        "template_name": "一维热传导经典正弦解",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "single_mode",
+          "temporal_behavior": "exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "basic",
+          "canonical",
+          "benchmark"
+        ],
+        "source_type": "canonical",
+        "source_reference": "canonical_heat1d_benchmark_family",
+        "variation_notes": "Derived from a standard heat1d teaching/benchmark pattern with controlled parameter sampling and dirichlet boundaries."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.295013658766881e-05,
+          "std_error": 0.0,
+          "mean_time": 0.034729719161987305
+        },
+        "fvm": {
+          "mean_error": 6.557069748554122e-05,
+          "std_error": 0.0,
+          "mean_time": 0.006170749664306641
+        },
+        "fem": {
+          "mean_error": 3.2771267706258584e-05,
+          "std_error": 0.0,
+          "mean_time": 0.1186985969543457
+        },
+        "spectral": {
+          "mean_error": 4.882659670279709e-12,
+          "std_error": 0.0,
+          "mean_time": 0.1710209846496582
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.882659670279709e-12
+    },
+    {
+      "problem_id": 46,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.05,
+        "L": 2.0,
+        "gradient_position": 0.25,
+        "nx": 101,
+        "t_final": 0.030123128878844226
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.3819577693939209,
+        0.4241791069507599,
+        0.25300008058547974,
+        0.24732466042041779,
+        0.6702746748924255
+      ],
+      "domain_features": [
+        0.540269672870636,
+        0.8718291521072388,
+        0.3071443736553192
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.1425179371039552e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0009987354278564453
+        },
+        "fvm": {
+          "mean_error": 3.9091217482971917e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 2.1426676021153584e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0010128021240234375
+        },
+        "spectral": {
+          "mean_error": 1.523591733278634e-11,
+          "std_error": 0.0,
+          "mean_time": 0.0015177726745605469
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.523591733278634e-11
+    },
+    {
+      "problem_id": 48,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 20.0,
+        "T2": 50.0,
+        "source_type": "quadratic",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.5088419318199158,
+        0.3932884633541107,
+        0.40629950165748596,
+        0.21162191033363342,
+        0.4551366865634918
+      ],
+      "domain_features": [
+        0.6281777024269104,
+        0.10214553028345108,
+        0.38362306356430054
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0015361309051513672
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 50,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "scale_ratio": 10,
+        "nx": 201,
+        "t_final": 0.06294756235681075
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.3268163502216339,
+        0.3108179569244385,
+        0.32552000880241394,
+        0.14223980903625488,
+        0.39023715257644653
+      ],
+      "domain_features": [
+        0.6144915819168091,
+        0.7263087630271912,
+        0.5808008909225464
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.303170256563039e-06,
+          "std_error": 0.0,
+          "mean_time": 0.14822959899902344
+        },
+        "fvm": {
+          "mean_error": 6.6043971904172925e-06,
+          "std_error": 0.0,
+          "mean_time": 0.030084609985351562
+        },
+        "fem": {
+          "mean_error": 3.304918090503195e-06,
+          "std_error": 0.0,
+          "mean_time": 0.9402897357940674
+        },
+        "spectral": {
+          "mean_error": 7.31401769899454e-12,
+          "std_error": 0.0,
+          "mean_time": 0.8464114665985107
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.31401769899454e-12
+    },
+    {
+      "problem_id": 52,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 201,
+        "t_final": 0.04367656390664645
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.3703528344631195,
+        0.4955793023109436,
+        0.4602471888065338,
+        0.13616906106472015,
+        0.3991358280181885
+      ],
+      "domain_features": [
+        0.5473324656486511,
+        0.7984057068824768,
+        0.626627504825592
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.4045286670673107e-06,
+          "std_error": 0.0,
+          "mean_time": 0.05057811737060547
+        },
+        "fvm": {
+          "mean_error": 2.8044900792091457e-06,
+          "std_error": 0.0,
+          "mean_time": 0.011164188385009766
+        },
+        "fem": {
+          "mean_error": 1.4041975808942567e-06,
+          "std_error": 0.0,
+          "mean_time": 0.455111026763916
+        },
+        "spectral": {
+          "mean_error": 1.0754038118742602e-11,
+          "std_error": 0.0,
+          "mean_time": 0.2696218490600586
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.0754038118742602e-11
+    },
+    {
+      "problem_id": 53,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.01,
+        "L": 2.0,
+        "gradient_position": 0.5,
+        "nx": 401,
+        "t_final": 0.09865420270487839
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.5624427199363708,
+        0.5395345091819763,
+        0.2807391583919525,
+        0.09625501930713654,
+        0.5189131498336792
+      ],
+      "domain_features": [
+        0.6121554970741272,
+        0.7022011280059814,
+        0.554668128490448
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.407254858840306e-08,
+          "std_error": 0.0,
+          "mean_time": 0.002529621124267578
+        },
+        "fvm": {
+          "mean_error": 1.7605331948415635e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0005068778991699219
+        },
+        "fem": {
+          "mean_error": 7.086643528917544e-08,
+          "std_error": 0.0,
+          "mean_time": 0.24204683303833008
+        },
+        "spectral": {
+          "mean_error": 2.952318246521562e-12,
+          "std_error": 0.0,
+          "mean_time": 0.033233642578125
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 2.952318246521562e-12
+    },
+    {
+      "problem_id": 55,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 5,
+        "nx": 401,
+        "t_final": 0.09041019757280769
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.4075433313846588,
+        0.3947787284851074,
+        0.43160372972488403,
+        0.19849838316440582,
+        0.4494630992412567
+      ],
+      "domain_features": [
+        0.5188933610916138,
+        0.7987158298492432,
+        0.4049842059612274
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.2619466661700482e-07,
+          "std_error": 0.0,
+          "mean_time": 0.06055140495300293
+        },
+        "fvm": {
+          "mean_error": 1.581614053263426e-07,
+          "std_error": 0.0,
+          "mean_time": 0.029480695724487305
+        },
+        "fem": {
+          "mean_error": 1.2585997319990893e-07,
+          "std_error": 0.0,
+          "mean_time": 1.0227971076965332
+        },
+        "spectral": {
+          "mean_error": 3.115791481075388e-12,
+          "std_error": 0.0,
+          "mean_time": 0.2532050609588623
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 3.115791481075388e-12
+    },
+    {
+      "problem_id": 58,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 20.0,
+        "T2": 0.0,
+        "source_type": "constant",
+        "nx": 21,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.025641025975346565
+      ],
+      "hardware_features": [
+        0.42218467593193054,
+        0.5406179428100586,
+        0.4774104952812195,
+        0.24677492678165436,
+        0.314788281917572
+      ],
+      "domain_features": [
+        0.5745404958724976,
+        0.10973969101905823,
+        0.3437129259109497
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0015368461608886719
+        },
+        "fem": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6900655593423543
+    },
+    {
+      "problem_id": 62,
+      "template_id": "heat1d_periodic_smooth",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 1.0,
+        "modes": [
+          2,
+          4,
+          6
+        ],
+        "nx": 256,
+        "t_final": 2.0
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.20000000298023224,
+        0.6282051205635071
+      ],
+      "hardware_features": [
+        0.33708545565605164,
+        0.3531706631183624,
+        0.40342822670936584,
+        0.25380226969718933,
+        0.3161014914512634
+      ],
+      "domain_features": [
+        0.889926552772522,
+        0.8569950461387634,
+        0.5998474359512329
+      ],
+      "metadata": {
+        "template_name": "一维周期边界热传导",
+        "boundary_type": "periodic",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "multi_mode_low",
+          "temporal_behavior": "multi_exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "periodic",
+          "smooth",
+          "spectral_advantage"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and periodic boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.4477274067845266e-06,
+          "std_error": 0.0,
+          "mean_time": 1.5598576068878174
+        },
+        "fvm": {
+          "mean_error": 4.894989090305499e-06,
+          "std_error": 0.0,
+          "mean_time": 0.2981593608856201
+        },
+        "fem": {
+          "mean_error": 2.4485605729423537e-06,
+          "std_error": 0.0,
+          "mean_time": 14.039650917053223
+        },
+        "spectral": {
+          "mean_error": 7.733152477170527e-12,
+          "std_error": 0.0,
+          "mean_time": 15.77803921699524
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.733152477170527e-12
+    },
+    {
+      "problem_id": 63,
+      "template_id": "heat1d_classic_sine_dirichlet",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.5,
+        "mode": 1,
+        "nx": 51,
+        "t_final": 0.5
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.36050599813461304,
+        0.3971810042858124,
+        0.4845936596393585,
+        0.17305828630924225,
+        0.6224763989448547
+      ],
+      "domain_features": [
+        0.834068238735199,
+        0.593590259552002,
+        0.4994558095932007
+      ],
+      "metadata": {
+        "template_name": "一维热传导经典正弦解",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "single_mode",
+          "temporal_behavior": "exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "basic",
+          "canonical",
+          "benchmark"
+        ],
+        "source_type": "canonical",
+        "source_reference": "canonical_heat1d_benchmark_family",
+        "variation_notes": "Derived from a standard heat1d teaching/benchmark pattern with controlled parameter sampling and dirichlet boundaries."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 5.636842753498054e-05,
+          "std_error": 0.0,
+          "mean_time": 0.058644771575927734
+        },
+        "fvm": {
+          "mean_error": 0.00011261311038324974,
+          "std_error": 0.0,
+          "mean_time": 0.015651941299438477
+        },
+        "fem": {
+          "mean_error": 5.634258644742591e-05,
+          "std_error": 0.0,
+          "mean_time": 0.17866039276123047
+        },
+        "spectral": {
+          "mean_error": 7.860736702767504e-12,
+          "std_error": 0.0,
+          "mean_time": 0.28389406204223633
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.860736702767504e-12
+    },
+    {
+      "problem_id": 65,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 0.0,
+        "T2": 0.0,
+        "source_type": "quadratic",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.5074589848518372,
+        0.33232226967811584,
+        0.4748035669326782,
+        0.069064199924469,
+        0.31496500968933105
+      ],
+      "domain_features": [
+        0.6109704971313477,
+        0.17418445646762848,
+        0.6319159269332886
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0010442733764648438
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0006551742553710938
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 66,
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.5,
+        "T_left": 50.0,
+        "flux_right": -10.0,
+        "nx": 101,
+        "t_final": 0.442491601518643
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.6000000238418579,
+        0.5,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.45242616534233093,
+        0.40430209040641785,
+        0.3987588882446289,
+        0.2015562504529953,
+        0.6842347979545593
+      ],
+      "domain_features": [
+        0.5741824507713318,
+        0.6700326800346375,
+        0.6248492002487183
+      ],
+      "metadata": {
+        "template_name": "一维混合边界热传导",
+        "boundary_type": "mixed_dirichlet_neumann",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_moderate",
+          "spatial_frequency": "low",
+          "temporal_behavior": "transient_to_steady",
+          "gradient_profile": "moderate_at_boundary",
+          "spectral_quality": "good_for_fem"
+        },
+        "expected_algorithm_bias": "fem_friendly",
+        "difficulty_tags": [
+          "mixed_boundary",
+          "heterogeneous",
+          "fem_strength"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and mixed_dirichlet_neumann boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.1279367278517313e-05,
+          "std_error": 0.0,
+          "mean_time": 0.10273337364196777
+        },
+        "fvm": {
+          "mean_error": 4.2554188462873115e-05,
+          "std_error": 0.0,
+          "mean_time": 0.02164173126220703
+        },
+        "fem": {
+          "mean_error": 2.1279118871816152e-05,
+          "std_error": 0.0,
+          "mean_time": 0.3766903877258301
+        },
+        "spectral": {
+          "mean_error": 4.780055264525822e-11,
+          "std_error": 0.0,
+          "mean_time": 0.6256351470947266
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.780055264525822e-11
+    },
+    {
+      "problem_id": 67,
+      "template_id": "heat1d_classic_sine_dirichlet",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "mode": 1,
+        "nx": 101,
+        "t_final": 0.5
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.24427683651447296,
+        0.3757309019565582,
+        0.28843218088150024,
+        0.2294410616159439,
+        0.6506842970848083
+      ],
+      "domain_features": [
+        0.980328381061554,
+        0.5953705906867981,
+        0.6929466724395752
+      ],
+      "metadata": {
+        "template_name": "一维热传导经典正弦解",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "single_mode",
+          "temporal_behavior": "exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "basic",
+          "canonical",
+          "benchmark"
+        ],
+        "source_type": "canonical",
+        "source_reference": "canonical_heat1d_benchmark_family",
+        "variation_notes": "Derived from a standard heat1d teaching/benchmark pattern with controlled parameter sampling and dirichlet boundaries."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 6.312102549193275e-06,
+          "std_error": 0.0,
+          "mean_time": 0.010233402252197266
+        },
+        "fvm": {
+          "mean_error": 1.2624481424177444e-05,
+          "std_error": 0.0,
+          "mean_time": 0.003172159194946289
+        },
+        "fem": {
+          "mean_error": 6.31402021117731e-06,
+          "std_error": 0.0,
+          "mean_time": 0.04577517509460449
+        },
+        "spectral": {
+          "mean_error": 1.9334063287430305e-11,
+          "std_error": 0.0,
+          "mean_time": 0.06574368476867676
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.9334063287430305e-11
+    },
+    {
+      "problem_id": 68,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 201,
+        "t_final": 0.027706796267556823
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.3508823812007904,
+        0.4182320833206177,
+        0.23933260142803192,
+        0.04886145144701004,
+        0.5738248229026794
+      ],
+      "domain_features": [
+        0.5678955316543579,
+        0.8819593787193298,
+        0.3974387049674988
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.1239253245197649e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0020253658294677734
+        },
+        "fvm": {
+          "mean_error": 1.9386522243481235e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0007276535034179688
+        },
+        "fem": {
+          "mean_error": 2.1581415643499429e-07,
+          "std_error": 0.0,
+          "mean_time": 0.05181312561035156
+        },
+        "spectral": {
+          "mean_error": 4.159164149704275e-12,
+          "std_error": 0.0,
+          "mean_time": 0.013685226440429688
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.159164149704275e-12
+    },
+    {
+      "problem_id": 69,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 50.0,
+        "T2": 50.0,
+        "source_type": "linear",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.20994380116462708,
+        0.46655941009521484,
+        0.39019253849983215,
+        0.031769219785928726,
+        0.35613584518432617
+      ],
+      "domain_features": [
+        0.5838228464126587,
+        0.29324638843536377,
+        0.5384170413017273
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0005011558532714844
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 70,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 0.0,
+        "T2": 0.0,
+        "source_type": "quadratic",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.20492108166217804,
+        0.43629539012908936,
+        0.44761985540390015,
+        0.08860770612955093,
+        0.4834192395210266
+      ],
+      "domain_features": [
+        0.5884628295898438,
+        0.16038547456264496,
+        0.6673767566680908
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 71,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "scale_ratio": 20,
+        "nx": 101,
+        "t_final": 0.045869725603138664
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.5669350624084473,
+        0.48924967646598816,
+        0.25325196981430054,
+        0.10165669023990631,
+        0.3766412138938904
+      ],
+      "domain_features": [
+        0.5049646496772766,
+        0.8709841966629028,
+        0.479282945394516
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.0445460675643644e-05,
+          "std_error": 0.0,
+          "mean_time": 0.024195194244384766
+        },
+        "fvm": {
+          "mean_error": 2.0875597678276634e-05,
+          "std_error": 0.0,
+          "mean_time": 0.0046710968017578125
+        },
+        "fem": {
+          "mean_error": 1.0447266514141363e-05,
+          "std_error": 0.0,
+          "mean_time": 0.08617091178894043
+        },
+        "spectral": {
+          "mean_error": 7.0328254880304145e-12,
+          "std_error": 0.0,
+          "mean_time": 0.12148237228393555
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.0328254880304145e-12
+    },
+    {
+      "problem_id": 72,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 2.0,
+        "scale_ratio": 5,
+        "nx": 101,
+        "t_final": 0.04612200017980492
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.5582539439201355,
+        0.5014838576316833,
+        0.27129751443862915,
+        0.25583434104919434,
+        0.4392125606536865
+      ],
+      "domain_features": [
+        0.6706689596176147,
+        0.6195774674415588,
+        0.5361281037330627
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 5.877954937270312e-06,
+          "std_error": 0.0,
+          "mean_time": 0.009031057357788086
+        },
+        "fvm": {
+          "mean_error": 1.172751853551119e-05,
+          "std_error": 0.0,
+          "mean_time": 0.003022432327270508
+        },
+        "fem": {
+          "mean_error": 5.88078160748237e-06,
+          "std_error": 0.0,
+          "mean_time": 0.04072141647338867
+        },
+        "spectral": {
+          "mean_error": 8.899195960224973e-12,
+          "std_error": 0.0,
+          "mean_time": 0.059316396713256836
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 8.899195960224973e-12
+    },
+    {
+      "problem_id": 73,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 101,
+        "t_final": 0.06546780729347795
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.21694022417068481,
+        0.5652437210083008,
+        0.4128734767436981,
+        0.05193835496902466,
+        0.33668839931488037
+      ],
+      "domain_features": [
+        0.5367066264152527,
+        0.8920108675956726,
+        0.48342424631118774
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 4.311777381735108e-06,
+          "std_error": 0.0,
+          "mean_time": 0.009102344512939453
+        },
+        "fvm": {
+          "mean_error": 8.598641108247624e-06,
+          "std_error": 0.0,
+          "mean_time": 0.0015177726745605469
+        },
+        "fem": {
+          "mean_error": 4.3117290527841345e-06,
+          "std_error": 0.0,
+          "mean_time": 0.03157854080200195
+        },
+        "spectral": {
+          "mean_error": 1.0613156450816504e-11,
+          "std_error": 0.0,
+          "mean_time": 0.04310297966003418
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.0613156450816504e-11
+    },
+    {
+      "problem_id": 77,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.05,
+        "L": 1.0,
+        "gradient_position": 0.25,
+        "nx": 201,
+        "t_final": 0.016461742812404128
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.5211008787155151,
+        0.5679157376289368,
+        0.20330500602722168,
+        0.053581252694129944,
+        0.6615616679191589
+      ],
+      "domain_features": [
+        0.6098987460136414,
+        0.560015857219696,
+        0.38111618161201477
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.2183244086726254e-07,
+          "std_error": 0.0,
+          "mean_time": 0.003026723861694336
+        },
+        "fvm": {
+          "mean_error": 2.3292889529908577e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0015244483947753906
+        },
+        "fem": {
+          "mean_error": 1.2811566693712137e-07,
+          "std_error": 0.0,
+          "mean_time": 0.048293352127075195
+        },
+        "spectral": {
+          "mean_error": 3.1810885304262134e-11,
+          "std_error": 0.0,
+          "mean_time": 0.016836166381835938
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 3.1810885304262134e-11
+    },
+    {
+      "problem_id": 79,
+      "template_id": "heat1d_classic_sine_dirichlet",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.0,
+        "mode": 2,
+        "nx": 201,
+        "t_final": 0.125
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.5284923315048218,
+        0.42499980330467224,
+        0.2964636981487274,
+        0.22464624047279358,
+        0.6205557584762573
+      ],
+      "domain_features": [
+        0.898251473903656,
+        0.567909300327301,
+        0.35756346583366394
+      ],
+      "metadata": {
+        "template_name": "一维热传导经典正弦解",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "single_mode",
+          "temporal_behavior": "exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "basic",
+          "canonical",
+          "benchmark"
+        ],
+        "source_type": "canonical",
+        "source_reference": "canonical_heat1d_benchmark_family",
+        "variation_notes": "Derived from a standard heat1d teaching/benchmark pattern with controlled parameter sampling and dirichlet boundaries."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.059238997575509e-06,
+          "std_error": 0.0,
+          "mean_time": 0.5850887298583984
+        },
+        "fvm": {
+          "mean_error": 4.117189626452807e-06,
+          "std_error": 0.0,
+          "mean_time": 0.11497926712036133
+        },
+        "fem": {
+          "mean_error": 2.0585386707516623e-06,
+          "std_error": 0.0,
+          "mean_time": 3.6692698001861572
+        },
+        "spectral": {
+          "mean_error": 7.227211328926902e-12,
+          "std_error": 0.0,
+          "mean_time": 4.472656965255737
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.227211328926902e-12
+    },
+    {
+      "problem_id": 86,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 20.0,
+        "T2": 0.0,
+        "source_type": "linear",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.30146580934524536,
+        0.4832310378551483,
+        0.3660622537136078,
+        0.11884994804859161,
+        0.5710483193397522
+      ],
+      "domain_features": [
+        0.6451539397239685,
+        0.21338756382465363,
+        0.603368878364563
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0015141963958740234
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0015170574188232422
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 88,
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.2,
+        "L": 1.5,
+        "T_left": 100.0,
+        "flux_right": -10.0,
+        "nx": 101,
+        "t_final": 0.3478877557518561
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.6000000238418579,
+        0.5,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.5711882710456848,
+        0.44754377007484436,
+        0.3585972487926483,
+        0.18059909343719482,
+        0.5950060486793518
+      ],
+      "domain_features": [
+        0.5143700838088989,
+        0.7062749862670898,
+        0.49263662099838257
+      ],
+      "metadata": {
+        "template_name": "一维混合边界热传导",
+        "boundary_type": "mixed_dirichlet_neumann",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_moderate",
+          "spatial_frequency": "low",
+          "temporal_behavior": "transient_to_steady",
+          "gradient_profile": "moderate_at_boundary",
+          "spectral_quality": "good_for_fem"
+        },
+        "expected_algorithm_bias": "fem_friendly",
+        "difficulty_tags": [
+          "mixed_boundary",
+          "heterogeneous",
+          "fem_strength"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and mixed_dirichlet_neumann boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.3016261420054517e-05,
+          "std_error": 0.0,
+          "mean_time": 0.03152966499328613
+        },
+        "fvm": {
+          "mean_error": 2.6004833199546545e-05,
+          "std_error": 0.0,
+          "mean_time": 0.006057024002075195
+        },
+        "fem": {
+          "mean_error": 1.3016608217447305e-05,
+          "std_error": 0.0,
+          "mean_time": 0.11573219299316406
+        },
+        "spectral": {
+          "mean_error": 3.6542654799666425e-11,
+          "std_error": 0.0,
+          "mean_time": 0.16825222969055176
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 3.6542654799666425e-11
+    },
+    {
+      "problem_id": 91,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "scale_ratio": 10,
+        "nx": 101,
+        "t_final": 0.027958779360954138
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.543593168258667,
+        0.5737748146057129,
+        0.2636442184448242,
+        0.14094026386737823,
+        0.5933979749679565
+      ],
+      "domain_features": [
+        0.6756731271743774,
+        0.6516211032867432,
+        0.506807804107666
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 6.955091878656914e-06,
+          "std_error": 0.0,
+          "mean_time": 0.015136003494262695
+        },
+        "fvm": {
+          "mean_error": 1.3883206827565978e-05,
+          "std_error": 0.0,
+          "mean_time": 0.0025947093963623047
+        },
+        "fem": {
+          "mean_error": 6.956038312724701e-06,
+          "std_error": 0.0,
+          "mean_time": 0.053624629974365234
+        },
+        "spectral": {
+          "mean_error": 5.142642812597613e-11,
+          "std_error": 0.0,
+          "mean_time": 0.07453083992004395
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 5.142642812597613e-11
+    },
+    {
+      "problem_id": 92,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 2.0,
+        "T1": 0.0,
+        "T2": 100.0,
+        "source_type": "quadratic",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.42797353863716125,
+        0.331384539604187,
+        0.47119197249412537,
+        0.25967174768447876,
+        0.6192389726638794
+      ],
+      "domain_features": [
+        0.5199725031852722,
+        0.14087946712970734,
+        0.5974401235580444
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0015125274658203125
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 94,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.01,
+        "L": 1.0,
+        "gradient_position": 0.25,
+        "nx": 401,
+        "t_final": 0.04509005219853482
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.4122893214225769,
+        0.5929580926895142,
+        0.25594499707221985,
+        0.0904201939702034,
+        0.3124278485774994
+      ],
+      "domain_features": [
+        0.5783675312995911,
+        0.580073356628418,
+        0.5720139741897583
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.667415460673171e-08,
+          "std_error": 0.0,
+          "mean_time": 0.008333921432495117
+        },
+        "fvm": {
+          "mean_error": 3.193127852628387e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0027053356170654297
+        },
+        "fem": {
+          "mean_error": 4.708424404764467e-08,
+          "std_error": 0.0,
+          "mean_time": 0.21108627319335938
+        },
+        "spectral": {
+          "mean_error": 2.833157993190222e-12,
+          "std_error": 0.0,
+          "mean_time": 0.0526578426361084
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 2.833157993190222e-12
+    },
+    {
+      "problem_id": 96,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 10,
+        "nx": 201,
+        "t_final": 0.01917047415830904
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.4611688554286957,
+        0.5866048336029053,
+        0.3538196086883545,
+        0.1298917531967163,
+        0.3143371045589447
+      ],
+      "domain_features": [
+        0.6919549107551575,
+        0.5412010550498962,
+        0.3164316415786743
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 6.875865940917326e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 1.3310250612910027e-07,
+          "std_error": 0.0,
+          "mean_time": 0.001653432846069336
+        },
+        "fem": {
+          "mean_error": 9.889615893535095e-08,
+          "std_error": 0.0,
+          "mean_time": 0.07394981384277344
+        },
+        "spectral": {
+          "mean_error": 8.108453131073037e-12,
+          "std_error": 0.0,
+          "mean_time": 0.010532140731811523
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 8.108453131073037e-12
+    },
+    {
+      "problem_id": 100,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 50.0,
+        "T2": 0.0,
+        "source_type": "constant",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.25846928358078003,
+        0.5473992824554443,
+        0.29310041666030884,
+        0.043161578476428986,
+        0.6683881878852844
+      ],
+      "domain_features": [
+        0.5331063270568848,
+        0.15694402158260345,
+        0.3614453673362732
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0009992122650146484
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0005018711090087891
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 102,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 2.0,
+        "T1": 20.0,
+        "T2": 100.0,
+        "source_type": "linear",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.3784625232219696,
+        0.4143063724040985,
+        0.29045361280441284,
+        0.18908478319644928,
+        0.44472503662109375
+      ],
+      "domain_features": [
+        0.5175299644470215,
+        0.12360118329524994,
+        0.6847590804100037
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 103,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 0.0,
+        "T2": 50.0,
+        "source_type": "linear",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.4118168354034424,
+        0.5226953625679016,
+        0.3772234320640564,
+        0.19603176414966583,
+        0.4197533130645752
+      ],
+      "domain_features": [
+        0.5482743978500366,
+        0.1644984632730484,
+        0.3621766269207001
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0015270709991455078
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 114,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.0,
+        "scale_ratio": 20,
+        "nx": 201,
+        "t_final": 0.025909550464530855
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.5426456928253174,
+        0.5275558829307556,
+        0.41583889722824097,
+        0.12962791323661804,
+        0.5509235262870789
+      ],
+      "domain_features": [
+        0.6168196201324463,
+        0.759938657283783,
+        0.3337777256965637
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.872174037704834e-06,
+          "std_error": 0.0,
+          "mean_time": 0.12102341651916504
+        },
+        "fvm": {
+          "mean_error": 5.7430915819377146e-06,
+          "std_error": 0.0,
+          "mean_time": 0.024721622467041016
+        },
+        "fem": {
+          "mean_error": 2.8726471854255042e-06,
+          "std_error": 0.0,
+          "mean_time": 0.8018739223480225
+        },
+        "spectral": {
+          "mean_error": 4.713100028816547e-12,
+          "std_error": 0.0,
+          "mean_time": 0.7058534622192383
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.713100028816547e-12
+    },
+    {
+      "problem_id": 115,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 20.0,
+        "T2": 50.0,
+        "source_type": "quadratic",
+        "nx": 41,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.07692307978868484
+      ],
+      "hardware_features": [
+        0.5149728655815125,
+        0.46474331617355347,
+        0.3294254541397095,
+        0.1878037452697754,
+        0.44426292181015015
+      ],
+      "domain_features": [
+        0.602547824382782,
+        0.24734114110469818,
+        0.6545611619949341
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6984302957695783
+    },
+    {
+      "problem_id": 117,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 401,
+        "t_final": 0.033431368907372506
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.3289961814880371,
+        0.3727448582649231,
+        0.3439590334892273,
+        0.20497751235961914,
+        0.39130115509033203
+      ],
+      "domain_features": [
+        0.5661471486091614,
+        0.8721538186073303,
+        0.3194277286529541
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.0563820050862443e-07,
+          "std_error": 0.0,
+          "mean_time": 0.014155387878417969
+        },
+        "fvm": {
+          "mean_error": 5.9217934221236694e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0030231475830078125
+        },
+        "fem": {
+          "mean_error": 3.0658040551642976e-07,
+          "std_error": 0.0,
+          "mean_time": 0.3251912593841553
+        },
+        "spectral": {
+          "mean_error": 7.467437893871392e-12,
+          "std_error": 0.0,
+          "mean_time": 0.09108853340148926
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.467437893871392e-12
+    },
+    {
+      "problem_id": 119,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.01,
+        "L": 1.0,
+        "gradient_position": 0.75,
+        "nx": 201,
+        "t_final": 0.02274750711756145
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.26107606291770935,
+        0.5062601566314697,
+        0.21421174705028534,
+        0.08597812801599503,
+        0.35591503977775574
+      ],
+      "domain_features": [
+        0.5882154703140259,
+        0.665741503238678,
+        0.5087505578994751
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.2487552219996786e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0010678768157958984
+        },
+        "fvm": {
+          "mean_error": 6.086524541511904e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 5.970324391208907e-08,
+          "std_error": 0.0,
+          "mean_time": 0.07910847663879395
+        },
+        "spectral": {
+          "mean_error": 8.95152850937592e-12,
+          "std_error": 0.0,
+          "mean_time": 0.005825996398925781
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 8.95152850937592e-12
+    },
+    {
+      "problem_id": 123,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.0,
+        "scale_ratio": 5,
+        "nx": 401,
+        "t_final": 0.07749851841417418
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.3385971486568451,
+        0.33716094493865967,
+        0.21228408813476562,
+        0.23320293426513672,
+        0.4958798885345459
+      ],
+      "domain_features": [
+        0.6971080303192139,
+        0.6859893798828125,
+        0.6911668181419373
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.2925426358155825e-06,
+          "std_error": 0.0,
+          "mean_time": 1.5478806495666504
+        },
+        "fvm": {
+          "mean_error": 2.584487347485002e-06,
+          "std_error": 0.0,
+          "mean_time": 0.29707980155944824
+        },
+        "fem": {
+          "mean_error": 1.292541734362474e-06,
+          "std_error": 0.0,
+          "mean_time": 27.656550407409668
+        },
+        "spectral": {
+          "mean_error": 4.202546354857029e-12,
+          "std_error": 0.0,
+          "mean_time": 20.33250141143799
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.202546354857029e-12
+    },
+    {
+      "problem_id": 125,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 0.0,
+        "T2": 0.0,
+        "source_type": "quadratic",
+        "nx": 41,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.07692307978868484
+      ],
+      "hardware_features": [
+        0.40643513202667236,
+        0.3937709927558899,
+        0.21528814733028412,
+        0.03348011150956154,
+        0.4538017511367798
+      ],
+      "domain_features": [
+        0.5121057033538818,
+        0.23963794112205505,
+        0.38280820846557617
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6984302957695783
+    },
+    {
+      "problem_id": 126,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.0,
+        "T1": 20.0,
+        "T2": 100.0,
+        "source_type": "constant",
+        "nx": 21,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.025641025975346565
+      ],
+      "hardware_features": [
+        0.2189496010541916,
+        0.3414615988731384,
+        0.47564697265625,
+        0.0027779345400631428,
+        0.37532877922058105
+      ],
+      "domain_features": [
+        0.5062566995620728,
+        0.12212589383125305,
+        0.5480597019195557
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0015277862548828125
+        },
+        "spectral": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6900655593423543
+    },
+    {
+      "problem_id": 129,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 20.0,
+        "T2": 0.0,
+        "source_type": "linear",
+        "nx": 21,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.025641025975346565
+      ],
+      "hardware_features": [
+        0.3112088441848755,
+        0.5109100341796875,
+        0.3901309370994568,
+        0.29454177618026733,
+        0.5481430888175964
+      ],
+      "domain_features": [
+        0.595501184463501,
+        0.25228652358055115,
+        0.6613311767578125
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6900655593423543
+    },
+    {
+      "problem_id": 130,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.05,
+        "L": 1.0,
+        "gradient_position": 0.5,
+        "nx": 401,
+        "t_final": 0.04073844359814606
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.26514261960983276,
+        0.45575016736984253,
+        0.3599749505519867,
+        0.05337374657392502,
+        0.5452437400817871
+      ],
+      "domain_features": [
+        0.5028249621391296,
+        0.8710673451423645,
+        0.40582969784736633
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 9.149147616563667e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0375666618347168
+        },
+        "fvm": {
+          "mean_error": 1.4300029396581042e-07,
+          "std_error": 0.0,
+          "mean_time": 0.010145425796508789
+        },
+        "fem": {
+          "mean_error": 9.450894115909014e-08,
+          "std_error": 0.0,
+          "mean_time": 0.9137952327728271
+        },
+        "spectral": {
+          "mean_error": 1.4476176099077549e-11,
+          "std_error": 0.0,
+          "mean_time": 0.23479676246643066
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.4476176099077549e-11
+    },
+    {
+      "problem_id": 132,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 2.0,
+        "scale_ratio": 5,
+        "nx": 201,
+        "t_final": 0.05686051622243841
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.3755645751953125,
+        0.3064836263656616,
+        0.4478875696659088,
+        0.2688482403755188,
+        0.3560996353626251
+      ],
+      "domain_features": [
+        0.6108072400093079,
+        0.5434302687644958,
+        0.5688960552215576
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 9.513091490413674e-07,
+          "std_error": 0.0,
+          "mean_time": 0.03427386283874512
+        },
+        "fvm": {
+          "mean_error": 1.8950532463586277e-06,
+          "std_error": 0.0,
+          "mean_time": 0.006082296371459961
+        },
+        "fem": {
+          "mean_error": 9.657571175739577e-07,
+          "std_error": 0.0,
+          "mean_time": 0.3063080310821533
+        },
+        "spectral": {
+          "mean_error": 4.2365976731037735e-11,
+          "std_error": 0.0,
+          "mean_time": 0.17619013786315918
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.2365976731037735e-11
+    },
+    {
+      "problem_id": 136,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 2.0,
+        "T1": 20.0,
+        "T2": 100.0,
+        "source_type": "constant",
+        "nx": 41,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.07692307978868484
+      ],
+      "hardware_features": [
+        0.5397635102272034,
+        0.31716957688331604,
+        0.440289169549942,
+        0.27833864092826843,
+        0.6088433861732483
+      ],
+      "domain_features": [
+        0.6396241784095764,
+        0.267596036195755,
+        0.31606051325798035
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.001331329345703125
+        },
+        "spectral": {
+          "mean_error": 0.6984302957695783,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6984302957695783
+    },
+    {
+      "problem_id": 139,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 101,
+        "t_final": 0.03167452522370324
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.25720876455307007,
+        0.5330303907394409,
+        0.25946125388145447,
+        0.2731914818286896,
+        0.5625076293945312
+      ],
+      "domain_features": [
+        0.5072325468063354,
+        0.5021719336509705,
+        0.3206631541252136
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 4.183140786064856e-06,
+          "std_error": 0.0,
+          "mean_time": 0.007634401321411133
+        },
+        "fvm": {
+          "mean_error": 8.317902464558094e-06,
+          "std_error": 0.0,
+          "mean_time": 0.002012014389038086
+        },
+        "fem": {
+          "mean_error": 4.192257147641401e-06,
+          "std_error": 0.0,
+          "mean_time": 0.03144335746765137
+        },
+        "spectral": {
+          "mean_error": 1.4410205672960268e-11,
+          "std_error": 0.0,
+          "mean_time": 0.04245924949645996
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.4410205672960268e-11
+    },
+    {
+      "problem_id": 141,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 1.0,
+        "gradient_position": 0.25,
+        "nx": 201,
+        "t_final": 0.025732664760970456
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.2878318428993225,
+        0.43917667865753174,
+        0.48277053236961365,
+        0.220243901014328,
+        0.3860974907875061
+      ],
+      "domain_features": [
+        0.6719122529029846,
+        0.6512802243232727,
+        0.6406888961791992
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 4.331449382503322e-07,
+          "std_error": 0.0,
+          "mean_time": 0.010530233383178711
+        },
+        "fvm": {
+          "mean_error": 7.175211326573501e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0014984607696533203
+        },
+        "fem": {
+          "mean_error": 3.650491584540393e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0841057300567627
+        },
+        "spectral": {
+          "mean_error": 9.627252268294058e-12,
+          "std_error": 0.0,
+          "mean_time": 0.06110191345214844
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 9.627252268294058e-12
+    },
+    {
+      "problem_id": 142,
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.5,
+        "T_left": 0.0,
+        "flux_right": 0.0,
+        "nx": 51,
+        "t_final": 0.39883032025195453
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.6000000238418579,
+        0.5,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.348617285490036,
+        0.3566509187221527,
+        0.25864875316619873,
+        0.12301463633775711,
+        0.4917668402194977
+      ],
+      "domain_features": [
+        0.6723628640174866,
+        0.75690096616745,
+        0.5761607885360718
+      ],
+      "metadata": {
+        "template_name": "一维混合边界热传导",
+        "boundary_type": "mixed_dirichlet_neumann",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_moderate",
+          "spatial_frequency": "low",
+          "temporal_behavior": "transient_to_steady",
+          "gradient_profile": "moderate_at_boundary",
+          "spectral_quality": "good_for_fem"
+        },
+        "expected_algorithm_bias": "fem_friendly",
+        "difficulty_tags": [
+          "mixed_boundary",
+          "heterogeneous",
+          "fem_strength"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and mixed_dirichlet_neumann boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 8.401417199304008e-05,
+          "std_error": 0.0,
+          "mean_time": 0.02573871612548828
+        },
+        "fvm": {
+          "mean_error": 0.00016766878741675907,
+          "std_error": 0.0,
+          "mean_time": 0.0055027008056640625
+        },
+        "fem": {
+          "mean_error": 8.401210196484262e-05,
+          "std_error": 0.0,
+          "mean_time": 0.07540082931518555
+        },
+        "spectral": {
+          "mean_error": 6.139392309670166e-11,
+          "std_error": 0.0,
+          "mean_time": 0.1076960563659668
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 6.139392309670166e-11
+    },
+    {
+      "problem_id": 143,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 2.0,
+        "T1": 50.0,
+        "T2": 50.0,
+        "source_type": "quadratic",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.5724945068359375,
+        0.3359200656414032,
+        0.23513107001781464,
+        0.026312703266739845,
+        0.5631453394889832
+      ],
+      "domain_features": [
+        0.5837216377258301,
+        0.25486427545547485,
+        0.568492591381073
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0015208721160888672
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 144,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 1.0,
+        "scale_ratio": 5,
+        "nx": 101,
+        "t_final": 0.05079519248501471
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.45381611585617065,
+        0.4029877483844757,
+        0.3261145353317261,
+        0.2877627909183502,
+        0.6007852554321289
+      ],
+      "domain_features": [
+        0.6081713438034058,
+        0.6138163208961487,
+        0.6587986946105957
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.760694830598235e-06,
+          "std_error": 0.0,
+          "mean_time": 0.0030450820922851562
+        },
+        "fvm": {
+          "mean_error": 5.486693409075982e-06,
+          "std_error": 0.0,
+          "mean_time": 0.0015225410461425781
+        },
+        "fem": {
+          "mean_error": 2.7601676276748827e-06,
+          "std_error": 0.0,
+          "mean_time": 0.019056081771850586
+        },
+        "spectral": {
+          "mean_error": 7.820523273350541e-12,
+          "std_error": 0.0,
+          "mean_time": 0.029904842376708984
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.820523273350541e-12
+    },
+    {
+      "problem_id": 149,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 20.0,
+        "T2": 50.0,
+        "source_type": "linear",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.2750374674797058,
+        0.32544347643852234,
+        0.3025780916213989,
+        0.21529173851013184,
+        0.6229726672172546
+      ],
+      "domain_features": [
+        0.699748694896698,
+        0.15927241742610931,
+        0.46317678689956665
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0005018711090087891
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0007631778717041016
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0005130767822265625
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 152,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 5,
+        "nx": 401,
+        "t_final": 0.0802271344518453
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.3917478322982788,
+        0.41290783882141113,
+        0.49598947167396545,
+        0.21532806754112244,
+        0.6804778575897217
+      ],
+      "domain_features": [
+        0.523695707321167,
+        0.8402134776115417,
+        0.5548295378684998
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.430803114432079e-07,
+          "std_error": 0.0,
+          "mean_time": 0.036586761474609375
+        },
+        "fvm": {
+          "mean_error": 1.4084999383102518e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0075418949127197266
+        },
+        "fem": {
+          "mean_error": 9.112415141431946e-08,
+          "std_error": 0.0,
+          "mean_time": 0.881866455078125
+        },
+        "spectral": {
+          "mean_error": 8.148570668230191e-12,
+          "std_error": 0.0,
+          "mean_time": 0.23513460159301758
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 8.148570668230191e-12
+    },
+    {
+      "problem_id": 156,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 2.0,
+        "T1": 20.0,
+        "T2": 50.0,
+        "source_type": "quadratic",
+        "nx": 21,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.025641025975346565
+      ],
+      "hardware_features": [
+        0.24581202864646912,
+        0.5005208849906921,
+        0.34132885932922363,
+        0.16957083344459534,
+        0.6059995293617249
+      ],
+      "domain_features": [
+        0.6269436478614807,
+        0.2107158750295639,
+        0.5236828923225403
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0009980201721191406
+        },
+        "fem": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.6900655593423543,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.6900655593423543
+    },
+    {
+      "problem_id": 158,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.05,
+        "L": 2.0,
+        "gradient_position": 0.75,
+        "nx": 401,
+        "t_final": 0.049091432340276624
+      },
+      "physics_features": [
+        0.0,
+        0.4000000059604645,
+        0.699999988079071,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.506750226020813,
+        0.5419195890426636,
+        0.2925378978252411,
+        0.2787726819515228,
+        0.3377366065979004
+      ],
+      "domain_features": [
+        0.6988538503646851,
+        0.8080362677574158,
+        0.3373083770275116
+      ],
+      "metadata": {
+        "template_name": "一维陡峭梯度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_discontinuous",
+          "spatial_frequency": "high_localized",
+          "temporal_behavior": "diffusion_smoothing",
+          "gradient_profile": "initially_steep",
+          "spectral_quality": "poor_initially"
+        },
+        "expected_algorithm_bias": "fvm_friendly",
+        "difficulty_tags": [
+          "steep_gradient",
+          "localized_feature",
+          "flux_aware"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through fvm_friendly behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 4.321846401665876e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0092620849609375
+        },
+        "fvm": {
+          "mean_error": 4.34971824271735e-08,
+          "std_error": 0.0,
+          "mean_time": 0.0030460357666015625
+        },
+        "fem": {
+          "mean_error": 1.4597202239254776e-07,
+          "std_error": 0.0,
+          "mean_time": 0.38727903366088867
+        },
+        "spectral": {
+          "mean_error": 5.04862659105744e-12,
+          "std_error": 0.0,
+          "mean_time": 0.0685420036315918
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 5.04862659105744e-12
+    },
+    {
+      "problem_id": 162,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 0.0,
+        "T2": 50.0,
+        "source_type": "constant",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.3112453520298004,
+        0.3606264293193817,
+        0.2557298541069031,
+        0.15660369396209717,
+        0.487366646528244
+      ],
+      "domain_features": [
+        0.5518879890441895,
+        0.10903462022542953,
+        0.4925965368747711
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.001514434814453125
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 163,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 1.0,
+        "scale_ratio": 10,
+        "nx": 101,
+        "t_final": 0.03825040328217903
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.49707701802253723,
+        0.3044048547744751,
+        0.4481520354747772,
+        0.25696441531181335,
+        0.4489046335220337
+      ],
+      "domain_features": [
+        0.5307225584983826,
+        0.7403361797332764,
+        0.34786900877952576
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.1085404541057455e-06,
+          "std_error": 0.0,
+          "mean_time": 0.0028951168060302734
+        },
+        "fvm": {
+          "mean_error": 4.167554356045812e-06,
+          "std_error": 0.0,
+          "mean_time": 0.0009980201721191406
+        },
+        "fem": {
+          "mean_error": 2.1136572905863345e-06,
+          "std_error": 0.0,
+          "mean_time": 0.013458013534545898
+        },
+        "spectral": {
+          "mean_error": 7.771554515692355e-12,
+          "std_error": 0.0,
+          "mean_time": 0.018859148025512695
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.771554515692355e-12
+    },
+    {
+      "problem_id": 164,
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "T_left": 0.0,
+        "flux_right": 10.0,
+        "nx": 101,
+        "t_final": 0.34540659389193284
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.6000000238418579,
+        0.5,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.5559117794036865,
+        0.572582483291626,
+        0.43743544816970825,
+        0.13827942311763763,
+        0.3324615955352783
+      ],
+      "domain_features": [
+        0.5031611323356628,
+        0.6908802390098572,
+        0.49772581458091736
+      ],
+      "metadata": {
+        "template_name": "一维混合边界热传导",
+        "boundary_type": "mixed_dirichlet_neumann",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_moderate",
+          "spatial_frequency": "low",
+          "temporal_behavior": "transient_to_steady",
+          "gradient_profile": "moderate_at_boundary",
+          "spectral_quality": "good_for_fem"
+        },
+        "expected_algorithm_bias": "fem_friendly",
+        "difficulty_tags": [
+          "mixed_boundary",
+          "heterogeneous",
+          "fem_strength"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and mixed_dirichlet_neumann boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.7939029491629335e-05,
+          "std_error": 0.0,
+          "mean_time": 0.1977994441986084
+        },
+        "fvm": {
+          "mean_error": 3.58665621953697e-05,
+          "std_error": 0.0,
+          "mean_time": 0.03997159004211426
+        },
+        "fem": {
+          "mean_error": 1.793768568860559e-05,
+          "std_error": 0.0,
+          "mean_time": 0.6882655620574951
+        },
+        "spectral": {
+          "mean_error": 1.7742891079309725e-11,
+          "std_error": 0.0,
+          "mean_time": 1.1024985313415527
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.7742891079309725e-11
+    },
+    {
+      "problem_id": 165,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 50.0,
+        "T2": 0.0,
+        "source_type": "linear",
+        "nx": 101,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.23964525759220123,
+        0.5530725121498108,
+        0.4707959294319153,
+        0.2938711941242218,
+        0.620810329914093
+      ],
+      "domain_features": [
+        0.6558955311775208,
+        0.22849665582180023,
+        0.611598551273346
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0015430450439453125
+        },
+        "spectral": {
+          "mean_error": 0.7035975447302919,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7035975447302919
+    },
+    {
+      "problem_id": 169,
+      "template_id": "heat1d_periodic_smooth",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.0,
+        "modes": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "nx": 128,
+        "t_final": 0.2
+      },
+      "physics_features": [
+        0.0,
+        0.0,
+        1.0,
+        0.20000000298023224,
+        0.30000001192092896
+      ],
+      "hardware_features": [
+        0.23807963728904724,
+        0.5183529853820801,
+        0.49299922585487366,
+        0.09549791365861893,
+        0.484483540058136
+      ],
+      "domain_features": [
+        0.8849554061889648,
+        0.5205676555633545,
+        0.568905770778656
+      ],
+      "metadata": {
+        "template_name": "一维周期边界热传导",
+        "boundary_type": "periodic",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "multi_mode_low",
+          "temporal_behavior": "multi_exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "excellent_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "periodic",
+          "smooth",
+          "spectral_advantage"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and periodic boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 9.8485665051185e-06,
+          "std_error": 0.0,
+          "mean_time": 0.3847980499267578
+        },
+        "fvm": {
+          "mean_error": 1.9695929867366785e-05,
+          "std_error": 0.0,
+          "mean_time": 0.06928014755249023
+        },
+        "fem": {
+          "mean_error": 9.848143058508588e-06,
+          "std_error": 0.0,
+          "mean_time": 1.4737818241119385
+        },
+        "spectral": {
+          "mean_error": 1.1684141991174466e-11,
+          "std_error": 0.0,
+          "mean_time": 5.93405818939209
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.1684141991174466e-11
+    },
+    {
+      "problem_id": 173,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 1.0,
+        "scale_ratio": 10,
+        "nx": 401,
+        "t_final": 0.06978821862946488
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.36255475878715515,
+        0.5442061424255371,
+        0.25009188055992126,
+        0.0068136220797896385,
+        0.3360191583633423
+      ],
+      "domain_features": [
+        0.6444718837738037,
+        0.6847509145736694,
+        0.364508718252182
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.442638524413412e-07,
+          "std_error": 0.0,
+          "mean_time": 0.17822623252868652
+        },
+        "fvm": {
+          "mean_error": 4.6657354068331864e-07,
+          "std_error": 0.0,
+          "mean_time": 0.027401447296142578
+        },
+        "fem": {
+          "mean_error": 2.542523520910665e-07,
+          "std_error": 0.0,
+          "mean_time": 2.7372686862945557
+        },
+        "spectral": {
+          "mean_error": 1.650747327535609e-11,
+          "std_error": 0.0,
+          "mean_time": 0.935960054397583
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.650747327535609e-11
+    },
+    {
+      "problem_id": 179,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 2.0,
+        "scale_ratio": 10,
+        "nx": 201,
+        "t_final": 0.035949529353721976
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.4729982018470764,
+        0.3419257402420044,
+        0.2599724531173706,
+        0.002208680845797062,
+        0.6147697567939758
+      ],
+      "domain_features": [
+        0.6329701542854309,
+        0.7820661664009094,
+        0.6122916340827942
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.179440038145695e-06,
+          "std_error": 0.0,
+          "mean_time": 0.04445457458496094
+        },
+        "fvm": {
+          "mean_error": 2.3546152052623014e-06,
+          "std_error": 0.0,
+          "mean_time": 0.008514404296875
+        },
+        "fem": {
+          "mean_error": 1.1781313255890022e-06,
+          "std_error": 0.0,
+          "mean_time": 0.34479594230651855
+        },
+        "spectral": {
+          "mean_error": 1.1979902628577519e-11,
+          "std_error": 0.0,
+          "mean_time": 0.2171492576599121
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 1.1979902628577519e-11
+    },
+    {
+      "problem_id": 180,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "scale_ratio": 20,
+        "nx": 401,
+        "t_final": 0.0840485451943747
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.37736567854881287,
+        0.3681716024875641,
+        0.3663754463195801,
+        0.01914517767727375,
+        0.6310524940490723
+      ],
+      "domain_features": [
+        0.6263328790664673,
+        0.8032351136207581,
+        0.44181039929389954
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 9.97335180481542e-07,
+          "std_error": 0.0,
+          "mean_time": 0.8495903015136719
+        },
+        "fvm": {
+          "mean_error": 1.989009958099866e-06,
+          "std_error": 0.0,
+          "mean_time": 0.15767574310302734
+        },
+        "fem": {
+          "mean_error": 9.957228736917177e-07,
+          "std_error": 0.0,
+          "mean_time": 15.049828052520752
+        },
+        "spectral": {
+          "mean_error": 3.5743335183916882e-12,
+          "std_error": 0.0,
+          "mean_time": 9.168569326400757
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 3.5743335183916882e-12
+    },
+    {
+      "problem_id": 181,
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 1.0,
+        "L": 1.0,
+        "T_left": 50.0,
+        "flux_right": -10.0,
+        "nx": 101,
+        "t_final": 0.4147565525800111
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.6000000238418579,
+        0.5,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.5652614831924438,
+        0.37401750683784485,
+        0.42095696926116943,
+        0.20339155197143555,
+        0.509236216545105
+      ],
+      "domain_features": [
+        0.5377060174942017,
+        0.8180928826332092,
+        0.68425053358078
+      ],
+      "metadata": {
+        "template_name": "一维混合边界热传导",
+        "boundary_type": "mixed_dirichlet_neumann",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_moderate",
+          "spatial_frequency": "low",
+          "temporal_behavior": "transient_to_steady",
+          "gradient_profile": "moderate_at_boundary",
+          "spectral_quality": "good_for_fem"
+        },
+        "expected_algorithm_bias": "fem_friendly",
+        "difficulty_tags": [
+          "mixed_boundary",
+          "heterogeneous",
+          "fem_strength"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and mixed_dirichlet_neumann boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.9520058290985865e-06,
+          "std_error": 0.0,
+          "mean_time": 0.45818257331848145
+        },
+        "fvm": {
+          "mean_error": 7.901117734221799e-06,
+          "std_error": 0.0,
+          "mean_time": 0.08507680892944336
+        },
+        "fem": {
+          "mean_error": 3.9509379445138485e-06,
+          "std_error": 0.0,
+          "mean_time": 1.7808654308319092
+        },
+        "spectral": {
+          "mean_error": 8.218097697590923e-12,
+          "std_error": 0.0,
+          "mean_time": 2.8206112384796143
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 8.218097697590923e-12
+    },
+    {
+      "problem_id": 182,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 201,
+        "t_final": 0.06310683058224784
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.2380196750164032,
+        0.4848497211933136,
+        0.2513873875141144,
+        0.1694851815700531,
+        0.5289722084999084
+      ],
+      "domain_features": [
+        0.5931970477104187,
+        0.7090526819229126,
+        0.6055693626403809
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.0568674339618397e-06,
+          "std_error": 0.0,
+          "mean_time": 0.04142928123474121
+        },
+        "fvm": {
+          "mean_error": 2.0846398925908747e-06,
+          "std_error": 0.0,
+          "mean_time": 0.008358955383300781
+        },
+        "fem": {
+          "mean_error": 1.050601237710218e-06,
+          "std_error": 0.0,
+          "mean_time": 0.33870363235473633
+        },
+        "spectral": {
+          "mean_error": 7.059056116948248e-12,
+          "std_error": 0.0,
+          "mean_time": 0.19660210609436035
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 7.059056116948248e-12
+    },
+    {
+      "problem_id": 187,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 101,
+        "t_final": 0.026334856863687167
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.29469794034957886,
+        0.37481626868247986,
+        0.3713698089122772,
+        0.12487872689962387,
+        0.3197016417980194
+      ],
+      "domain_features": [
+        0.5747228264808655,
+        0.7095012068748474,
+        0.34066876769065857
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 3.7357462838992784e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0015430450439453125
+        },
+        "fvm": {
+          "mean_error": 6.806874623877521e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 3.740805451831403e-07,
+          "std_error": 0.0,
+          "mean_time": 0.0015282630920410156
+        },
+        "spectral": {
+          "mean_error": 5.753873208010531e-12,
+          "std_error": 0.0,
+          "mean_time": 0.0030655860900878906
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 5.753873208010531e-12
+    },
+    {
+      "problem_id": 188,
+      "template_id": "heat1d_mixed_boundary",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.2,
+        "L": 0.5,
+        "T_left": 100.0,
+        "flux_right": 10.0,
+        "nx": 101,
+        "t_final": 0.23982544458081356
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.6000000238418579,
+        0.5,
+        0.23076923191547394
+      ],
+      "hardware_features": [
+        0.4314437210559845,
+        0.3423081934452057,
+        0.4917038679122925,
+        0.27086779475212097,
+        0.6687589883804321
+      ],
+      "domain_features": [
+        0.5664325952529907,
+        0.5676538944244385,
+        0.38470885157585144
+      ],
+      "metadata": {
+        "template_name": "一维混合边界热传导",
+        "boundary_type": "mixed_dirichlet_neumann",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_moderate",
+          "spatial_frequency": "low",
+          "temporal_behavior": "transient_to_steady",
+          "gradient_profile": "moderate_at_boundary",
+          "spectral_quality": "good_for_fem"
+        },
+        "expected_algorithm_bias": "fem_friendly",
+        "difficulty_tags": [
+          "mixed_boundary",
+          "heterogeneous",
+          "fem_strength"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and mixed_dirichlet_neumann boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.6495807185024093e-05,
+          "std_error": 0.0,
+          "mean_time": 0.21834492683410645
+        },
+        "fvm": {
+          "mean_error": 3.2983443043511985e-05,
+          "std_error": 0.0,
+          "mean_time": 0.04065895080566406
+        },
+        "fem": {
+          "mean_error": 1.6494327470433564e-05,
+          "std_error": 0.0,
+          "mean_time": 0.7537915706634521
+        },
+        "spectral": {
+          "mean_error": 5.99991363422439e-12,
+          "std_error": 0.0,
+          "mean_time": 1.2035932540893555
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 5.99991363422439e-12
+    },
+    {
+      "problem_id": 190,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 1.5,
+        "T1": 20.0,
+        "T2": 100.0,
+        "source_type": "linear",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.25805211067199707,
+        0.5838073492050171,
+        0.2904027998447418,
+        0.17340517044067383,
+        0.579910397529602
+      ],
+      "domain_features": [
+        0.6298466324806213,
+        0.2881188690662384,
+        0.35937559604644775
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.00151824951171875
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 191,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "L": 0.5,
+        "T1": 50.0,
+        "T2": 50.0,
+        "source_type": "constant",
+        "nx": 51,
+        "t_final": 0.0
+      },
+      "physics_features": [
+        0.0,
+        0.15000000596046448,
+        0.0,
+        0.10000000149011612,
+        0.10256410390138626
+      ],
+      "hardware_features": [
+        0.2778554856777191,
+        0.4400162994861603,
+        0.21314112842082977,
+        0.046286847442388535,
+        0.5732195973396301
+      ],
+      "domain_features": [
+        0.6489524245262146,
+        0.29350194334983826,
+        0.43033015727996826
+      ],
+      "metadata": {
+        "template_name": "一维稳态热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth_to_linear",
+          "spatial_frequency": "low",
+          "temporal_behavior": "steady",
+          "gradient_profile": "linear_or_smooth",
+          "spectral_quality": "good_for_fdmfem"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "steady",
+          "simple",
+          "baseline"
+        ],
+        "source_type": "template_derived",
+        "source_reference": "template_derived_heat1d_family",
+        "variation_notes": "Template variation built from a structured mother problem by perturbing coefficients, grids, and dirichlet boundary settings."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fvm": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        },
+        "fem": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0015151500701904297
+        },
+        "spectral": {
+          "mean_error": 0.7001400420140048,
+          "std_error": 0.0,
+          "mean_time": 0.0
+        }
+      },
+      "best_algorithm": "fdm",
+      "best_error": 0.7001400420140048
+    },
+    {
+      "problem_id": 193,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.5,
+        "L": 1.0,
+        "scale_ratio": 10,
+        "nx": 201,
+        "t_final": 0.0394746007971291
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.3517856299877167,
+        0.5057229995727539,
+        0.2890629470348358,
+        0.28465738892555237,
+        0.666539192199707
+      ],
+      "domain_features": [
+        0.596182107925415,
+        0.6313444972038269,
+        0.5141739249229431
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 2.328136892671717e-06,
+          "std_error": 0.0,
+          "mean_time": 0.09062814712524414
+        },
+        "fvm": {
+          "mean_error": 4.650481688682204e-06,
+          "std_error": 0.0,
+          "mean_time": 0.01853775978088379
+        },
+        "fem": {
+          "mean_error": 2.325882096898135e-06,
+          "std_error": 0.0,
+          "mean_time": 0.6507294178009033
+        },
+        "spectral": {
+          "mean_error": 4.135454611950008e-11,
+          "std_error": 0.0,
+          "mean_time": 0.5157992839813232
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.135454611950008e-11
+    },
+    {
+      "problem_id": 194,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 10,
+        "nx": 401,
+        "t_final": 0.09861845802558793
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.3446144461631775,
+        0.5439478158950806,
+        0.29551973938941956,
+        0.2397640496492386,
+        0.5402935743331909
+      ],
+      "domain_features": [
+        0.5432711243629456,
+        0.6656104326248169,
+        0.4270542562007904
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 1.0460007047424242e-07,
+          "std_error": 0.0,
+          "mean_time": 0.04485344886779785
+        },
+        "fvm": {
+          "mean_error": 1.7241117736232128e-07,
+          "std_error": 0.0,
+          "mean_time": 0.009057760238647461
+        },
+        "fem": {
+          "mean_error": 4.0832010264792943e-07,
+          "std_error": 0.0,
+          "mean_time": 1.1082820892333984
+        },
+        "spectral": {
+          "mean_error": 2.7924414396096342e-11,
+          "std_error": 0.0,
+          "mean_time": 0.28401994705200195
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 2.7924414396096342e-11
+    },
+    {
+      "problem_id": 199,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "dimension": 1,
+      "params": {
+        "k": 0.1,
+        "L": 2.0,
+        "scale_ratio": 20,
+        "nx": 401,
+        "t_final": 0.05825803718002378
+      },
+      "physics_features": [
+        0.0,
+        0.25,
+        0.800000011920929,
+        0.10000000149011612,
+        1.0
+      ],
+      "hardware_features": [
+        0.44871681928634644,
+        0.38195616006851196,
+        0.21515591442584991,
+        0.17837028205394745,
+        0.4179020822048187
+      ],
+      "domain_features": [
+        0.6327242255210876,
+        0.8344980478286743,
+        0.30726420879364014
+      ],
+      "metadata": {
+        "template_name": "一维多尺度热传导",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "initially_multi_scale",
+          "spatial_frequency": "multi_scale",
+          "temporal_behavior": "scale_separation",
+          "gradient_profile": "multi_scale",
+          "spectral_quality": "mixed"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "multi_scale",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_heat1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "algorithm_results": {
+        "fdm": {
+          "mean_error": 7.172225066422835e-08,
+          "std_error": 0.0,
+          "mean_time": 0.029814958572387695
+        },
+        "fvm": {
+          "mean_error": 1.025708580779256e-07,
+          "std_error": 0.0,
+          "mean_time": 0.006104946136474609
+        },
+        "fem": {
+          "mean_error": 1.6215761006871232e-07,
+          "std_error": 0.0,
+          "mean_time": 0.66636061668396
+        },
+        "spectral": {
+          "mean_error": 4.32393487897751e-12,
+          "std_error": 0.0,
+          "mean_time": 0.16555094718933105
+        }
+      },
+      "best_algorithm": "spectral",
+      "best_error": 4.32393487897751e-12
+    }
+  ]
+}

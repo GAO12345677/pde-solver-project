@@ -1,0 +1,546 @@
+{
+  "generated_at": 1774187399.5216756,
+  "manifest_path": "D:\\cursorku\\real_world_benchmark\\literature_cases.json",
+  "local_cases": [
+    {
+      "case_name": "heat1d_rod_cooling",
+      "equation_type": "heat1d",
+      "application": "1D heat conduction in a rod / diffusion-like transport analogue",
+      "algorithms": [
+        "fdm",
+        "fvm",
+        "fem",
+        "spectral",
+        "pinn"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "heat1d",
+          "algorithm": "fdm",
+          "l2_error": 1.743408127733981e-05,
+          "linf_error": 2.4924526686231907e-05,
+          "elapsed_s": 0.10895919999893522,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "heat1d",
+          "algorithm": "fvm",
+          "l2_error": 3.487574657179224e-05,
+          "linf_error": 4.956774910991335e-05,
+          "elapsed_s": 0.019376600001123734,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "heat1d",
+          "algorithm": "fem",
+          "l2_error": 1.743429462775948e-05,
+          "linf_error": 2.4843107734984216e-05,
+          "elapsed_s": 0.34753920000366634,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "heat1d",
+          "algorithm": "spectral",
+          "l2_error": 9.427012262251454e-12,
+          "linf_error": 1.339861555038624e-11,
+          "elapsed_s": 0.5912391999954707,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "heat1d",
+          "algorithm": "pinn",
+          "l2_error": 3.0538632042538354e-05,
+          "linf_error": 4.8828310041271195e-05,
+          "elapsed_s": 0.0,
+          "solver_status": "ok_cached",
+          "details": {
+            "training_summary": {
+              "adam_epochs_configured": 500,
+              "adam_epochs_run": 0,
+              "patience": 90,
+              "min_delta": 1e-06,
+              "early_stopped": false,
+              "cache_hit": true,
+              "cache_origin": "disk",
+              "best_loss": 6.0390329963411205e-06,
+              "lbfgs_steps_configured": 5,
+              "lbfgs_steps_run": 0,
+              "collocation_points": 256,
+              "boundary_points": 128,
+              "cached_adam_epochs_run": 500,
+              "cached_lbfgs_steps_run": 5
+            }
+          }
+        }
+      ],
+      "best_by_error": "spectral",
+      "best_by_time": "pinn",
+      "best_balanced": "spectral"
+    },
+    {
+      "case_name": "poisson1d_steady_diffusion",
+      "equation_type": "poisson1d",
+      "application": "1D steady diffusion / source-driven potential field",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral",
+        "bem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "poisson1d",
+          "algorithm": "fdm",
+          "l2_error": 5.78714343058153e-05,
+          "linf_error": 8.225076216672456e-05,
+          "elapsed_s": 0.0003754999997909181,
+          "solver_status": "steady_solved",
+          "details": null
+        },
+        {
+          "equation_type": "poisson1d",
+          "algorithm": "fem",
+          "l2_error": 5.786572272281002e-05,
+          "linf_error": 8.224264447320717e-05,
+          "elapsed_s": 0.0005668000012519769,
+          "solver_status": "steady_solved",
+          "details": null
+        },
+        {
+          "equation_type": "poisson1d",
+          "algorithm": "spectral",
+          "l2_error": 1.279422017177768e-16,
+          "linf_error": 2.914335439641036e-16,
+          "elapsed_s": 3.319999814266339e-05,
+          "solver_status": "steady_solved",
+          "details": null
+        },
+        {
+          "equation_type": "poisson1d",
+          "algorithm": "bem",
+          "l2_error": 5.787143434556675e-05,
+          "linf_error": 8.225076221335392e-05,
+          "elapsed_s": 1.290000363951549e-05,
+          "solver_status": "steady_solved",
+          "details": null
+        }
+      ],
+      "best_by_error": "spectral",
+      "best_by_time": "bem",
+      "best_balanced": "spectral"
+    },
+    {
+      "case_name": "wave1d_string_vibration",
+      "equation_type": "wave1d",
+      "application": "1D vibrating string benchmark",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "wave1d",
+          "algorithm": "fdm",
+          "l2_error": 4.2609028068132316e-05,
+          "linf_error": 6.05588072133892e-05,
+          "elapsed_s": 0.0026636000038706698,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "wave1d",
+          "algorithm": "fem",
+          "l2_error": 3.8977083059642765e-05,
+          "linf_error": 5.6941428655673087e-05,
+          "elapsed_s": 0.002520000001823064,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "wave1d",
+          "algorithm": "spectral",
+          "l2_error": 9.21597443025784e-17,
+          "linf_error": 1.9533747928932692e-16,
+          "elapsed_s": 0.00016230000619543716,
+          "solver_status": "ok",
+          "details": null
+        }
+      ],
+      "best_by_error": "spectral",
+      "best_by_time": "spectral",
+      "best_balanced": "spectral"
+    },
+    {
+      "case_name": "heat2d_square_plate",
+      "equation_type": "heat2d",
+      "application": "2D square plate conduction benchmark",
+      "algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "heat2d",
+          "algorithm": "fdm",
+          "l2_error": 0.00018468744865236033,
+          "linf_error": 0.0003786092697374288,
+          "elapsed_s": 0.013533899997128174,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "heat2d",
+          "algorithm": "fvm",
+          "l2_error": 0.00018468744865468003,
+          "linf_error": 0.00037860926974209175,
+          "elapsed_s": 0.011274100004811771,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "heat2d",
+          "algorithm": "fem",
+          "l2_error": 0.00028015012802771723,
+          "linf_error": 0.0005673643590314303,
+          "elapsed_s": 1.4030729000005522,
+          "solver_status": "ok",
+          "details": null
+        }
+      ],
+      "best_by_error": "fdm",
+      "best_by_time": "fvm",
+      "best_balanced": "fvm"
+    },
+    {
+      "case_name": "wave2d_membrane",
+      "equation_type": "wave2d",
+      "application": "2D membrane / shallow-water-like wave propagation analogue",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "source_refs": [
+        "pdebench_darus",
+        "pdearena_repo"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "wave2d",
+          "algorithm": "fdm",
+          "l2_error": 9.612949948745705e-06,
+          "linf_error": 1.970654739458233e-05,
+          "elapsed_s": 0.0004713000016636215,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "wave2d",
+          "algorithm": "fem",
+          "l2_error": 8.068291547879384e-05,
+          "linf_error": 0.00016364141415364797,
+          "elapsed_s": 0.009364800003822893,
+          "solver_status": "ok",
+          "details": null
+        },
+        {
+          "equation_type": "wave2d",
+          "algorithm": "spectral",
+          "l2_error": 1.2018353419600898e-16,
+          "linf_error": 5.551115123125783e-16,
+          "elapsed_s": 0.0005213000040384941,
+          "solver_status": "ok",
+          "details": null
+        }
+      ],
+      "best_by_error": "spectral",
+      "best_by_time": "fdm",
+      "best_balanced": "spectral"
+    },
+    {
+      "case_name": "heat3d_cube_conduction",
+      "equation_type": "heat3d",
+      "application": "3D cube conduction benchmark",
+      "algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "heat3d",
+          "algorithm": "fdm",
+          "l2_error": 0.001687495902085622,
+          "linf_error": 0.005506514004651963,
+          "elapsed_s": 0.0007915000023785979,
+          "solver_status": "ok",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        },
+        {
+          "equation_type": "heat3d",
+          "algorithm": "fvm",
+          "l2_error": 0.0016874959020856035,
+          "linf_error": 0.005506514004652074,
+          "elapsed_s": 0.0007574999981443398,
+          "solver_status": "ok",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        },
+        {
+          "equation_type": "heat3d",
+          "algorithm": "fem",
+          "l2_error": 0.004332558866721715,
+          "linf_error": 0.013630830665638416,
+          "elapsed_s": 0.002899999999499414,
+          "solver_status": "ok",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        }
+      ],
+      "best_by_error": "fvm",
+      "best_by_time": "fvm",
+      "best_balanced": "fvm"
+    },
+    {
+      "case_name": "wave3d_cavity_vibration",
+      "equation_type": "wave3d",
+      "application": "3D cavity/acoustic-wave benchmark",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "source_refs": [
+        "pdearena_repo"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "wave3d",
+          "algorithm": "fdm",
+          "l2_error": 6.913047735839946e-05,
+          "linf_error": 0.00021684997895476954,
+          "elapsed_s": 0.00029879999783588573,
+          "solver_status": "ok",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        },
+        {
+          "equation_type": "wave3d",
+          "algorithm": "fem",
+          "l2_error": 0.0017966160044433177,
+          "linf_error": 0.005092353353892742,
+          "elapsed_s": 0.00012060000153724104,
+          "solver_status": "ok",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        },
+        {
+          "equation_type": "wave3d",
+          "algorithm": "spectral",
+          "l2_error": 1.7882069748333883e-16,
+          "linf_error": 7.494005416219807e-16,
+          "elapsed_s": 0.000363900006050244,
+          "solver_status": "ok",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        }
+      ],
+      "best_by_error": "spectral",
+      "best_by_time": "fem",
+      "best_balanced": "fdm"
+    },
+    {
+      "case_name": "poisson3d_electrostatic_box",
+      "equation_type": "poisson3d",
+      "application": "3D electrostatic / Darcy-like elliptic benchmark",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "bem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready",
+      "results": [
+        {
+          "equation_type": "poisson3d",
+          "algorithm": "fdm",
+          "l2_error": 0.001341117582048512,
+          "linf_error": 0.004206846684065235,
+          "elapsed_s": 0.02160409999487456,
+          "solver_status": "steady_solved",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        },
+        {
+          "equation_type": "poisson3d",
+          "algorithm": "fem",
+          "l2_error": 0.006676829451221576,
+          "linf_error": 0.020656671223451495,
+          "elapsed_s": 0.024873200003639795,
+          "solver_status": "steady_solved",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        },
+        {
+          "equation_type": "poisson3d",
+          "algorithm": "bem",
+          "l2_error": 1.3841505696625795,
+          "linf_error": 1.8775979590463283,
+          "elapsed_s": 0.4156737000012072,
+          "solver_status": "steady_solved",
+          "details": {
+            "boundary_residual": 0.0
+          }
+        }
+      ],
+      "best_by_error": "fdm",
+      "best_by_time": "fdm",
+      "best_balanced": "fdm"
+    }
+  ],
+  "selector_accuracy": [
+    {
+      "strategy": "static_rf",
+      "accuracy": 1.0,
+      "num_test_samples": 60,
+      "details": {
+        "trained_samples": 180,
+        "labels": [
+          "fdm",
+          "fem",
+          "spectral"
+        ],
+        "train_info": {
+          "strategy": "static_rf",
+          "num_samples": 240,
+          "labels": [
+            "fdm",
+            "fem",
+            "spectral"
+          ]
+        }
+      }
+    },
+    {
+      "strategy": "mlp_nn",
+      "accuracy": 1.0,
+      "num_test_samples": 60,
+      "details": {
+        "trained_samples": 180,
+        "labels": [
+          "fdm",
+          "fem",
+          "spectral"
+        ],
+        "train_info": {
+          "strategy": "mlp_nn",
+          "num_samples": 240,
+          "labels": [
+            "fdm",
+            "fem",
+            "spectral"
+          ]
+        }
+      }
+    },
+    {
+      "strategy": "gnn_selector",
+      "accuracy": 1.0,
+      "num_test_samples": 60,
+      "details": {
+        "trained_samples": 180,
+        "labels": [
+          "fdm",
+          "fem",
+          "spectral"
+        ],
+        "train_info": {
+          "strategy": "gnn_selector",
+          "num_samples": 240,
+          "labels": [
+            "fdm",
+            "fem",
+            "spectral"
+          ],
+          "training_summary": {
+            "epochs_configured": 180,
+            "epochs_run": 76,
+            "best_epoch": 58,
+            "best_val_loss": 7.90702979429625e-05,
+            "early_stopped": true,
+            "patience": 18,
+            "validation_fraction": 0.2,
+            "hidden_dim": 16
+          }
+        },
+        "training_summary": {
+          "epochs_configured": 180,
+          "epochs_run": 76,
+          "best_epoch": 58,
+          "best_val_loss": 7.90702979429625e-05,
+          "early_stopped": true,
+          "patience": 18,
+          "validation_fraction": 0.2,
+          "hidden_dim": 16
+        }
+      }
+    },
+    {
+      "strategy": "dynamic_rl",
+      "accuracy": 0.26666666666666666,
+      "num_test_samples": 60,
+      "details": {
+        "train_info": {
+          "episodes": 200,
+          "avg_reward": 0.7011318432745908,
+          "min": 0.6268809318593362,
+          "max": 0.791444959448893
+        },
+        "note": "Accuracy is measured against proxy labels from the synthetic dataset."
+      }
+    }
+  ],
+  "notes": [
+    "These are aligned runnable analogue cases mapped to public benchmark sources.",
+    "They are safe to run inside the current project without modifying core solver code."
+  ]
+}

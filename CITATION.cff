@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this project in academic work, please cite it using the metadata in this file."
+title: "PDE Solver Project"
+authors:
+  - family-names: "Gao"
+    given-names: "Thomas"
+version: "v11"
+date-released: "2026-06-07"
+license: "MIT"
+repository-code: "https://github.com/GAO12345677/pde-solver-project"
+abstract: "A course-oriented PDE solving platform with numerical solvers, algorithm selection, natural-language parsing, benchmarks, API services, frontend demos, and finance-modeling extensions."

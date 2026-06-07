@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <style>
+      .title { font-family: "SimSun", "Songti SC", serif; font-size: 30px; fill: #111; }
+      .label { font-family: "SimSun", "Songti SC", serif; font-size: 28px; fill: #111; }
+      .small { font-family: "SimSun", "Songti SC", serif; font-size: 22px; fill: #333; }
+      .box { fill: #ffffff; stroke: #111; stroke-width: 2.2; rx: 14; ry: 14; }
+      .midbox { fill: #f7f7f7; stroke: #111; stroke-width: 2.6; rx: 18; ry: 18; }
+      .arrow { stroke: #111; stroke-width: 2.8; fill: none; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#111"/>
+    </marker>
+  </defs>
+
+  <text x="700" y="70" text-anchor="middle" class="title">算法选择问题形式化定义示意图</text>
+
+  <rect x="90" y="130" width="320" height="150" class="box"/>
+  <text x="250" y="180" text-anchor="middle" class="label">F 物理方程组特征</text>
+  <text x="250" y="225" text-anchor="middle" class="small">维度、线性/非线性</text>
+  <text x="250" y="260" text-anchor="middle" class="small">定常/非定常、耦合类型</text>
+
+  <rect x="90" y="370" width="320" height="150" class="box"/>
+  <text x="250" y="420" text-anchor="middle" class="label">H 硬件环境特征</text>
+  <text x="250" y="465" text-anchor="middle" class="small">架构类型、核心数、算力</text>
+  <text x="250" y="500" text-anchor="middle" class="small">存储容量、带宽、协同模式</text>
+
+  <rect x="90" y="610" width="320" height="150" class="box"/>
+  <text x="250" y="660" text-anchor="middle" class="label">D 领域需求特征</text>
+  <text x="250" y="705" text-anchor="middle" class="small">精度要求、收敛速度</text>
+  <text x="250" y="740" text-anchor="middle" class="small">计算耗时、资源开销、鲁棒性</text>
+
+  <rect x="530" y="300" width="360" height="290" class="midbox"/>
+  <text x="710" y="375" text-anchor="middle" class="label">M 机器学习驱动的</text>
+  <text x="710" y="420" text-anchor="middle" class="label">自适应映射模型</text>
+  <text x="710" y="485" text-anchor="middle" class="small">学习 F、H、D 到 A 的映射关系</text>
+  <text x="710" y="525" text-anchor="middle" class="small">综合物理约束、硬件约束</text>
+  <text x="710" y="565" text-anchor="middle" class="small">与领域约束进行决策输出</text>
+
+  <rect x="1020" y="370" width="280" height="150" class="box"/>
+  <text x="1160" y="420" text-anchor="middle" class="label">A 候选数值算法</text>
+  <text x="1160" y="465" text-anchor="middle" class="small">有限差分法、有限元法</text>
+  <text x="1160" y="500" text-anchor="middle" class="small">有限体积法或最优算法输出</text>
+
+  <line x1="410" y1="205" x2="530" y2="355" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="410" y1="445" x2="530" y2="445" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="410" y1="685" x2="530" y2="535" class="arrow" marker-end="url(#arrowhead)"/>
+  <line x1="890" y1="445" x2="1020" y2="445" class="arrow" marker-end="url(#arrowhead)"/>
+
+  <text x="700" y="845" text-anchor="middle" class="small">
+    图2-1 算法选择问题形式化定义示意图
+  </text>
+</svg>

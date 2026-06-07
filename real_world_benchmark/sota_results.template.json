@@ -1,0 +1,22 @@
+{
+  "generated_at": 1774187175.9952583,
+  "instructions": [
+    "Fill this file with published or externally reproduced baseline numbers.",
+    "One entry per case_name. Keep metrics comparable to local results: l2_error, linf_error, elapsed_s.",
+    "Suggested sources: PDEBench pretrained models, PDEArena experiments, or literature-reported benchmark tables."
+  ],
+  "baselines": [
+    {
+      "case_name": "wave2d_membrane",
+      "model_name": "FNO",
+      "source": "PDEBench or PDEArena",
+      "citation": "Replace with paper or dataset URL",
+      "metrics": {
+        "l2_error": null,
+        "linf_error": null,
+        "elapsed_s": null
+      },
+      "notes": "Fill manually after reproducing or extracting from a paper table."
+    }
+  ]
+}

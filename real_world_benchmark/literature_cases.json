@@ -1,0 +1,188 @@
+{
+  "generated_at": 1774187175.9939628,
+  "scope": "Collect publicly documented PDE benchmark sources and map them to current project coverage.",
+  "public_sources": [
+    {
+      "source_id": "pdebench_darus",
+      "title": "PDEBench Datasets",
+      "kind": "academic_dataset",
+      "doi_or_url": "https://doi.org/10.18419/DARUS-2986",
+      "repo_url": "https://github.com/pdebench/PDEBench",
+      "citation": "Takamoto et al., PDEBench: An Extensive Benchmark for Scientific Machine Learning, NeurIPS 2022.",
+      "pdes": [
+        "1D diffusion-sorption",
+        "2D Darcy flow",
+        "2D shallow water",
+        "1D/2D diffusion-reaction"
+      ],
+      "notes": "Public academic dataset with physically grounded PDE scenarios and pretrained surrogate baselines."
+    },
+    {
+      "source_id": "pdearena_repo",
+      "title": "PDEArena",
+      "kind": "benchmark_repo",
+      "doi_or_url": "https://github.com/pdearena/pdearena",
+      "citation": "Gupta and Brandstetter, Towards Multi-spatiotemporal-scale Generalized PDE Modeling, arXiv 2022.",
+      "pdes": [
+        "Shallow water",
+        "Navier-Stokes",
+        "Maxwell-related benchmark ecosystem"
+      ],
+      "notes": "Useful for future SOTA surrogate comparisons and benchmark adapters."
+    },
+    {
+      "source_id": "pdebench_pretrained",
+      "title": "PDEBench Pretrained Models",
+      "kind": "pretrained_models",
+      "doi_or_url": "https://doi.org/10.18419/DARUS-2987",
+      "citation": "PDEBench pretrained FNO / U-Net / PINN baselines.",
+      "pdes": [
+        "Aligned with PDEBench datasets"
+      ],
+      "notes": "Can be used later as external baseline references without rewriting core project code."
+    }
+  ],
+  "runnable_aligned_cases": [
+    {
+      "case_name": "heat1d_rod_cooling",
+      "equation_type": "heat1d",
+      "application": "1D heat conduction in a rod / diffusion-like transport analogue",
+      "algorithms": [
+        "fdm",
+        "fvm",
+        "fem",
+        "spectral",
+        "pinn"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "poisson1d_steady_diffusion",
+      "equation_type": "poisson1d",
+      "application": "1D steady diffusion / source-driven potential field",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral",
+        "bem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "wave1d_string_vibration",
+      "equation_type": "wave1d",
+      "application": "1D vibrating string benchmark",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "heat2d_square_plate",
+      "equation_type": "heat2d",
+      "application": "2D square plate conduction benchmark",
+      "algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "wave2d_membrane",
+      "equation_type": "wave2d",
+      "application": "2D membrane / shallow-water-like wave propagation analogue",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "source_refs": [
+        "pdebench_darus",
+        "pdearena_repo"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "heat3d_cube_conduction",
+      "equation_type": "heat3d",
+      "application": "3D cube conduction benchmark",
+      "algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "wave3d_cavity_vibration",
+      "equation_type": "wave3d",
+      "application": "3D cavity/acoustic-wave benchmark",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "source_refs": [
+        "pdearena_repo"
+      ],
+      "status": "ready"
+    },
+    {
+      "case_name": "poisson3d_electrostatic_box",
+      "equation_type": "poisson3d",
+      "application": "3D electrostatic / Darcy-like elliptic benchmark",
+      "algorithms": [
+        "fdm",
+        "fem",
+        "bem"
+      ],
+      "source_refs": [
+        "pdebench_darus"
+      ],
+      "status": "ready"
+    }
+  ],
+  "future_adapter_cases": [
+    {
+      "case_name": "pdebench_diffusion_sorption",
+      "dataset_source": "pdebench_darus",
+      "mapping_note": "Most similar to heat1d / transport-diffusion class, but requires dataset adapter and data normalization.",
+      "status": "pending_adapter"
+    },
+    {
+      "case_name": "pdebench_darcy_flow_2d",
+      "dataset_source": "pdebench_darus",
+      "mapping_note": "Closest to 2D Poisson / Darcy elliptic flow, but current project lacks a dedicated 2D linear Poisson solver benchmark path.",
+      "status": "pending_adapter"
+    },
+    {
+      "case_name": "pdebench_shallow_water_2d",
+      "dataset_source": "pdebench_darus",
+      "mapping_note": "Closest to wave2d-like hyperbolic behavior; requires a benchmark adapter instead of direct reuse.",
+      "status": "pending_adapter"
+    }
+  ],
+  "limitations": [
+    "Current local runs use project-supported aligned analogue cases, not direct ingestion of all external datasets.",
+    "Automatic SOTA reruns usually require extra repos, GPU resources, and dataset-specific adapters.",
+    "This script therefore separates source collection, local benchmarking, and external baseline ingestion."
+  ]
+}

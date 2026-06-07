@@ -1,0 +1,3048 @@
+{
+  "generated_at": 1775108220.0626974,
+  "config": {
+    "model_path": "model\\selector_real_labels_rf_strict.pkl",
+    "num_problems": 100,
+    "num_runs_per_problem": 3,
+    "seed": 42,
+    "relative_tolerance": 0.03,
+    "label_keys": [
+      "fdm",
+      "fem",
+      "fvm",
+      "spectral"
+    ],
+    "strategy": "rf",
+    "target_mode": "strict",
+    "feature_mode": "engineered_v1"
+  },
+  "summary": {
+    "overall_accuracy": 0.98,
+    "tolerant_accuracy": 0.99,
+    "supported_accuracy": 0.98,
+    "total_correct": 98,
+    "supported_total_correct": 98,
+    "total_problems": 100,
+    "supported_total_problems": 100,
+    "unsupported_actual_best_count": 0,
+    "elapsed_s": 157.3046839237213,
+    "accuracy_by_equation": {
+      "heat3d": {
+        "total": 17,
+        "correct": 15,
+        "supported_total": 17,
+        "supported_correct": 15,
+        "tolerant_correct": 16,
+        "accuracy": 0.8823529411764706,
+        "tolerant_accuracy": 0.9411764705882353,
+        "supported_accuracy": 0.8823529411764706
+      },
+      "heat2d": {
+        "total": 16,
+        "correct": 16,
+        "supported_total": 16,
+        "supported_correct": 16,
+        "tolerant_correct": 16,
+        "accuracy": 1.0,
+        "tolerant_accuracy": 1.0,
+        "supported_accuracy": 1.0
+      },
+      "wave2d": {
+        "total": 15,
+        "correct": 15,
+        "supported_total": 15,
+        "supported_correct": 15,
+        "tolerant_correct": 15,
+        "accuracy": 1.0,
+        "tolerant_accuracy": 1.0,
+        "supported_accuracy": 1.0
+      },
+      "heat1d": {
+        "total": 22,
+        "correct": 22,
+        "supported_total": 22,
+        "supported_correct": 22,
+        "tolerant_correct": 22,
+        "accuracy": 1.0,
+        "tolerant_accuracy": 1.0,
+        "supported_accuracy": 1.0
+      },
+      "wave3d": {
+        "total": 10,
+        "correct": 10,
+        "supported_total": 10,
+        "supported_correct": 10,
+        "tolerant_correct": 10,
+        "accuracy": 1.0,
+        "tolerant_accuracy": 1.0,
+        "supported_accuracy": 1.0
+      },
+      "wave1d": {
+        "total": 13,
+        "correct": 13,
+        "supported_total": 13,
+        "supported_correct": 13,
+        "tolerant_correct": 13,
+        "accuracy": 1.0,
+        "tolerant_accuracy": 1.0,
+        "supported_accuracy": 1.0
+      },
+      "poisson3d": {
+        "total": 7,
+        "correct": 7,
+        "supported_total": 7,
+        "supported_correct": 7,
+        "tolerant_correct": 7,
+        "accuracy": 1.0,
+        "tolerant_accuracy": 1.0,
+        "supported_accuracy": 1.0
+      }
+    },
+    "confusion_matrix": {
+      "fem": {
+        "fem": 25
+      },
+      "fvm": {
+        "fvm": 9,
+        "fem": 1
+      },
+      "fdm": {
+        "fdm": 18,
+        "fvm": 1
+      },
+      "spectral": {
+        "spectral": 46
+      }
+    },
+    "predicted_distribution": {
+      "fem": 26,
+      "fvm": 10,
+      "fdm": 18,
+      "spectral": 46
+    },
+    "actual_distribution": {
+      "fem": 25,
+      "fvm": 10,
+      "fdm": 19,
+      "spectral": 46
+    }
+  },
+  "detailed_results": [
+    {
+      "problem_id": 0,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7233333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.3853020759345825,
+        "fvm": 0.3853020759345825,
+        "fem": 0.38503586342157764
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0003445148468017578,
+        "fvm": 0.0003310839335123698,
+        "fem": 0.8936163584391276
+      }
+    },
+    {
+      "problem_id": 1,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.47333333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414119004,
+        "fvm": 0.0001615074341411829,
+        "fem": 0.000589633880245868
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00033791859944661457,
+        "fvm": 0.000310977300008138,
+        "fem": 0.88279922803243
+      }
+    },
+    {
+      "problem_id": 2,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.45666666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.491633547742261e-05,
+        "fvm": 4.491633547796513e-05,
+        "fem": 7.431016697050633e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0012342135111490886,
+        "fvm": 0.001218716303507487,
+        "fem": 0.19287880261739096
+      }
+    },
+    {
+      "problem_id": 3,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7366666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5244261548249354,
+        "fem": 0.5243601153586445,
+        "spectral": 0.5244176202523826
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00013971328735351562,
+        "fem": 0.016209920247395832,
+        "spectral": 0.0002788702646891276
+      }
+    },
+    {
+      "problem_id": 4,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.77,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.38530207593458243,
+        "fvm": 0.38530207593458243,
+        "fem": 0.38503586342157753
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00035230318705240887,
+        "fvm": 0.0003101030985514323,
+        "fem": 0.9026803175608317
+      }
+    },
+    {
+      "problem_id": 5,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.52,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.8870766566796222e-05,
+        "fvm": 2.8870766566836263e-05,
+        "fem": 4.7763250191578816e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0015581448872884114,
+        "fvm": 0.0018045902252197266,
+        "fem": 0.539546012878418
+      }
+    },
+    {
+      "problem_id": 6,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.6566666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5534664834712316,
+        "fvm": 0.5534664834712316,
+        "fem": 0.5534441507752081
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0015204747517903645,
+        "fvm": 0.0018340746561686199,
+        "fem": 0.5350452264149984
+      }
+    },
+    {
+      "problem_id": 7,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.8166666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 1.0409476513348792e-05,
+        "fem": 0.00043646730315429145,
+        "spectral": 2.4467412366295387e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00013717015584309897,
+        "fem": 0.018398125966389973,
+        "spectral": 0.00026925404866536457
+      }
+    },
+    {
+      "problem_id": 8,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": false,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.45666666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00010190028954205118,
+        "fvm": 0.00010190028954205248,
+        "fem": 0.00043708252327473874
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0008754730224609375,
+        "fvm": 0.0005747477213541666,
+        "fem": 1.4249738852183025
+      }
+    },
+    {
+      "problem_id": 9,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.6333333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5328856681204475,
+        "fem": 0.5328666877443108,
+        "spectral": 0.5328759689661305
+      },
+      "all_algorithm_times": {
+        "fdm": 0.000249942143758138,
+        "fem": 0.041877031326293945,
+        "spectral": 0.0003019968668619792
+      }
+    },
+    {
+      "problem_id": 10,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 1.0,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.7695836291435004e-05,
+        "fvm": 9.54317221053208e-05,
+        "fem": 4.769505880630197e-05,
+        "spectral": 7.509007089504831e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.051465352376302086,
+        "fvm": 0.00995477040608724,
+        "fem": 0.327220360438029,
+        "spectral": 0.2501833438873291
+      }
+    },
+    {
+      "problem_id": 11,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.67,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.780122083130725e-05,
+        "fem": 0.0005655390141073382,
+        "spectral": 1.5481837842941145e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00041445096333821613,
+        "fem": 0.8431189060211182,
+        "spectral": 0.0005204677581787109
+      }
+    },
+    {
+      "problem_id": 12,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5566666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5244261548249354,
+        "fem": 0.5243601153586441,
+        "spectral": 0.5244176202523824
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00014257431030273438,
+        "fem": 0.015506505966186523,
+        "spectral": 0.0002139409383138021
+      }
+    },
+    {
+      "problem_id": 13,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 1.3435487988768928e-05,
+        "fem": 1.35060211362777e-05,
+        "spectral": 3.170222730092054e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0017201900482177734,
+        "fem": 0.0032518704732259116,
+        "spectral": 0.00017801920572916666
+      }
+    },
+    {
+      "problem_id": 14,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7966666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.394831516481998,
+        "fem": 0.3946389073144294,
+        "spectral": 0.3948141800968579
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0003018379211425781,
+        "fem": 0.46007243792215985,
+        "spectral": 0.0004145304361979167
+      }
+    },
+    {
+      "problem_id": 15,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.6533333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00010190028954204905,
+        "fvm": 0.00010190028954204642,
+        "fem": 0.00043708252327453724
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004401206970214844,
+        "fvm": 0.0004267692565917969,
+        "fem": 1.4301814238230388
+      }
+    },
+    {
+      "problem_id": 16,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9733333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 1.302761799641059e-06,
+        "fvm": 2.593909192896547e-06,
+        "fem": 1.313029074636571e-06,
+        "spectral": 6.0946002757410565e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.045052131017049156,
+        "fvm": 0.010272582372029623,
+        "fem": 0.31768616040547687,
+        "spectral": 0.24174022674560547
+      }
+    },
+    {
+      "problem_id": 17,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5533333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 3.095577048927743e-05,
+        "fem": 0.0004473260237206019,
+        "spectral": 1.4281818552453613e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005044142405192057,
+        "fem": 1.4630018870035808,
+        "spectral": 0.0005684693654378256
+      }
+    },
+    {
+      "problem_id": 18,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00022146549012810348,
+        "fem": 0.0003382417322211375,
+        "spectral": 2.686501350881838e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0014845530192057292,
+        "fem": 0.0017786026000976562,
+        "spectral": 0.00018199284871419272
+      }
+    },
+    {
+      "problem_id": 19,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.6133333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5534664834712316,
+        "fvm": 0.5534664834712315,
+        "fem": 0.5534441507752065
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0014791488647460938,
+        "fvm": 0.0019538402557373047,
+        "fem": 0.5601187547047933
+      }
+    },
+    {
+      "problem_id": 20,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5866666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00010190028954204905,
+        "fvm": 0.00010190028954204642,
+        "fem": 0.00043708252327453724
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005242824554443359,
+        "fvm": 0.0004851023356119792,
+        "fem": 1.5803679625193279
+      }
+    },
+    {
+      "problem_id": 21,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9566666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.4230696559932337e-05,
+        "fvm": 4.851535262886516e-05,
+        "fem": 2.4236031896718068e-05,
+        "spectral": 2.04292533386209e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0014780362447102864,
+        "fvm": 0.0010468165079752605,
+        "fem": 0.012043635050455729,
+        "spectral": 0.02123149236043294
+      }
+    },
+    {
+      "problem_id": 22,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9733333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0001092750715626367,
+        "fvm": 0.0002174798926918305,
+        "fem": 0.00010930079478194588,
+        "spectral": 9.658745616597237e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00880138079325358,
+        "fvm": 0.0021730264027913413,
+        "fem": 0.0333253542582194,
+        "spectral": 0.045084238052368164
+      }
+    },
+    {
+      "problem_id": 23,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.97,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.590102773731996e-05,
+        "fvm": 0.000151794160629345,
+        "fem": 7.583598764732525e-05,
+        "spectral": 6.019144245272469e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.07476536432902019,
+        "fvm": 0.01621834437052409,
+        "fem": 0.4784543514251709,
+        "spectral": 0.39437397321065265
+      }
+    },
+    {
+      "problem_id": 24,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.6833333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5507536591957582,
+        "fvm": 0.5507536591957582,
+        "fem": 0.5507189103790745
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0011359850565592449,
+        "fvm": 0.001279751459757487,
+        "fem": 0.24678937594095865
+      }
+    },
+    {
+      "problem_id": 25,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 1.0,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 6.936531948689543e-07,
+        "fem": 8.245945262660173e-05,
+        "spectral": 7.197157900887132e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0028465588887532554,
+        "fem": 0.0047308603922526045,
+        "spectral": 0.0002330144246419271
+      }
+    },
+    {
+      "problem_id": 26,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.65,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5372104761406211,
+        "fem": 0.5372024991757084,
+        "spectral": 0.5372082939170747
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0003674825032552083,
+        "fem": 0.11496988932291667,
+        "spectral": 0.0005103747049967448
+      }
+    },
+    {
+      "problem_id": 27,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.64,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5534664834712316,
+        "fvm": 0.5534664834712316,
+        "fem": 0.5534441507752081
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0026574134826660156,
+        "fvm": 0.0029300053914388022,
+        "fem": 0.652066707611084
+      }
+    },
+    {
+      "problem_id": 28,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.48333333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414118855,
+        "fvm": 0.00016150743414118795,
+        "fem": 0.0005896338802458482
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004718303680419922,
+        "fvm": 0.00047787030537923175,
+        "fem": 1.2134255568186443
+      }
+    },
+    {
+      "problem_id": 29,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.62,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.780122083130725e-05,
+        "fem": 0.0005655390141073386,
+        "spectral": 1.5481837842941145e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005172093709309896,
+        "fem": 1.2412350177764893,
+        "spectral": 0.0005891323089599609
+      }
+    },
+    {
+      "problem_id": 30,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5466666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00011383153201135352,
+        "fvm": 0.00011383153201134705,
+        "fem": 0.0008372735881594316
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004134178161621094,
+        "fvm": 0.00041492780049641925,
+        "fem": 0.7316021124521891
+      }
+    },
+    {
+      "problem_id": 31,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.56,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.930585660047145e-05,
+        "fvm": 7.930585660053375e-05,
+        "fem": 0.00013120912079211608
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0007377465565999349,
+        "fvm": 0.0007844765981038412,
+        "fem": 0.08911943435668945
+      }
+    },
+    {
+      "problem_id": 32,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.99,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0012022216501085601,
+        "fvm": 0.0024201995134829463,
+        "fem": 0.0011972718345367949,
+        "spectral": 1.2743884477437608e-09
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0039653778076171875,
+        "fvm": 0.0012410481770833333,
+        "fem": 0.013917684555053711,
+        "spectral": 0.019213199615478516
+      }
+    },
+    {
+      "problem_id": 33,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.59,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 1.0409476513367183e-05,
+        "fem": 0.0004364673031544283,
+        "spectral": 1.4946254726464473e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00022172927856445312,
+        "fem": 0.024532397588094074,
+        "spectral": 0.0003199577331542969
+      }
+    },
+    {
+      "problem_id": 34,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.41333333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414119004,
+        "fvm": 0.0001615074341411829,
+        "fem": 0.000589633880245868
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004829565684000651,
+        "fvm": 0.0005174477895100912,
+        "fem": 1.2616523106892903
+      }
+    },
+    {
+      "problem_id": 35,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.8266666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0017970396415354075,
+        "fem": 0.008885898857583851,
+        "bem": 1.3305633846543459
+      },
+      "all_algorithm_times": {
+        "fdm": 0.015324036280314127,
+        "fem": 1.272998332977295,
+        "bem": 0.13660788536071777
+      }
+    },
+    {
+      "problem_id": 36,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.72,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 3.827600876063818e-06,
+        "fem": 5.054288704812556e-05,
+        "spectral": 1.610584163761648e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0002989768981933594,
+        "fem": 0.10780636469523112,
+        "spectral": 0.00039807955423990887
+      }
+    },
+    {
+      "problem_id": 37,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 1.0,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0020725239657210983,
+        "fvm": 0.004205933144235078,
+        "fem": 0.002065026403073248,
+        "spectral": 3.764412262193256e-10
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0021421114603678384,
+        "fvm": 0.000637213389078776,
+        "fem": 0.005832592646280925,
+        "spectral": 0.007902224858601889
+      }
+    },
+    {
+      "problem_id": 38,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 1.0,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00019032012425928692,
+        "fvm": 0.00038127060449829876,
+        "fem": 0.00019030267547854926,
+        "spectral": 2.8270543188197305e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.016649723052978516,
+        "fvm": 0.0030089219411214194,
+        "fem": 0.051598548889160156,
+        "spectral": 0.0847325325012207
+      }
+    },
+    {
+      "problem_id": 39,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 1.0,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 8.27051757084261e-08,
+        "fem": 2.3346173996202442e-05,
+        "spectral": 4.992049239092553e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.002545436223347982,
+        "fem": 0.004433949788411458,
+        "spectral": 0.0002425511678059896
+      }
+    },
+    {
+      "problem_id": 40,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.4266666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00017623278735207263,
+        "fvm": 0.00017623278735218672,
+        "fem": 0.0002915854094642764
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0003406206766764323,
+        "fvm": 0.0003333091735839844,
+        "fem": 0.0289004643758138
+      }
+    },
+    {
+      "problem_id": 41,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9833333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 9.847161015288197e-05,
+        "fem": 0.00013374186712977902,
+        "spectral": 2.269627028817127e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.002388556798299154,
+        "fem": 0.002814054489135742,
+        "spectral": 0.0002460479736328125
+      }
+    },
+    {
+      "problem_id": 42,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7533333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5244261548249354,
+        "fem": 0.5243601153586445,
+        "spectral": 0.5244176202523826
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00021227200826009115,
+        "fem": 0.02483208974202474,
+        "spectral": 0.00033926963806152344
+      }
+    },
+    {
+      "problem_id": 43,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 5.7996779112107016e-05,
+        "fem": 0.002012691101612541,
+        "spectral": 7.673688607346523e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00261537233988444,
+        "fem": 0.002901315689086914,
+        "spectral": 0.0002265771230061849
+      }
+    },
+    {
+      "problem_id": 44,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5266666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.930585660047145e-05,
+        "fvm": 7.930585660053375e-05,
+        "fem": 0.00013120912079211608
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0007174015045166016,
+        "fvm": 0.0006747245788574219,
+        "fem": 0.08484760920206706
+      }
+    },
+    {
+      "problem_id": 45,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7233333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.3853020759345825,
+        "fvm": 0.3853020759345825,
+        "fem": 0.38503586342157764
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0006364981333414713,
+        "fvm": 0.0004535516103108724,
+        "fem": 1.3057180245717366
+      }
+    },
+    {
+      "problem_id": 46,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.61,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.780122083130725e-05,
+        "fem": 0.0005655390141073386,
+        "spectral": 1.5481837842941145e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005901654561360677,
+        "fem": 1.2461356321970622,
+        "spectral": 0.0006805260976155599
+      }
+    },
+    {
+      "problem_id": 47,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.63,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.6025365053094283,
+        "fem": 0.6025343024933819,
+        "spectral": 0.6025350269121917
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00040404001871744793,
+        "fem": 0.18813594182332358,
+        "spectral": 0.0005206267038981119
+      }
+    },
+    {
+      "problem_id": 48,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5933333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.491633547742261e-05,
+        "fvm": 4.491633547796513e-05,
+        "fem": 7.431016697050633e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0012864271799723308,
+        "fvm": 0.0015018781026204426,
+        "fem": 0.23079888025919595
+      }
+    },
+    {
+      "problem_id": 49,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.65,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.8870766566746647e-05,
+        "fvm": 2.8870766566782476e-05,
+        "fem": 4.776325018989567e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0021953582763671875,
+        "fvm": 0.0027597745259602866,
+        "fem": 0.645557165145874
+      }
+    },
+    {
+      "problem_id": 50,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5833333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5372104761406211,
+        "fem": 0.5372024991757084,
+        "spectral": 0.5372082939170747
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0006480216979980469,
+        "fem": 0.11829153696695964,
+        "spectral": 0.0005384286244710287
+      }
+    },
+    {
+      "problem_id": 51,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9933333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00030157511603436506,
+        "fvm": 0.0006041293472926659,
+        "fem": 0.0003012651805324668,
+        "spectral": 4.148242445182303e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.016266584396362305,
+        "fvm": 0.0037429332733154297,
+        "fem": 0.04883408546447754,
+        "spectral": 0.07414444287618001
+      }
+    },
+    {
+      "problem_id": 52,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.8433333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.394831516481998,
+        "fem": 0.3946389073144294,
+        "spectral": 0.3948141800968579
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0008523464202880859,
+        "fem": 0.6898392836252848,
+        "spectral": 0.0007645289103190104
+      }
+    },
+    {
+      "problem_id": 53,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.49,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.930585660047145e-05,
+        "fvm": 7.930585660053375e-05,
+        "fem": 0.00013120912079211608
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0008369286855061849,
+        "fvm": 0.0008722146352132162,
+        "fem": 0.08016085624694824
+      }
+    },
+    {
+      "problem_id": 54,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.79,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.001341117582048512,
+        "fem": 0.006676829451222127,
+        "bem": 1.3841505696625795
+      },
+      "all_algorithm_times": {
+        "fdm": 0.03350710868835449,
+        "fem": 2.1528560320536294,
+        "bem": 0.3285987377166748
+      }
+    },
+    {
+      "problem_id": 55,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9833333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.7592584175686704e-07,
+        "fem": 6.593757463590763e-05,
+        "spectral": 3.122735083284726e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0020917256673177085,
+        "fem": 0.003226200739542643,
+        "spectral": 0.00028816858927408856
+      }
+    },
+    {
+      "problem_id": 56,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5372104761406211,
+        "fem": 0.5372024991757084,
+        "spectral": 0.5372082939170747
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00031948089599609375,
+        "fem": 0.11272899309794109,
+        "spectral": 0.0004723866780598958
+      }
+    },
+    {
+      "problem_id": 57,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9666666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0002450434359801516,
+        "fvm": 0.0004920029953807099,
+        "fem": 0.0002451578636897194,
+        "spectral": 4.314989739766241e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0027800401051839194,
+        "fvm": 0.001081546147664388,
+        "fem": 0.010244607925415039,
+        "spectral": 0.016377607981363933
+      }
+    },
+    {
+      "problem_id": 58,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 6.157168780504538e-05,
+        "fvm": 0.00012326534618168692,
+        "fem": 6.157988472524654e-05,
+        "spectral": 2.969279886891499e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.011472304662068685,
+        "fvm": 0.0031742254892985025,
+        "fem": 0.05422298113505045,
+        "spectral": 0.0808253288269043
+      }
+    },
+    {
+      "problem_id": 59,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.41,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414118855,
+        "fvm": 0.00016150743414118795,
+        "fem": 0.0005896338802458482
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004545847574869792,
+        "fvm": 0.0004563331604003906,
+        "fem": 1.2730595270792644
+      }
+    },
+    {
+      "problem_id": 60,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 9.183862411949784e-06,
+        "fvm": 1.8254719510566058e-05,
+        "fem": 9.19857647385804e-06,
+        "spectral": 3.351716461302994e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.007162570953369141,
+        "fvm": 0.002131223678588867,
+        "fem": 0.02830219268798828,
+        "spectral": 0.04022828737894694
+      }
+    },
+    {
+      "problem_id": 61,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.72,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.37661220989422267,
+        "fvm": 0.37661220989422267,
+        "fem": 0.37614766047578724
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004013379414876302,
+        "fvm": 0.00037487347920735675,
+        "fem": 0.6962905724843343
+      }
+    },
+    {
+      "problem_id": 62,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.71,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.3853020759345825,
+        "fvm": 0.3853020759345825,
+        "fem": 0.38503586342157764
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004917780558268229,
+        "fvm": 0.0005439917246500651,
+        "fem": 1.2524876594543457
+      }
+    },
+    {
+      "problem_id": 63,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.56,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 3.369265140147514e-06,
+        "fem": 3.190341022645702e-05,
+        "spectral": 1.3542402282203955e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0007305939992268881,
+        "fem": 0.19359389940897623,
+        "spectral": 0.0005172093709309896
+      }
+    },
+    {
+      "problem_id": 64,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.8333333333333334,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0017970396415355795,
+        "fem": 0.008885898857584779,
+        "bem": 1.3305633846543459
+      },
+      "all_algorithm_times": {
+        "fdm": 0.015594561894734701,
+        "fem": 1.245757261912028,
+        "bem": 0.134339968363444
+      }
+    },
+    {
+      "problem_id": 65,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 5.1754034564571e-06,
+        "fvm": 1.0351903217740525e-05,
+        "fem": 5.180455904297378e-06,
+        "spectral": 4.731718746903738e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.013190348943074545,
+        "fvm": 0.0031263033548990884,
+        "fem": 0.05623896916707357,
+        "spectral": 0.07869323094685872
+      }
+    },
+    {
+      "problem_id": 66,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.8466666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.002532974082651562,
+        "fem": 0.012384274032016177,
+        "bem": 1.2570220380781976
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00728758176167806,
+        "fem": 0.6815934181213379,
+        "bem": 0.0506434440612793
+      }
+    },
+    {
+      "problem_id": 67,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7866666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.002532974082651562,
+        "fem": 0.012384274032016177,
+        "bem": 1.2570220380781976
+      },
+      "all_algorithm_times": {
+        "fdm": 0.007843255996704102,
+        "fem": 0.6985955238342285,
+        "bem": 0.049795071283976235
+      }
+    },
+    {
+      "problem_id": 68,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414118855,
+        "fvm": 0.00016150743414118795,
+        "fem": 0.0005896338802458482
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004317760467529297,
+        "fvm": 0.00043892860412597656,
+        "fem": 1.2441139221191406
+      }
+    },
+    {
+      "problem_id": 69,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7933333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.40399596964123985,
+        "fem": 0.40388276088879044,
+        "spectral": 0.4039602299007467
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0006265640258789062,
+        "fem": 1.2538005510965984,
+        "spectral": 0.0009605884552001953
+      }
+    },
+    {
+      "problem_id": 70,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9833333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.3053045079224775e-06,
+        "fvm": 4.607803705566117e-06,
+        "fem": 2.322610165149331e-06,
+        "spectral": 8.060766760890224e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.04253228505452474,
+        "fvm": 0.009482383728027344,
+        "fem": 0.18074790636698404,
+        "spectral": 0.19489272435506186
+      }
+    },
+    {
+      "problem_id": 71,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.48,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.930585660022628e-05,
+        "fvm": 7.930585660053805e-05,
+        "fem": 0.00013120912079202948
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0007572174072265625,
+        "fvm": 0.0008368492126464844,
+        "fem": 0.08444007237752278
+      }
+    },
+    {
+      "problem_id": 72,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7966666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0017970396415354075,
+        "fem": 0.008885898857584087,
+        "bem": 1.3305633846543459
+      },
+      "all_algorithm_times": {
+        "fdm": 0.014950434366861979,
+        "fem": 1.2552804152170818,
+        "bem": 0.1356812318166097
+      }
+    },
+    {
+      "problem_id": 73,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9933333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 5.799677911332975e-05,
+        "fem": 0.002012691101612461,
+        "spectral": 3.9942670409698423e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.002505699793497721,
+        "fem": 0.002935330073038737,
+        "spectral": 0.00020432472229003906
+      }
+    },
+    {
+      "problem_id": 74,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.99,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.3046715100540093e-06,
+        "fvm": 4.6078037153459725e-06,
+        "fem": 2.3062657804259074e-06,
+        "spectral": 2.401126097607525e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.038682778676350914,
+        "fvm": 0.008198976516723633,
+        "fem": 0.19532950719197592,
+        "spectral": 0.19752232233683267
+      }
+    },
+    {
+      "problem_id": 75,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.99,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 8.761581064994186e-05,
+        "fem": 8.271918609181605e-05,
+        "spectral": 2.277789211855872e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0026350816090901694,
+        "fem": 0.004851420720418294,
+        "spectral": 0.00026861826578776043
+      }
+    },
+    {
+      "problem_id": 76,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.879785352965293e-05,
+        "fem": 7.003091551856087e-05,
+        "spectral": 1.7737091625433195e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0019562244415283203,
+        "fem": 0.0023179054260253906,
+        "spectral": 0.00016601880391438803
+      }
+    },
+    {
+      "problem_id": 77,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.6466666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.41073471231035846,
+        "fem": 0.41066195703849745,
+        "spectral": 0.4107115677720172
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0007675488789876302,
+        "fem": 2.3155342737833657,
+        "spectral": 0.0008455912272135416
+      }
+    },
+    {
+      "problem_id": 78,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9866666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 3.311194732716599e-09,
+        "fem": 3.585651280967394e-06,
+        "spectral": 2.3681949399597005e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0026166439056396484,
+        "fem": 0.0059053897857666016,
+        "spectral": 0.0002502600351969401
+      }
+    },
+    {
+      "problem_id": 79,
+      "equation_type": "poisson3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.8266666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.002532974082651562,
+        "fem": 0.012384274032016177,
+        "bem": 1.2570220380781976
+      },
+      "all_algorithm_times": {
+        "fdm": 0.007906595865885416,
+        "fem": 0.7214089234670004,
+        "bem": 0.047790209452311196
+      }
+    },
+    {
+      "problem_id": 80,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.78,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.5462842136251943,
+        "fvm": 0.5462842136251942,
+        "fem": 0.546222843921317
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0009412765502929688,
+        "fvm": 0.0008409023284912109,
+        "fem": 0.08829696973164876
+      }
+    },
+    {
+      "problem_id": 81,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.5766666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 1.1829892006883435e-05,
+        "fem": 0.00013458961358261861,
+        "spectral": 1.5843268489232747e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00035770734151204425,
+        "fem": 0.059890349706014,
+        "spectral": 0.0003356138865152995
+      }
+    },
+    {
+      "problem_id": 82,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.99,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 8.256858748385457e-08,
+        "fem": 2.8164820859668087e-05,
+        "spectral": 2.0098665805890359e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0019877751668294272,
+        "fem": 0.0027886231740315757,
+        "spectral": 0.00016125043233235678
+      }
+    },
+    {
+      "problem_id": 83,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 1.0,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 1.2230408659473023e-06,
+        "fvm": 2.4204512058989784e-06,
+        "fem": 1.2478675285085985e-06,
+        "spectral": 3.646661325606461e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.018681446711222332,
+        "fvm": 0.004308144251505534,
+        "fem": 0.09887075424194336,
+        "spectral": 0.09677982330322266
+      }
+    },
+    {
+      "problem_id": 84,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.81,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 8.853059548580539e-06,
+        "fem": 0.00011715121716395551,
+        "spectral": 1.4100119210539199e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00036485989888509113,
+        "fem": 0.05852246284484863,
+        "spectral": 0.0003147125244140625
+      }
+    },
+    {
+      "problem_id": 85,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.87,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.39483151648199816,
+        "fem": 0.39463890731442947,
+        "spectral": 0.3948141800968579
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005536079406738281,
+        "fem": 0.6919161478678385,
+        "spectral": 0.0005563100179036459
+      }
+    },
+    {
+      "problem_id": 86,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.79,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm",
+        "fem"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.3853020759345825,
+        "fvm": 0.3853020759345825,
+        "fem": 0.38503586342157764
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00040149688720703125,
+        "fvm": 0.0004223187764485677,
+        "fem": 1.278303066889445
+      }
+    },
+    {
+      "problem_id": 87,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.98,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0003377923634846337,
+        "fvm": 0.0006730943250237992,
+        "fem": 0.00033775010395436654,
+        "spectral": 1.744680888898552e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.008596022923787435,
+        "fvm": 0.0022759437561035156,
+        "fem": 0.03138216336568197,
+        "spectral": 0.046843767166137695
+      }
+    },
+    {
+      "problem_id": 88,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.56,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 3.369265140147514e-06,
+        "fem": 3.190341022645702e-05,
+        "spectral": 1.3542402282203955e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005064010620117188,
+        "fem": 0.20778044064839682,
+        "spectral": 0.0006268024444580078
+      }
+    },
+    {
+      "problem_id": 89,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.38666666666666666,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.491633547742261e-05,
+        "fvm": 4.491633547796513e-05,
+        "fem": 7.431016697050633e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0012046496073404949,
+        "fvm": 0.0013803641001383464,
+        "fem": 0.2436253229777018
+      }
+    },
+    {
+      "problem_id": 90,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9833333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0001342166618178169,
+        "fvm": 0.00026862688548287214,
+        "fem": 0.00013415548253919489,
+        "spectral": 1.2666676602543996e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.039194583892822266,
+        "fvm": 0.0081175168355306,
+        "fem": 0.18473394711812338,
+        "spectral": 0.19968612988789877
+      }
+    },
+    {
+      "problem_id": 91,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9866666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.590102948320873e-05,
+        "fvm": 0.00015179416062931588,
+        "fem": 7.583598765233785e-05,
+        "spectral": 1.3024940423691653e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.06652474403381348,
+        "fvm": 0.01499780019124349,
+        "fem": 0.43163084983825684,
+        "spectral": 0.3660093943277995
+      }
+    },
+    {
+      "problem_id": 92,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fvm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.57,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00011383153201135352,
+        "fvm": 0.00011383153201134705,
+        "fem": 0.0008372735881594316
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0002543926239013672,
+        "fvm": 0.0002438227335611979,
+        "fem": 0.6568356355031332
+      }
+    },
+    {
+      "problem_id": 93,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": false,
+      "tolerant_prediction_correct": false,
+      "model_confidence": 0.30666666666666664,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414118855,
+        "fvm": 0.00016150743414118795,
+        "fem": 0.0005896338802458482
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0005631446838378906,
+        "fvm": 0.0005657672882080078,
+        "fem": 1.2766672770182292
+      }
+    },
+    {
+      "problem_id": 94,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.99,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.3081968423179367e-06,
+        "fvm": 4.6078037153459725e-06,
+        "fem": 2.3065807831439506e-06,
+        "spectral": 8.510120105658166e-12
+      },
+      "all_algorithm_times": {
+        "fdm": 0.03319573402404785,
+        "fvm": 0.008913278579711914,
+        "fem": 0.19306723276774088,
+        "spectral": 0.1988369623819987
+      }
+    },
+    {
+      "problem_id": 95,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.49666666666666665,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fvm"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 4.491633547742261e-05,
+        "fvm": 4.491633547796513e-05,
+        "fem": 7.431016697050633e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0013183752695719402,
+        "fvm": 0.001478433609008789,
+        "fem": 0.24412107467651367
+      }
+    },
+    {
+      "problem_id": 96,
+      "equation_type": "wave1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9966666666666667,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 7.782966606974348e-05,
+        "fem": 6.924093316377811e-05,
+        "spectral": 9.464875331390985e-17
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0022165775299072266,
+        "fem": 0.0028134981791178384,
+        "spectral": 0.00022069613138834635
+      }
+    },
+    {
+      "problem_id": 97,
+      "equation_type": "wave3d",
+      "predicted_algorithm": "fem",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.7433333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.4039959696412399,
+        "fem": 0.40388276088879066,
+        "spectral": 0.4039602299007467
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0006206830342610677,
+        "fem": 1.2500278155008953,
+        "spectral": 0.0006684462229410807
+      }
+    },
+    {
+      "problem_id": 98,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.9933333333333333,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 0.0012022247228693733,
+        "fvm": 0.002420199513483143,
+        "fem": 0.0011972671287069094,
+        "spectral": 3.5712122787604748e-09
+      },
+      "all_algorithm_times": {
+        "fdm": 0.003360112508138021,
+        "fvm": 0.0010205904642740886,
+        "fem": 0.010574261347452799,
+        "spectral": 0.017874797185262043
+      }
+    },
+    {
+      "problem_id": 99,
+      "equation_type": "heat1d",
+      "predicted_algorithm": "spectral",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": true,
+      "tolerant_prediction_correct": true,
+      "model_confidence": 0.94,
+      "model_label_keys": [
+        "fdm",
+        "fem",
+        "fvm",
+        "spectral"
+      ],
+      "near_optimal_algorithms": [
+        "spectral"
+      ],
+      "all_algorithm_errors": {
+        "fdm": 2.0595164659501042e-05,
+        "fvm": 4.123570262279478e-05,
+        "fem": 2.059993602872791e-05,
+        "spectral": 1.3001517630094521e-11
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0017549991607666016,
+        "fvm": 0.0008976459503173828,
+        "fem": 0.00967248280843099,
+        "spectral": 0.016797622044881184
+      }
+    }
+  ]
+}

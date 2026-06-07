@@ -1,0 +1,367 @@
+{
+  "generated_at": 1775100259.1872988,
+  "config": {
+    "input_path": "real_world_benchmark\\generated_selector_problems_smoke.json",
+    "num_runs_per_problem": 1,
+    "error_weight": 0.8,
+    "time_weight": 0.2,
+    "limit": 12
+  },
+  "summary": {
+    "total_input_problems": 12,
+    "accepted_records": 3,
+    "skipped_records": 9,
+    "elapsed_s": 0.18674206733703613,
+    "equation_distribution": {
+      "wave1d": 2,
+      "heat2d": 1
+    },
+    "template_distribution": {
+      "wave1d_high_frequency": 2,
+      "heat2d_classic_sine": 1
+    },
+    "best_by_error_distribution": {
+      "spectral": 2,
+      "fem": 1
+    },
+    "best_supported_algorithm_distribution": {
+      "spectral": 2,
+      "fem": 1
+    },
+    "skip_reason_distribution": {
+      "unsupported_template_for_exact_labeling": 9
+    }
+  },
+  "records": [
+    {
+      "problem_id": 1,
+      "template_id": "wave1d_high_frequency",
+      "equation_type": "wave1d",
+      "dimension": 1,
+      "params": {
+        "c": 1.0,
+        "L": 1.5,
+        "mode": 5,
+        "nx": 201,
+        "t_final": 0.1
+      },
+      "physics_features": [
+        0.0,
+        0.10000000149011612,
+        1.0,
+        0.10000000149011612,
+        0.4871794879436493
+      ],
+      "hardware_features": [
+        0.28583386540412903,
+        0.42255860567092896,
+        0.45602092146873474,
+        0.07018184661865234,
+        0.3233211040496826
+      ],
+      "domain_features": [
+        0.556276798248291,
+        0.617437481880188,
+        0.5647665858268738
+      ],
+      "metadata": {
+        "template_name": "一维高频波动",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth",
+          "spatial_frequency": "high",
+          "temporal_behavior": "high_frequency_oscillatory",
+          "gradient_profile": "high_frequency",
+          "spectral_quality": "good_for_spectral_if_resolved"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "high_frequency",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_wave1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "supported_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "algorithm_errors": {
+        "fdm": 0.0001636550822937445,
+        "fem": 0.00015878332389771655,
+        "spectral": 5.498644760358004e-16
+      },
+      "algorithm_times": {
+        "fdm": 0.002041339874267578,
+        "fem": 0.003381967544555664,
+        "spectral": 0.0003447532653808594
+      },
+      "normalized_errors": {
+        "fdm": 1.0,
+        "fem": 0.9702315484019005,
+        "spectral": 0.0
+      },
+      "normalized_times": {
+        "fdm": 0.5585995761048748,
+        "fem": 1.0,
+        "spectral": 0.0
+      },
+      "algorithm_scores": {
+        "fdm": 0.911719915220975,
+        "fem": 0.9761852387215204,
+        "spectral": 0.0
+      },
+      "best_by_error": "spectral",
+      "best_supported_algorithm": "spectral",
+      "best_by_score": "spectral",
+      "best_supported_by_score": "spectral"
+    },
+    {
+      "problem_id": 2,
+      "template_id": "heat2d_classic_sine",
+      "equation_type": "heat2d",
+      "dimension": 2,
+      "params": {
+        "k": 0.25,
+        "L": 2.0,
+        "mx": 1,
+        "my": 2,
+        "nx": 31,
+        "t_final": 0.96,
+        "ny": 31
+      },
+      "physics_features": [
+        0.5,
+        0.0,
+        1.0,
+        0.10000000149011612,
+        0.05128205195069313
+      ],
+      "hardware_features": [
+        0.5394241809844971,
+        0.4957762062549591,
+        0.4413175582885742,
+        0.1598166823387146,
+        0.5531670451164246
+      ],
+      "domain_features": [
+        0.6576310992240906,
+        0.5204679369926453,
+        0.3809618353843689
+      ],
+      "metadata": {
+        "template_name": "二维热传导经典正弦解",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "very_smooth",
+          "spatial_frequency": "low_2d_mode",
+          "temporal_behavior": "exponential_decay",
+          "gradient_profile": "smooth",
+          "spectral_quality": "good_for_spectral"
+        },
+        "expected_algorithm_bias": "spectral_friendly",
+        "difficulty_tags": [
+          "basic_2d",
+          "canonical",
+          "benchmark"
+        ],
+        "source_type": "canonical",
+        "source_reference": "canonical_heat2d_benchmark_family",
+        "variation_notes": "Derived from a standard heat2d teaching/benchmark pattern with controlled parameter sampling and dirichlet boundaries."
+      },
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "supported_algorithms": [
+        "fdm",
+        "fem"
+      ],
+      "algorithm_errors": {
+        "fdm": 0.14982569775934154,
+        "fvm": 0.14982569775934118,
+        "fem": 0.14966830953711202
+      },
+      "algorithm_times": {
+        "fdm": 0.004358768463134766,
+        "fvm": 0.005925893783569336,
+        "fem": 0.16154742240905762
+      },
+      "normalized_errors": {
+        "fdm": 1.0,
+        "fvm": 0.9999999999977074,
+        "fem": 0.0
+      },
+      "normalized_times": {
+        "fdm": 0.0,
+        "fvm": 0.009969710160974492,
+        "fem": 1.0
+      },
+      "algorithm_scores": {
+        "fdm": 0.8,
+        "fvm": 0.8019939420303609,
+        "fem": 0.2
+      },
+      "best_by_error": "fem",
+      "best_supported_algorithm": "fem",
+      "best_by_score": "fem",
+      "best_supported_by_score": "fem"
+    },
+    {
+      "problem_id": 10,
+      "template_id": "wave1d_high_frequency",
+      "equation_type": "wave1d",
+      "dimension": 1,
+      "params": {
+        "c": 1.0,
+        "L": 1.5,
+        "mode": 6,
+        "nx": 301,
+        "t_final": 0.1
+      },
+      "physics_features": [
+        0.0,
+        0.10000000149011612,
+        1.0,
+        0.10000000149011612,
+        0.7435897588729858
+      ],
+      "hardware_features": [
+        0.31636714935302734,
+        0.454517126083374,
+        0.27678951621055603,
+        0.280813068151474,
+        0.36584311723709106
+      ],
+      "domain_features": [
+        0.5089821219444275,
+        0.674038827419281,
+        0.6969501972198486
+      ],
+      "metadata": {
+        "template_name": "一维高频波动",
+        "boundary_type": "dirichlet",
+        "solution_characteristics": {
+          "smoothness": "smooth",
+          "spatial_frequency": "high",
+          "temporal_behavior": "high_frequency_oscillatory",
+          "gradient_profile": "high_frequency",
+          "spectral_quality": "good_for_spectral_if_resolved"
+        },
+        "expected_algorithm_bias": "mixed",
+        "difficulty_tags": [
+          "high_frequency",
+          "resolution_demanding",
+          "algorithm_discrimination"
+        ],
+        "source_type": "synthetic_exploration",
+        "source_reference": "structured_synthetic_wave1d_selector_stress_case",
+        "variation_notes": "Constructed to stress selector decision boundaries through mixed behavior, nontrivial gradients, or multi-scale structure."
+      },
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "supported_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "algorithm_errors": {
+        "fdm": 0.00013738151981670385,
+        "fem": 0.0001341411393000362,
+        "spectral": 4.744114287451826e-16
+      },
+      "algorithm_times": {
+        "fdm": 0.0017163753509521484,
+        "fem": 0.005965709686279297,
+        "spectral": 0.0003142356872558594
+      },
+      "normalized_errors": {
+        "fdm": 1.0,
+        "fem": 0.976413272170797,
+        "spectral": 0.0
+      },
+      "normalized_times": {
+        "fdm": 0.24810158623017212,
+        "fem": 1.0,
+        "spectral": 0.0
+      },
+      "algorithm_scores": {
+        "fdm": 0.8496203172460345,
+        "fem": 0.9811306177366377,
+        "spectral": 0.0
+      },
+      "best_by_error": "spectral",
+      "best_supported_algorithm": "spectral",
+      "best_by_score": "spectral",
+      "best_supported_by_score": "spectral"
+    }
+  ],
+  "skipped": [
+    {
+      "problem_id": 0,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 3,
+      "template_id": "wave1d_robin_boundary",
+      "equation_type": "wave1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 4,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 5,
+      "template_id": "heat2d_flux_sensitive",
+      "equation_type": "heat2d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 6,
+      "template_id": "heat3d_flux_oriented",
+      "equation_type": "heat3d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 7,
+      "template_id": "heat1d_steep_gradient",
+      "equation_type": "heat1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 8,
+      "template_id": "heat1d_multi_scale",
+      "equation_type": "heat1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 9,
+      "template_id": "wave1d_periodic_smooth",
+      "equation_type": "wave1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    },
+    {
+      "problem_id": 11,
+      "template_id": "heat1d_steady",
+      "equation_type": "heat1d",
+      "reason": "unsupported_template_for_exact_labeling"
+    }
+  ]
+}

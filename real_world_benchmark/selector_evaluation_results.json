@@ -1,0 +1,359 @@
+{
+  "generated_at": 1775097405.5516288,
+  "config": {
+    "num_problems": 10,
+    "num_runs_per_problem": 1,
+    "seed": 42,
+    "requested_strategy": "static_rf",
+    "active_strategy": "static_rf"
+  },
+  "strategy_initialization_failures": [],
+  "overall_accuracy": 0.3,
+  "supported_accuracy": 0.4,
+  "supported_total_correct": 4,
+  "supported_total_problems": 10,
+  "total_correct": 3,
+  "total_problems": 10,
+  "total_elapsed_s": 5.717047929763794,
+  "unsupported_actual_best_count": 1,
+  "prediction_failure_count": 0,
+  "prediction_failure_examples": [],
+  "accuracy_by_equation": {
+    "heat2d": {
+      "total": 3,
+      "correct": 2,
+      "accuracy": 0.6666666666666666,
+      "supported_total": 3,
+      "supported_correct": 2,
+      "supported_accuracy": 0.6666666666666666
+    },
+    "wave2d": {
+      "total": 3,
+      "correct": 0,
+      "accuracy": 0.0,
+      "supported_total": 3,
+      "supported_correct": 0,
+      "supported_accuracy": 0.0
+    },
+    "heat3d": {
+      "total": 4,
+      "correct": 1,
+      "accuracy": 0.25,
+      "supported_total": 4,
+      "supported_correct": 2,
+      "supported_accuracy": 0.5
+    }
+  },
+  "confusion_matrix": {
+    "fem": {
+      "fdm": 5
+    },
+    "fvm": {
+      "fdm": 1
+    },
+    "fdm": {
+      "fdm": 3
+    },
+    "spectral": {
+      "fdm": 1
+    }
+  },
+  "algorithm_statistics": {
+    "fdm": {
+      "num_problems": 10,
+      "mean_error": 0.23817300625880203,
+      "std_error": 0.24391938939776267,
+      "mean_time": 0.0007275581359863281
+    },
+    "fvm": {
+      "num_problems": 7,
+      "mean_error": 0.1892011185951607,
+      "std_error": 0.2244552529827038,
+      "mean_time": 0.0009118829454694476
+    },
+    "fem": {
+      "num_problems": 10,
+      "mean_error": 0.23823279378451553,
+      "std_error": 0.24375360395857534,
+      "mean_time": 0.5569740295410156
+    },
+    "spectral": {
+      "num_problems": 3,
+      "mean_error": 0.3524311964061711,
+      "std_error": 0.24923041155519068,
+      "mean_time": 0.0014058748881022136
+    }
+  },
+  "detailed_results": [
+    {
+      "problem_id": 0,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 0.3853020759345825,
+        "fvm": 0.3853020759345825,
+        "fem": 0.38503586342157764
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0010914802551269531,
+        "fvm": 0.00038814544677734375,
+        "fem": 0.9192099571228027
+      },
+      "selector_confidence": 0.45666666666666667,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fem",
+      "supported_prediction_correct": false,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 1,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fvm",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 0.00016150743414119004,
+        "fvm": 0.0001615074341411829,
+        "fem": 0.000589633880245868
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0003311634063720703,
+        "fvm": 0.00030350685119628906,
+        "fem": 0.8860251903533936
+      },
+      "selector_confidence": 0.5066666666666667,
+      "raw_predicted_algorithm": "spectral",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fdm",
+      "supported_prediction_correct": true,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 2,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "all_algorithm_errors": {
+        "fdm": 4.491633547742262e-05,
+        "fvm": 4.491633547796513e-05,
+        "fem": 7.431016697050633e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0009255409240722656,
+        "fvm": 0.00098419189453125,
+        "fem": 0.2047579288482666
+      },
+      "selector_confidence": 0.5366666666666666,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fdm",
+      "supported_prediction_correct": true,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 3,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 0.5244261548249354,
+        "fem": 0.5243601153586445,
+        "spectral": 0.5244176202523826
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00019431114196777344,
+        "fem": 0.016061782836914062,
+        "spectral": 0.003724813461303711
+      },
+      "selector_confidence": 0.6366666666666667,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "actual_best_supported_algorithm": "fem",
+      "supported_prediction_correct": false,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 4,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 0.38530207593458243,
+        "fvm": 0.38530207593458243,
+        "fem": 0.38503586342157753
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00035262107849121094,
+        "fvm": 0.0003025531768798828,
+        "fem": 0.8580906391143799
+      },
+      "selector_confidence": 0.39666666666666667,
+      "raw_predicted_algorithm": "spectral",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fem",
+      "supported_prediction_correct": false,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 5,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "all_algorithm_errors": {
+        "fdm": 2.8870766566796222e-05,
+        "fvm": 2.8870766566836263e-05,
+        "fem": 4.7763250191578816e-05
+      },
+      "all_algorithm_times": {
+        "fdm": 0.001867532730102539,
+        "fvm": 0.0020792484283447266,
+        "fem": 0.5756924152374268
+      },
+      "selector_confidence": 0.49333333333333335,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fdm",
+      "supported_prediction_correct": true,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 6,
+      "equation_type": "heat2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 0.5534664834712316,
+        "fvm": 0.5534664834712316,
+        "fem": 0.5534441507752081
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0014989376068115234,
+        "fvm": 0.0019030570983886719,
+        "fem": 0.5597515106201172
+      },
+      "selector_confidence": 0.6366666666666667,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fem",
+      "supported_prediction_correct": false,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 7,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "spectral",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 1.040947651334879e-05,
+        "fem": 0.00043646730315429145,
+        "spectral": 2.4467412366295387e-16
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00017976760864257812,
+        "fem": 0.01709890365600586,
+        "spectral": 0.0002429485321044922
+      },
+      "selector_confidence": 0.5066666666666667,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "actual_best_supported_algorithm": "spectral",
+      "supported_prediction_correct": false,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 8,
+      "equation_type": "heat3d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fdm",
+      "prediction_correct": true,
+      "all_algorithm_errors": {
+        "fdm": 0.00010190028954205118,
+        "fvm": 0.00010190028954205248,
+        "fem": 0.00043708252327473874
+      },
+      "all_algorithm_times": {
+        "fdm": 0.00043129920959472656,
+        "fvm": 0.00042247772216796875,
+        "fem": 1.4782612323760986
+      },
+      "selector_confidence": 0.43333333333333335,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "fvm"
+      ],
+      "actual_best_supported_algorithm": "fdm",
+      "supported_prediction_correct": true,
+      "prediction_error": null
+    },
+    {
+      "problem_id": 9,
+      "equation_type": "wave2d",
+      "predicted_algorithm": "fdm",
+      "actual_best_algorithm": "fem",
+      "prediction_correct": false,
+      "all_algorithm_errors": {
+        "fdm": 0.5328856681204475,
+        "fem": 0.5328666877443108,
+        "spectral": 0.5328759689661305
+      },
+      "all_algorithm_times": {
+        "fdm": 0.0004029273986816406,
+        "fem": 0.05479073524475098,
+        "spectral": 0.0002498626708984375
+      },
+      "selector_confidence": 0.75,
+      "raw_predicted_algorithm": "fdm",
+      "candidate_algorithms": [
+        "fdm",
+        "fem",
+        "spectral"
+      ],
+      "actual_best_supported_algorithm": "fem",
+      "supported_prediction_correct": false,
+      "prediction_error": null
+    }
+  ]
+}
